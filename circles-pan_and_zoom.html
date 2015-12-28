@@ -101,8 +101,6 @@ svgContainer.append("g")
 
 function zoomed() {
     svgContainer.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-  svgContainer.select(".x.axis").call(xAxis);
-  svgContainer.select(".y.axis").call(yAxis);
 }//above function causes zooming which is called in var zoom
 
 function reset() {
