@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+<meta charset="utf-8">
+<title>Circles Varying</title>
+<style>
+body {
+  position: relative;
+  width: 960px;
+}
+svgContainer {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+rect {
+  fill: #ddd;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+}
+
+</style>
+
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+<body>
+<p>Enter indices of array to be used for which attribute</p>
+<form id="form1" >
+<!--Form to get inputs from the user , for now variable indices -->
+   S.no: <input type="number" name="Sno" value=""> <br>
+  X-Axis: <input type="number" name="Xaxis" value=""><br>
+  Y-Axis: <input type="number" name="Yaxis" value=""><br>
+  Colour: <input type="number" name="Colour" value=""><br>
+  Size: <input type="number" name="Size" value=""><br>
+  <br>
+  <!--S.no: <input type="number" name="Sno" value=""> <br>  //For x and y axis ranges
+  S.no: <input type="number" name="Sno" value=""> <br>  // Also for xfact,yfact and rfact in the plotting part-->   
+  <button onclick="Submit_to_script()">Submit_Data_For_Graph</button>
+</form> 
+
+
+<script>
+function Submit_to_script() {
+    var x = document.getElementById("form1");
+    var i;
+    var t=[];
+    var copy = table;
+    for (i = 0; i < 5;i++) {
+        table[i]=copy[x.elements[i].value]; 
+    }
+  //Changes in table variable are not getting changed in other script  
+}
+</script>
+
+<button onclick="reset()">Reset_Graph</button><!--Resets graph after zooming  -->
+
+<script>
+//script for the graph
+  var table;
+d3.text("table2.csv", function(text) {
+  var data = d3.csv.parseRows(text).map(function(row) {
+    return row.map(function(value) {
+      return +value;    //to convert text to numbers
+    });
+  });
+ 
+   table=data;  //Copying data to table variable
+});
+ window.alert(); // without this window.alert the graph does not get plotted
+// window.alert(table[0][3]);
+</script>
+
+
+
+<script>
+ var margin = {top: 0, right: 10, bottom: 15, left: 100},
+    width = 900 //- margin.left - margin.right,
+    height = 400 //- margin.top - margin.bottom;
+
+ var x = d3.scale.linear()
+    .domain([0, (width )]) // changes range of values for x axis
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .domain([0, height ]) // changes range of values for y axis
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .ticks(20)
+    .tickSize(-height);
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10)
+    .tickSize(-width);
+
+var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .scaleExtent([1,10000])   //this controls maximum zooming amount
+    .center([width / 2, height / 2])
+    .size([width, height])
+    .on("zoom", zoomed);
+
+ var svg = d3.select("body").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom)
+ .append("g")
+    .call(zoom);
+
+ d3.select("button").on("click", reset);
+svg.append("rect")
+    .attr("width", width+margin.left + margin.right )
+    .attr("height", height+margin.top + margin.bottom);
+
+var svgContainer=svg.append("g");
+
+svgContainer.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+svgContainer.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+
+function zoomed() {
+ // svg.select(".x.axis").call(xAxis);
+ // svg.select(".y.axis").call(yAxis); //above two causes fixed axis
+
+
+  svgContainer.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+  //above line causes movement also
+}//above function causes zooming which is called in var zoom
+
+
+function reset() {
+  svgContainer.call(zoom
+      .x(x.domain([-width / 2, width / 2]))
+      .y(y.domain([-height / 2, height / 2]))
+      .event);
+}
+
+var min1=Math.min.apply(null,table[4])+5
+var max1=Math.max.apply(null,table[4])
+var xfact=40; // Scale of x factor
+var yfact=20  ; // Scale of y factor
+var rfact=1//scale of radius
+for(i=0;i<table[0].length;i++)
+{
+
+ var circle=svgContainer.append("circle").attr("cx",20).attr("cy", 100).attr("r",rfact*table[3][i]).attr("style","fill:rgb(0,0,0) ;stroke: blue ;stroke-width: 2");
+
+
+ }
+
+ var rect=svgContainer.append("rect").attr("x", margin.left-100).attr("y",height-5).attr("width",10).attr("height",10).attr("style","fill:rgb(255,0,0) ;stroke: blue ;stroke-width: 2");//rect to mark ORIGIN ,the number 100 has to be seen to compensate for the origin shift
+
+d3.selectAll("circle").data(table[4]).style('fill', function(d){return d3.rgb(((max1-d)*255/(max1-min1)),((max1-d)*255/(max1-min1)),((max1-d)*255/(max1-min1)))});//sets color by a linear gray scale
+
+d3.selectAll("circle").data(table[1]).attr("cx",function(d){return margin.left-100+xfact*d});
+d3.selectAll("circle").data(table[2]).attr("cy",function(d){return height-(yfact*d)}); //sets y and x axis of centre of each circle
+</script>
+
+
+
+</body>
+
+</html>

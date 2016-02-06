@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Title Page</title>
+		<!-- Bootstrap CSS -->
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		<script type="text/javascript">
+			/// Global variables
+			// var x1=[],col1=[],y1=[],m1=[],m2=[],m3=[];
+			var x1,y1,m1,m2,m3,col1;
+			var margin;
+			var svg,svgContainer;
+		</script>
+
+
+		<style>
+ 
+ svgContainer {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+ rect {
+  fill: #ddd;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #fff;
+}
+ 
+</style>
+	</head>
+	<body>
+		<h1 class="text-center">Hello World</h1>
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="well">
+				<div id="drawbox"> </div>
+			</div>
+			<button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
+			<button type="button" class="btn btn-default" onclick="doPlot()">Plot Now</button>
+		</div>
+	</div>
+	<!-- jQuery -->
+	<script src="js/jquery.js"></script>
+	<!-- Bootstrap JavaScript -->
+	<script src="/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/d3/d3.min.js"></script>
+	
+	<script type="text/javascript">
+
+function SetSize(){
+	   margin = {top: 0, right: 10, bottom: 15, left: 100},
+    width = 900 //- margin.left - margin.right,
+    height = 400 //- margin.top - margin.bottom;
+ var x = d3.scale.linear()
+    .domain([margin.left-(width/2), margin.left+(width / 2)]) // changes range of values for x axis
+    .range([0, width]);
+var y = d3.scale.linear()
+    .domain([-height / 2, height / 2]) // changes range of values for y axis
+    .range([height, 0]);
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .ticks(20)
+    .tickSize(-height);
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10)
+    .tickSize(-width);
+var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .scaleExtent([1,10000 ])   //this controls maximum zooming amount
+    .center([width / 2, height / 2])
+    .size([width, height])
+    .on("zoom", zoomed);
+   svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom)
+ .append("g")
+    .call(zoom);
+ d3.select("button").on("click", reset);
+svg.append("rect")
+    .attr("width", width+margin.left + margin.right )
+    .attr("height", height+margin.top + margin.bottom);
+  svgContainer=svg.append("g");
+svgContainer.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+svgContainer.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+
+}
+
+
+		function loadMe(){
+
+SetSize();
+	d3.text("table2.csv", fillData);
+
+
+
+
+	function fillData(text){
+	console.log("Read this ",text);
+	
+	var data = d3.csv.parseRows(text).map(function(row) {
+	return row.map(function(value) {
+	return +value;    //to convert text to numbers
+	});
+	});
+	console.log(data);
+	col1=data[0];
+	x1=data[1];
+	y1=data[2];
+	m1=data[3];
+	m2=data[4];
+	m3=data[5];   //Taking data from respective rows
+
+	console.log("Before loading",x1,y1,m1,m2,m3);
+	}
+		console.log("After loading",x1,y1,m1,m2,m3);
+	// window.alert("hello");
+	}
+
+	function doPlot(){
+
+
+	
+	 
+	//m1 and m2 varying along both x and y axis
+	//m1 is represented as radius,m2 in color using some sort of gray scale,minimum is white and maximum is black
+	var min1=Math.min.apply(null,m2)+5;
+	var max1=Math.max.apply(null,m2);
+	for(i=0;i<col1.length;i++)
+	{
+	var circle=svgContainer.append("circle").attr("cx",20).attr("cy", 100).attr("r",1.5*m1[i]).attr("style","fill:rgb(0,0,0) ;stroke: blue ;stroke-width: 2");
+	console.log(circle);
+	}
+ svgContainer.append("rect").attr("x", margin.left+250).attr("y",height-5).attr("width",10).attr("height",10).attr("style","fill:rgb(255,0,0) ;stroke: blue ;stroke-width: 2");//ORIGIN ,the number 250 has to be seen to compensate for the origin shift
+	d3.selectAll("circle").data(m2).style('fill', function(d){return d3.rgb(((max1-d)*255/(max1-min1)),((max1-d)*255/(max1-min1)),((max1-d)*255/(max1-min1)))});
+	d3.selectAll("circle").data(x1).attr("cx",function(d){return margin.left+250+50*d});
+	d3.selectAll("circle").data(y1).attr("cy",function(d){return height-(50*d)});
+	}
+	function zoomed() {
+	// svg.select(".x.axis").call(xAxis);
+	// svg.select(".y.axis").call(yAxis); //above two causes fixed axis
+	svgContainer.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	//above line causes movement also
+	}//above function causes zooming which is called in var zoom
+	function reset() {
+	svgContainer.call(zoom
+	.x(x.domain([-width / 2, width / 2]))
+	.y(y.domain([-height / 2, height / 2]))
+	.event);
+	}
+	</script>
+</body>
+</html>
