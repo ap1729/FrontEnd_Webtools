@@ -64,7 +64,11 @@ function Submit_to_script() {
 <script>
 //script for the graph
   var table;
+<<<<<<< HEAD
 d3.text("table2.csv", function(text) {
+=======
+d3.text("table1.csv", function(text) {
+>>>>>>> b814f88c7127e5845e1d07909b5fa2ab412c9a33
   var data = d3.csv.parseRows(text).map(function(row) {
     return row.map(function(value) {
       return +value;    //to convert text to numbers
