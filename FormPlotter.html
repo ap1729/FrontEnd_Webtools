@@ -73,7 +73,7 @@
 					</select>
                      
                     <button type="button" class="btn btn-default" onclick="AddData()">Add Data</button>
-                    <button type="button" class="btn btn-default" onclick="Changes()">ViewChanges</button>
+                   <!-- <button type="button" class="btn btn-default" onclick="Changes()">ViewChanges</button> -->
                     <button type="button" class="btn btn-default" onclick="RePlot()">RePlot</button>
                     <button type="button" class="btn btn-default" onclick="ResetChange()">ReSet Changes</button>
               </form>
@@ -210,7 +210,7 @@ svgContainer.append("g")
     function AddData() {
     var dat = document.getElementById("getdata");  //gets data from form
     dict.push({Col : parseInt(dat.elements[0].value), Attr : convert(dat.elements[1].value)}); // appending into dictionary as numbers for easy use later
-
+    Changes();
     }
   function convert(str0){
    //function to convert user input into number
@@ -239,8 +239,8 @@ svgContainer.append("g")
 	col1=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
     x1= [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40];
     y1= [10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
-    m1=[1,3,4,6,7,9,11,13,14,15];
-    m2=[1,6,10,15,40,35,21,24,15,7];
+    m1=[1,3,4,6,7,9,11,13,14,15,32,15,39,23,22,16,42,24,34,32];
+    m2=[1,6,10,15,40,35,21,24,15,7,32,13,26,37,25,31,27,11,13];
 	for(i=1;i<dict.length;i++)
 	{
      if(dict[i].Attr==0)
@@ -271,7 +271,7 @@ svgContainer.append("g")
 
   function ResetChange(){//Function to reset changes to dictionary
       dict=[{Col:-1,Attr:"default"}];
-      doPlot();
+      RePlot();
       var disp="";
       document.getElementById("FormOutput").innerHTML=disp;
   }
