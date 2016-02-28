@@ -65,7 +65,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 func EvaluateMore(r rowdata) rowdata {
 	// log.Printf("I received this to process %#v", r)
 	// Actual algo goes here ....
-        var a,b float64
+        a,b float64
 
         a=(r.Column1-30)/20
         b=(r.Column2-30)/20
