@@ -1,0 +1,19 @@
+
+
+Column-0	[ ID readONLY  ]	-->   ElementID      [ SAME Readonly]
+Column-1	[ EDITABLE ]		-->   Xaxis       [ 232 EDITABLE]
+Column-1	[ EDITABLE  ]		-->   Xaxis       [ 232 EDITABLE]
+Column-3	[ EDITABLE  ]		-->   Color       [ 232 EDITABLE]
+Column-4	[ EDITABLE  ]		-->   Size       [ 232 EDITABLE]
+
+// 
+
+if col0 = xaxis 
+$(#input0).enabled=true
+$(#input0_attrib).enabled=false
+else
+$(#input0).enabled=false
+$(#input0_attrib).enabled=true
+end 
+
+
