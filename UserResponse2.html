@@ -147,7 +147,7 @@ var yAxis = d3.svg.axis()
 var zoom = d3.behavior.zoom()
     .x(x)
     .y(y)
-    .scaleExtent([1,10000 ])   //this controls maximum zooming amount
+    .scaleExtent([0.01,10000 ])   //this controls maximum zooming amount
     .center([width / 2, height / 2])
     .size([width, height])
     .on("zoom", zoomed);
@@ -197,8 +197,8 @@ function loadMe(){
     y1=table[2];
     m1=table[3];
     m2=table[4];
-    m3=table[5];
-  xfact=20;
+   // m3=table[5];
+  xfact=20; 
   yfact=10;
    rfact=15/((Math.min.apply(null,m1)+Math.max.apply(null,m1))/2);//temporary,should change later
  // window.alert(rfact);  
@@ -219,6 +219,7 @@ function loadMe(){
   alert("clicked");
  var display="";
   display+="Id  "+this.id+"<br>";
+  //Use currMap to get right Column Mapping and not just hard code it 
   display+="Column 1 Value "+" "+(this.cx.animVal.value+100-margin.left)/xfact+"   Xaxis Value "+(this.cx.animVal.value+100-margin.left)+"<br>";
   display+="Column 2 Value"+" "+(height-this.cy.animVal.value)/yfact+"   YaxisValue "+" "+(height-this.cy.animVal.value) +"<br>";
   display+="Column 3 Value" + " "+ this.r.animVal.value/rfact+"    Radius Value "+" "+this.r.animVal.value+"<br>";
@@ -314,7 +315,7 @@ function RePlot(){
       disp1+="Nothing Added";
       document.getElementById("FormOutput").innerHTML=disp1;//Setting paragraph to Null 
        dict=[{Col:-1,Attr:"default"}];//Setting Dictionary to Null
-  console.log(col1,x1,y1,m1,m2,m3);
+  console.log(col1,x1,y1,m1,m2);
   //window.alert(x1);
   xfact=20;
   yfact=10;
@@ -371,7 +372,10 @@ function Addchange(){
   BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[3].value),Column4:parseFloat(dat1[2].value)};//Creating object to send to backend
   BackGet=$.post("http://localhost:8080/update",JSON.stringify(BackObj),"json");//getting from server
   //BackGet.responseText has the values
-  var a =BackGet.responseText;
+  
+  //alert(BackGet.responseText);
+  var a =BackGet.responseText; //Error in this line,if i breakpoint here ,it works
+   //alert(BackGet.responseText);
    ParsedData=JSON.parse(a);
   //  ParsedData=BackGet.responseText;
     dat1[0].value=xfact*ParsedData.Column1;
@@ -434,7 +438,14 @@ var display="";
  document.getElementById("Form2Output").innerHTML=display;
 }
 
-
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
 
   
   </script> 

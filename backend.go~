@@ -48,7 +48,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		udpateData := EvaluateMore(rxdata)
 
 		txbytes, _ := json.Marshal(udpateData)
-
+                log.Println("returning data is ",string(txbytes[0]))
 		nbytes, werr := w.Write(txbytes)
 		_ = nbytes
 		if werr != nil {
@@ -65,7 +65,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 func EvaluateMore(r rowdata) rowdata {
 	// log.Printf("I received this to process %#v", r)
 	// Actual algo goes here ....
-        a,b float64
+        var a,b float64
 
         a=(r.Column1-30)/20
         b=(r.Column2-30)/20
