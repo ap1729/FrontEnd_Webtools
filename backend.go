@@ -54,7 +54,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		if werr != nil {
 			log.Println("I got some error while writing back", werr)
 		} else {
-			// log.Println("Sent this  ", string(txbytes))
+			 log.Println("Sent this  ", string(txbytes))
 			// log.Printf("Successfully returned %d bytes", nbytes)
 		}
 

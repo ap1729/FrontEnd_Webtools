@@ -362,23 +362,15 @@ function Changes(){
      document.getElementById("FormOutput").innerHTML=disp;
   }
 
-function Addchange(){
-  var dat1 = document.getElementById("putdata");  //gets data from form
-  
+ function onsuccess(obj) {
+     /* body... */ 
 
-  // Send Data to Backend for Recalculating
-  var BackObj;
-  var ParsedData;
-  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[3].value),Column4:parseFloat(dat1[2].value)};//Creating object to send to backend
-  BackGet=$.post("http://localhost:8080/update",JSON.stringify(BackObj),"json");//getting from server
-  //BackGet.responseText has the values
-  
-  //alert(BackGet.responseText);
-  var a =BackGet.responseText; //Error in this line,if i breakpoint here ,it works
-   //alert(BackGet.responseText);
-   ParsedData=JSON.parse(a);
-  //  ParsedData=BackGet.responseText;
-    dat1[0].value=xfact*ParsedData.Column1;
+
+  var dat1 = document.getElementById("putdata");  //gets data from form
+ 
+  console.log("Received this obj",obj);   
+ParsedData=obj;
+  dat1[0].value=xfact*ParsedData.Column1;
     dat1[1].value=yfact*ParsedData.Column2;
     dat1[3].value=ParsedData.Column3;
     dat1[2].value=ParsedData.Column4;
@@ -436,6 +428,27 @@ var display="";
   display+="Column 4 value"+ "  "+dat1[2].value+"Color Value "+" "+((max1-dat1[2].value)*255/(max1-min1)),((max1-dat1[2].value)*255/(max1-min1)),((max1-dat1[2].value)*255/(max1-min1))+"<br>";
 
  document.getElementById("Form2Output").innerHTML=display;
+  }
+function Addchange(){ 
+  var dat1 = document.getElementById("putdata");  //gets data from form
+
+  // Send Data to Backend for Recalculating
+   
+  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[3].value),Column4:parseFloat(dat1[2].value)};//Creating object to send to backend
+  // var resobject;
+  // BackGet=
+  $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+  //BackGet.responseText has the values
+ 
+  // //alert(BackGet.responseText);
+  // console.log("Trying to parse ",BackGet);
+  // var a =BackGet.responseText; //Error in this line,if i breakpoint here ,it works
+  //  //alert(BackGet.responseText);
+  //  console.log("Trying to parse ",a);
+  //  ParsedData=JSON.parse(a);
+  //  console.log("Parsed Data =  ",ParsedData);
+  //  ParsedData=BackGet.responseText;
+  
 }
 
 function sleep(milliseconds) {
