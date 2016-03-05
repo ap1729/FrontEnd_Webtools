@@ -75,6 +75,16 @@
         <div>
            <div class="panel panel-default">
              <div class="panel-body">
+             <form id="graphinfo">
+                X-Factor<input type="number" step="0.0000000001" name="xfactor" value="">
+                Y-Factor<input type="number" step="0.0000000001" name="yfactor" value=""> 
+                R-Factor<input type="number" step="0.0000000001" name="rfactor" value=""> 
+                
+                <button type="button" class="btn btn-default" onclick="Resize()">ResizeGraph</button> 
+             <button type="button" class="btn btn-default" onclick="switchsizecolor()">Switch size and Color</button>
+              <button type="button" class="btn btn-default" onclick="ViewMap()">Show Map</button>
+               </form>  
+
               <form id="getdata">
                     Column No<input type="number" name="Sno" value=""> 
 
@@ -90,6 +100,7 @@
                    <!-- <button type="button" class="btn btn-default" onclick="Changes()">ViewChanges</button> -->
                     <button type="button" class="btn btn-default" onclick="RePlot()">RePlot</button>
                     <button type="button" class="btn btn-default" onclick="ResetChange()">ReSet Changes</button>
+
               </form>
               <p id="FormOutput">
               Hi There.
@@ -251,7 +262,18 @@ svgContainer.append("rect").attr("x", margin.left-100).attr("y",height-5).attr("
   .y(y.domain([-height / 2, height / 2]))
   .event);
   }
-    
+  
+   function Resize()
+    {
+     var dat = document.getElementById("graphinfo");
+     xfact*=parseFloat(dat.elements[0].value);
+     yfact*=parseFloat(dat.elements[1].value);
+     rfact*=parseFloat(dat.elements[2].value);
+     if(currMap.length==0)
+     currMap=[{Col:0,Attr:0},{Col:1,Attr:1},{Col:2,Attr:2},{Col:3,Attr:3},{Col:4,Attr:4}];
+     RePlot();
+    }    
+
     function AddData() {
     var dat = document.getElementById("getdata");  //gets data from form
     dict.push({Col : parseInt(dat.elements[0].value), Attr : convert(dat.elements[1].value)}); // appending into dictionary as numbers for easy use later
@@ -309,10 +331,10 @@ function RePlot(){
       document.getElementById("FormOutput").innerHTML=disp1;//Setting paragraph to Null 
        dict=[{Col:-1,Attr:"default"}];//Setting Dictionary to Null
   console.log(col1,x1,y1,m1,m2);
-  xfact=20;
-  yfact=10;
+ // xfact=20;
+  //yfact=10;
   
-  rfact=15/((Math.min.apply(null,m1)+Math.max.apply(null,m1))/2);//temporary,should change later
+ // rfact=15/((Math.min.apply(null,m1)+Math.max.apply(null,m1))/2);//temporary,should change later
  // window.alert(rfact);
   min1=Math.min.apply(null,m2);
   max1=Math.max.apply(null,m2);
@@ -321,6 +343,31 @@ function RePlot(){
   d3.selectAll("circle").data(x1).attr("cx",function(d){return margin.left-100+xfact*d});
   d3.selectAll("circle").data(y1).attr("cy",function(d){return height-(yfact*d)});
   d3.selectAll("circle").data(m1).attr("r",function(d){return rfact*d});
+  }
+    function switchsizecolor()
+  {
+    //function to switch size and colour
+    if(map[3]==3 || map[4]==4)
+      {
+        
+        xfact=20;
+        yfact=10;
+        rfact=15/((Math.min.apply(null,m2)+Math.max.apply(null,m2))/2);
+        map=[0,1,2,4,3];
+        currMap=[{Col:0,Attr:0},{Col:1,Attr:1},{Col:2,Attr:2},{Col:3,Attr:4},{Col:4,Attr:3}];
+      }
+    else
+    {
+      xfact=20;
+        yfact=10;
+        rfact=15/((Math.min.apply(null,m2)+Math.max.apply(null,m2))/2);
+       map=[0,1,2,3,4];
+        currMap=[{Col:0,Attr:0},{Col:1,Attr:1},{Col:2,Attr:2},{Col:3,Attr:3},{Col:4,Attr:4}];
+    }
+   dict=[{Col:-1,Attr:"default"}];//Setting Dictionary to Null 
+
+
+RePlot();
   }
 function newMapping(){
 //function which givs new Map on clicking Replot()
@@ -367,7 +414,7 @@ function Changes(){
      document.getElementById("FormOutput").innerHTML=disp;
   }
  
-
+ 
 
 
 
