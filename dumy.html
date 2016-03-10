@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Evaluate SINR</title>
+
+<style>
+
+
+</style>
+
+		<!-- Bootstrap CSS -->
+		<script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
+		<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">		
+		<script src="/bower_components/d3/d3.js" type="text/javascript" charset="utf-8" async defer></script>
+		  <script>
+    var table,x1,y1,m1,m2,xfact,yfact;
+    </script>
+  
+		<!-- <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css"> -->
+<!-- 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> -->
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+</script>
+	</head>
+	<body>
+	<div class="navbar">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">MOSSSAIC</a>
+			<ul class="nav navbar-nav">
+				<li class="active">
+					<a href="#">Reload</a>
+				</li>
+				<li>
+					<a href="#">Help</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	 
+	<div class="panel panel-default">	
+		<div class="panel-body">
+		 <div class="well well-lg">
+		 <p class="lead"> 
+Below is shown, a plot of the csv file with few columns, assuming the <mark>Columns-1</mark> 2 and 3 represent the <mark>id</mark>,<mark>X</mark> <mark>Y</mark> locations of the node. Additional columns can be any metric of that node. Each metric can be mapped to different possible attributes of the elements that will be displayed or mapped. For e.g a metric-1 can be mapped to the fill-color of the circle element. <button type="button" class="btn btn-primary" onclick="RunExample1()">Try Now</button></p>
+	</div>
+
+
+
+	</div>
+<div class="well">
+<svg width="1024" height="600" >
+  <circle cx="40" cy="60" r="10"></circle>
+  <circle cx="80" cy="60" r="10"></circle>
+  <circle cx="120" cy="60" r="10"></circle>
+</svg>
+	
+	
+</div>
+
+<div class="btn-toolbar">
+
+	<div class="btn-group"><button   data-toggle="tooltip" data-placement="top" title="Generates 10 dataSamples <br> But only 3 gets Mapped"  type="button" class="btn btn-large btn-block btn-default" onclick=action1() >Randomize</button>		</div>
+	<div class="btn-group"><button type="button" class="btn btn-large btn-block btn-default" onclick=action2()>Map Data</button>	</div>
+	<div class="btn-group"><button type="button" class="btn btn-large btn-block btn-default" onclick=action3() >Rnd Size</button></div>
+<div class="btn-group"><button title="Adds 10 more data points" type="button" class="btn btn-large btn-block btn-default" onclick=action4() >Append More</button></div>
+
+</div>
+	</div>
+
+
+
+
+		<!-- jQuery -->
+		<script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" ></script>
+
+		<!-- Bootstrap JavaScript -->
+		<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<!-- <script type="text/javascript" src="/bower_components/d3/d3.min.js"></script> -->
+	<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="/bower_components/toastr/toastr.min.js" type="text/javascript" charset="utf-8" ></script>
+	<script type="text/javascript" src="support.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="/bower_components/toastr/toastr.min.css">
+
+		
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+
+		<script type="text/javascript">
+   
+		var graph;
+		var svg=  d3.select("svg");
+		var circles=svg.selectAll("circle");
+		var cd;
+		var data;
+		var w,h;
+		load();
+		fillData();
+
+		function fillData () {
+			 // body...  
+			 	w=Number(svg.attr("width"));
+			 	h=Number(svg.attr("height"));
+			 	data=[];
+			 	circles=svg.selectAll("circle");
+			 	L=circles[0].length;
+			 	console.log(L);
+
+			for(var i = 0; i < L; i++)
+			{
+				n=Math.random();
+				 
+				x=Math.random()*w;
+				y=Math.random()*h; ;
+				r=10; //Math.random()*500+50;
+				OBJ={ID:i,x:x,y:y,r:r};
+		 
+				data[i]=OBJ;
+			}
+				cd=circles.data(data);
+				circles.attr("cx", function(d) { return d.x; });
+        	 	circles.attr("cy", function(d) { return d.y; });
+		 		circles.attr("r", function(d) { return d.r; });
+
+			// d3.select("body").transition()
+			// .styleTween("color",function() { return d3.interpolate("green", "red"); })
+// d3.select("p").transition().tween("text", function() {
+//   var i = d3.interpolateRound(0, 100);
+//   return function(t) {
+//     this.textContent = i(t);
+//   };
+// });     
+
+		}
+ 		function RunExample1 ( ) {
+        	 // body...  
+        	gcircle = d3.selectAll("circle");
+        	gcircle.style("fill","#F08080");
+        	gcircle.style("fill-opacity",.3);
+			// gcircle.attr("r", 10);
+				// circles.attr("cx", function(d) { return d.x; });
+    //     	 	circles.attr("cy", function(d) { return d.y; });
+		 	// 	circles.attr("r", function(d) { return d.r; });
+		
+        }
+        function action1 () {
+        	/// randomize function 
+			 	w=Number(svg.attr("width"));
+			 	h=Number(svg.attr("height"));
+        		
+    		for(var i = 0; i < data.length; i++)
+			{
+				n=Math.random();	 
+				x=Math.random()*w;
+				y=Math.random()*h; ;
+				r=2; //Math.random()*500+50;
+				OBJ={ID:i,x:x,y:y,r:r};
+				data[i].x=x;
+				data[i].y=y;
+				// data[i].r=r;
+			}
+			d3.selectAll("circle").attr({
+				"cx":function(d) { return d.x; } ,
+				"cy":function(d) { return d.y; } 
+			});
+
+        }
+        function action2 () {
+        	 // body...  
+        	 console.log("Action 2 ",cd);
+        	 if (data==null) {
+        	 toastr.warning('Empty Data');
+        	 return;
+        	 }
+        	 if (data.length>0) {
+        	 	circles.attr("cx", function(d) { return d.x; });
+        	 	circles.attr("cy", function(d) { return d.y; });
+		 		circles.attr("r", function(d) { return d.r; });
+        	 }
+        	  // d3.selectAll('circle').style("fill","green").transition().style("fill", "red");
+        	 d3.selectAll('circle').transition().duration(500).styleTween("fill", function() { return d3.interpolate("green", 0x80808010); });
+
+        }
+        function action3() {
+         	if (data==null) {return}
+         	
+         	var minR=2;
+        	for(var i = 0; i < data.length; i++)
+			{ 
+				r=Math.random()*20+minR;
+				data[i].r=r;
+			}
+ 		d3.selectAll("circle").attr("r", function(d) { return d.r; });
+			// action2();
+        }
+
+ 	function action4 () {
+ 		 // body...  
+ 		 			 	w=Number(svg.attr("width"));
+			 	h=Number(svg.attr("height"));
+
+			for(var i = 0; i < 10; i++)
+			{
+				n=Math.random();	 
+				x=Math.random()*w;
+				y=Math.random()*h; ;
+				r=10; //Math.random()*500+50;
+				OBJ={ID:i,x:x,y:y,r:r};
+				console.log(OBJ);
+				data.push(OBJ);
+			}
+			//
+		circles=svg.selectAll("circle");
+		cd=circles.data(data);		
+      	ncircles =  cd.enter().append('circle'); 
+ 		// Call remapping of all the element attrips to the data 
+      	ncircles.attr("cx", function(d) {  return d.x; });
+        ncircles.attr("cy", function(d) {  return d.y; });
+		ncircles.attr("r", function(d) {  return d.r; });
+		ncircles.style("fill","gray");
+      	// newcircles.style("fill","red");
+      	 // circles=d3.selectAll("circle");
+        // d3.selectAll('circle').transition().duration(1000).styleTween("fill", function() { return d3.interpolate("green", "red"); });     
+	 		    
+ 	}
+		
+  
+		</script>
+ 		 
+	</body>
+	</html>
+
+
