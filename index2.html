@@ -80,9 +80,10 @@ Below is shown, a plot of the csv file with few columns, assuming the <mark>Colu
 
 		<script type="text/javascript">
    
-
-
-  graph = new SimpleGraph("chart", {
+		var graph;
+		function RunExample1 ( ) {
+			 // body...  
+			 graph = new SimpleGraph("chart", {
           "xmax": 60, "xmin": 0,
           "ymax": 40, "ymin": 0, 
           "title": "Simple Graph1",
@@ -91,7 +92,8 @@ Below is shown, a plot of the csv file with few columns, assuming the <mark>Colu
         });
 
  
-
+		}
+  
 		</script>
  		 
 	</body>
