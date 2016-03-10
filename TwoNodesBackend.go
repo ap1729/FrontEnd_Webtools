@@ -76,6 +76,7 @@ func EvaluateMore(r rowdata) rowdata {
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
         if r.Column3<0{r.Column3=-r.Column3} 
+ //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
     return r
 }
 

@@ -3,7 +3,7 @@ from numpy import *
 import random
 x=linspace(0,200,200)
 y=linspace(0,200,200)
-g=x
+g=linspace(0,200,200)
 dist1=dist2=x
 for i in range(0,200):
  x[i]=random.random()
@@ -42,7 +42,7 @@ y[0]=y[1]=0.5
 e[0]=e[1]=max(e)+1
 f[0]=200
 f[1]=200
-g[0]=g[1]=1
+g[0]=g[1]=0
 x=30*x
 y=30*y-5	
 import csv
@@ -50,6 +50,7 @@ import csv
 with open('testfile4.csv', 'w') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(linspace(1,200,200))
+    writer.writerow(g)
     writer.writerow(x) 
     writer.writerow(y)
     writer.writerow(f)

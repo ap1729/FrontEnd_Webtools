@@ -14,7 +14,7 @@ import (
 type rowdata struct {
 	Id                        string
 	Column1, Column2, Column3 float64
-	Column4                   float64
+	Column4 ,Column5          float64
 }
 
 func handlerroute(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +66,8 @@ func EvaluateMore(r rowdata) rowdata {
 	// log.Printf("I received this to process %#v", r)
 	// Actual algo goes here ....
         var a,b,dist1,dist2 float64
-
+ if (r.Column5==1) || (r.Column5==2)
+  {
         a=(r.Column1)/30
         b=(r.Column2+5)/30
 
@@ -75,9 +76,22 @@ func EvaluateMore(r rowdata) rowdata {
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
-        if r.Column3<0{r.Column3=-r.Column3} 
-log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
-    return r
+        if r.Column3<0 {r.Column3=-r.Column3} 
+	if (Math.IsInf(r.Column3)||Math.IsInf(r.Column4))
+        {
+ 	 r.Column3=-1
+  	r.Column4=-1
+   	}
+
+       //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
+    
+  }
+else
+  {
+    log.Printf("BASESTATION")
+  }
+
+return r
 }
 
 func main() {

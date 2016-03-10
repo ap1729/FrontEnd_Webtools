@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!--  
+Backend File:TwoNodesBackend.go //needs to be changed
+Python File:NewColumn.py
+csv file :testfile4.csv
+
+
+-->
+
 <html lang="">
   <head>
     <meta charset="utf-8">
@@ -24,7 +31,7 @@
             var m2;//=[1,6,10,15,40,35,21,24,15,7];//Default initialisation
             var dict= [{Col:-1,Attr:"default"}];//for dictionary, has to be array for push
             var currMap=[];//current mapping of metrics to attributes
-            var map=[0,1,2,3,4];//Original mapping
+            var map=[0,1,2,3,4,5];//Original mapping
             var idtochange="";//to identify the circle clicked
              var mapctr=1;//mapctr is to identify when map should be [] again ,for ex on AddData as map is altered  
 
@@ -213,13 +220,13 @@ function loadMe(){
   display+="Id  "+this.id+"<br>";
   //Use currMap to get right Column Mapping and not just hard code it 
   display+="Column 1 Value "+" "+(this.cx.animVal.value+100-margin.left)/xfact+" "+"   Xaxis Value "+(this.cx.animVal.value+100-margin.left)+"<br>";
-  display+="Column "+map[2]+" Value"+" "+(height-this.cy.animVal.value)/yfact+" "+"   YaxisValue "+" "+(height-this.cy.animVal.value) +"<br>";
-  display+="Column "+ map[3]+" Value" + " "+ this.r.animVal.value/rfact+"  "+"    Radius Value "+" "+this.r.animVal.value+"<br>";
+  display+="Column "+map[3]+" Value"+" "+(height-this.cy.animVal.value)/yfact+" "+"   YaxisValue "+" "+(height-this.cy.animVal.value) +"<br>";
+  display+="Column "+ map[4]+" Value" + " "+ this.r.animVal.value/rfact+"  "+"    Radius Value "+" "+this.r.animVal.value+"<br>";
   var  b=this.style.fill;
   var a = b.split("(")[1].split(")")[0];
   a = a.split(",");
   //alert(a);//a has the 3 r,g,b values while var b had string of rgb values
-  display+="Column " +map[4]+" value"+" "+(max1-((a[0]*(max1-min1))/255))+"    Colour Value"+ "  " + a+"<br>";
+  display+="Column " +map[5]+" value"+" "+(max1-((a[0]*(max1-min1))/255))+"    Colour Value"+ "  " + a+"<br>";
   idtochange=this.id;
  document.getElementById("Form2Output").innerHTML=display;
   });//function to put values of circle on click
@@ -258,15 +265,16 @@ function RePlot(){
     m1=[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
     m2=[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10];
  
-  if(map[0]!=-1)
+  
    col1=table[map[0]];
-  if(map[1]!=-1)
-    x1=table[map[2]];
+   node=table[map[1]];//node and col1 should never be changed
   if(map[2]!=-1)
-    y1=table[map[3]];
+    x1=table[map[2]];
   if(map[3]!=-1)
-    m1=table[map[4]];
+    y1=table[map[3]];
   if(map[4]!=-1)
+    m1=table[map[4]];
+  if(map[5]!=-1)
     m2=table[map[5]];
 
  //   var disp1="";
@@ -307,7 +315,7 @@ function Addchange(){
 
   var dat1 = document.getElementById("putdata");  //gets data from form
   // Send Data to Backend for Recalculating
-  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[2].value),Column4:parseFloat(dat1[3].value)};//Creating object to send to backend
+  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[2].value),Column4:parseFloat(dat1[3].value),Column5:node[idtochange]};//Creating object to send to backend
   // var resobject;
   // BackGet=
   $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
