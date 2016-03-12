@@ -315,7 +315,8 @@ function Addchange(){
 
   var dat1 = document.getElementById("putdata");  //gets data from form
   // Send Data to Backend for Recalculating
-  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[2].value),Column4:parseFloat(dat1[3].value),Column5:node[idtochange]};//Creating object to send to backend
+var idno=parseInt(idtochange.replace( /^\D+/g, ''));
+  BackObj={Id:idtochange,Column1:parseFloat(dat1[0].value/xfact),Column2:parseFloat(dat1[1].value/yfact),Column3:parseFloat(dat1[2].value),Column4:parseFloat(dat1[3].value),Column5:node[idno]};//Creating object to send to backend
   // var resobject;
   // BackGet=
   $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server

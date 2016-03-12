@@ -83,7 +83,7 @@ func EvaluateMore(r rowdata) rowdata {
 			r.Column4 = -1
 		}
 
-		//log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
+		log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
 
 	} else {
 
