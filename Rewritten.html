@@ -1,0 +1,248 @@
+<!DOCTYPE html><!--  
+Backend File:TwoNodesBackend.go //needs to be changed
+Python File:NewColumn.py
+csv file :testfile4.csv
+
+
+-->
+
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+      var col1,node,x1,y1,m1,m2,table;    
+      /// Global variables
+      </script>
+        <style>
+ 
+   svgContainer {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+   }
+  rect {
+  fill: #ddd;
+  }
+  .axis path,
+ .axis line {
+  fill: none;
+  stroke: #fff;
+  }
+ 
+   </style>
+  </head>
+  <body>
+    <h1 class="text-center">Graph</h1>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="well">
+           <div id="drawbox"> </div>
+          </div>
+      <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
+      <button type="button" class="btn btn-default" >Plot Initial</button>   <!--onclick="doPlot()"-->
+        </div>
+      </div>
+        <div>
+           <div class="panel panel-default">
+             <div class="panel-body">
+              <p id="MapOutput">
+                  Map
+                <!--To print the value of Form output  -->
+               </p>
+             </div>
+           </div>
+
+        </div>
+        <div>
+           <div class="panel panel-default">
+             <div class="panel-body">
+              <form id="putdata">
+                Xaxis <input type="number" step="0.0000000001">
+                Yaxis<input type="number" step="0.0000000001">
+                Size<input type="number" step="0.0000000001">
+                Colour<input type="number" step="0.0000000001">
+              </form>
+              <p id="Form2Output">No circle has been clicked yet</p>
+               <button type="button" class="btn btn-default" onclick="Addchange()">Make Changes and Plot</button>
+                
+                 <button type="button" class="btn btn-default" onclick="ResetChange()">ReSet Changes</button> 
+             </div>
+           </div>
+        </div>
+        
+           
+      
+
+  <!-- jQuery -->
+  <script src="js/jquery.js"></script>
+  <!-- Bootstrap JavaScript -->
+  <script src="/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/d3/d3.min.js"></script>
+  
+  <script type="text/javascript">
+function SetSize(){
+     margin = {top: 0, right: 10, bottom: 15, left: 100},
+    width = 900 //- margin.left - margin.right,
+    height = 400 //- margin.top - margin.bottom;
+var x = d3.scale.linear()
+    .domain([0, (width )]) // changes range of values for x axis
+    .range([0, width]);
+var y = d3.scale.linear()
+    .domain([0, height ]) // changes range of values for y axis
+    .range([height, 0]);
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .ticks(20)
+    .tickSize(-height);
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10)
+    .tickSize(-width);
+
+var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .scaleExtent([0.01,10000 ])   //this controls maximum zooming amount
+    .center([width / 2, height / 2])
+    .size([width, height])
+    .on("zoom", zoomed);
+
+
+var drag = d3.behavior.drag()
+    .origin(function(d) { return d; })
+    .on("dragstart", dragstarted)
+    .on("drag", dragged)
+    .on("dragend", dragended);
+
+
+svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom)
+ .append("g")
+    .call(zoom);
+    //var cgroup = svg.append("g");
+  svgContainer=svg.append("g");
+svgContainer.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+svgContainer.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+
+d3.csv('testfile5.csv', 
+        // accessor function
+        function(d) {
+            return {col1: d.col1,
+                node:d.node
+                ,x1:d.x1,
+                y1:d.y1,
+                m1:d.m1,
+                m2:d.m2
+                 }; 
+        } ,
+       
+        function (err, rows) {
+            //console.log(rows);
+            var svg = d3.select("svg");
+            // get element with maximum value for size, for scaling graph
+           // maxrow = _.max(rows, function (d) {return parseInt(d.size); } )
+            // Create circle elements inside svg based on data
+           // var cgroup = svg.append("g");
+            var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
+            // Now work on updating the circles based on the data
+            circles
+            .attr("r", function(d,i) { return (0.1*d.m1);})
+            .attr("cx",function(d,i) { return (30*d.x1);})
+            .attr("cy",function(d,i) { return (height- 20*d.y1);})
+            .style("fill",function(d,i) { return "hsl(" + Math.random() * 360 + ",100%,50%)";})
+            .call(drag);
+            setcolor();
+            }
+              
+              );
+
+
+}
+function zoomed() {
+  // svg.select(".x.axis").call(xAxis);
+  // svg.select(".y.axis").call(yAxis); //above two causes fixed axis
+  
+  
+  svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+ 
+    
+  //svgContainer.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  //above line causes movement also
+  
+    }//above function causes zooming which is called in var zoom
+
+function dragstarted(d) {
+  d3.event.sourceEvent.stopPropagation();
+  d3.select(this).classed("dragging", true);
+}
+
+function dragged(d) {
+ // d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+
+ // d3.select(this).attr("cx", d[0] = d3.event.sourceEvent.x)
+               //.attr("cy", d[1] = d3.event.sourceEvent.y);
+
+
+// d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+     //  d.x += d3.event.dx;
+      //      d.y += d3.event.dy;
+            d3.select(this).attr("transform", function(d,i){
+                return "translate(" + [d3.event.dx,d3.event.dy ] + ")"});
+}
+
+function dragended(d) {
+  d3.select(this).classed("dragging", false);
+}
+  
+function loadMe(){
+d3.text("testfile4.csv", fillData);
+   SetSize();  
+   //window.alert();//sync async error
+
+}
+
+
+ function fillData(text){
+   console.log("Read this ",text);
+  var data = d3.csv.parseRows(text).map(function(row) {
+  return row.map(function(value) {
+  return +value;    //to convert text to numbers
+  });
+  });
+  console.log(data);
+  table=data;   //Taking data from respective rows
+  table1=data;
+    col1=table[0];
+  node=table[1]
+    x1=table[2];   
+    y1=table[3];
+    m1=table[4];
+    m2=table[5];
+ }
+ function setcolor(){
+  var min1=Math.min.apply(null,m2);
+  var max1=Math.max.apply(null,m2);
+  d3.selectAll("circle").data(m2).style('fill', function(d){return d3.rgb(((max1-d)*255/(max1-min1)),0,0)});
+   console.log("Before loading",table);
+ }
+ //svgContainer.call(zoom);
+</script>
+</body>
+</html>
