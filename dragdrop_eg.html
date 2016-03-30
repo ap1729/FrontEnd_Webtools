@@ -43,8 +43,7 @@ var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
-    .call(zoom);
+    .attr("transform", "translate(" + margin.left + "," + margin.right + ")").call(zoom);
 
 var rect = svg.append("rect")
     .attr("width", width)
@@ -74,21 +73,21 @@ container.append("g")
     .attr("x2", width)
     .attr("y2", function(d) { return d; });
 
-d3.csv("nodeloc.csv", dottype, function(error, dots) {
+d3.csv("testfile5.csv", dottype, function(error, dots) {
   dot = container.append("g")
       .attr("class", "dot")
     .selectAll("circle")
       .data(dots)
     .enter().append("circle")
-      .attr("r", function(d) { return d.m1/20; })
-      .attr("cx", function(d) { return d.x*20; })
-      .attr("cy", function(d) { return d.y*20; })
+      .attr("r", function(d) { return 10; })
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
       .call(drag);
 });
 
 function dottype(d) {
-  d.x = +d.x;
-  d.y = +d.y;
+  d.x1 = +d.x1;
+  d.y1 = +d.y1;
   return d;
 }
 
@@ -97,16 +96,39 @@ function zoomed() {
 }
 
 function dragstarted(d) {
+  console.log("Started draging ",d);
   d3.event.sourceEvent.stopPropagation();
   d3.select(this).classed("dragging", true);
 }
 
-function dragged(d) {
-  d3.select(this).attr("cx", d.x = (d3.event.x)).attr("cy", d.y = (d3.event.y));
+function dragged(d,v1,v2,v3) {
+
+   console.log('Received drag event ',d,d3.event,v1,v2,v3);
+
+  function f1 (d) {
+     // body...  
+
+      d.x1 = d3.event.x;
+     return d3.event.x;
+  }
+
+
+  function f2 (d) {
+     // body...  
+     // d.x = d3.event.x;
+  d.y1 = (d3.event.y);
+
+     return d3.event.y ;
+  }
+
+
+  d3.select(this).attr("cx", f1 ).attr("cy", f2);
+
 }
 
 function dragended(d) {
   d3.select(this).classed("dragging", false);
+
 }
 
 </script>
