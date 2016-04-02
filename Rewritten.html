@@ -142,7 +142,7 @@ xaxisobject=svgContainer.append("g")
 svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
- window.alert()
+ //window.alert()
 d3.csv('testfile5.csv', 
         // accessor function
         function(d) {
@@ -162,7 +162,7 @@ d3.csv('testfile5.csv',
           
             // Create circle elements inside svg based on data
            // var cgroup = svg.append("g");
-           window.alert();
+        //   window.alert();
             var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
             // Now work on updating the circles based on the data
             circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
