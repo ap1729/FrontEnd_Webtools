@@ -95,6 +95,7 @@ csv file :testfile4.csv
   var xaxisobject;
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
   var idtochange="";
+  var BScord=[{x:7.50000,y:10.0000},{x:22.5000,y:10.00000}];//basestation coords
 var x = d3.scale.linear()
     .domain([-5, (30 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
@@ -165,7 +166,7 @@ d3.csv('testfile5.csv',
         //   window.alert();
             var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
             // Now work on updating the circles based on the data
-            circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
+            circles.attr("r", function(d,i) {console.log(d.m1); return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
             .attr("id",function(d,i){ 
                if(d.node==1) 
                  return "node1  "+d.col1;
@@ -218,7 +219,7 @@ function dragged(d) {
   //  d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
 
-// d.x=d3.event.sourceEvent.offsetX;
+ //d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
 d.x=d3.event.sourceEvent.clientX;//try putting -35 here
 d.y=d3.event.sourceEvent.clientY;
@@ -245,13 +246,9 @@ d.y=d3.event.sourceEvent.offsetY;
 var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
-console.log('Am I at ', x.invert(d.x),y.invert(d.y)) 
-
-
+console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //Backend Part here
-//console.log('Values are ??',x.invert(d.x),y.invert(d.y),d.m1,d.m2,d.node,d.col1);
-//In next line cannot send d.col1,should be a number ,not a string
-BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseInt(d.m1),Column4:parseInt(d.m2)};//Creating object to send to backend
+BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseInt(d.m1),Column4:parseInt(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
@@ -260,7 +257,6 @@ BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseInt(
                   idtochange = "BaseStation "+d.col1;
                 else
                   idtochange = "ERROR";
-//window.alert(id);
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
              
 }
@@ -270,22 +266,60 @@ function onsuccess(obj) {
  console.log("Received this obj",obj); 
  ParsedData=obj;
 
+if(ParsedData.Id!="0")
+{
  var shape1=document.getElementById(idtochange); 
   d3.select(shape1).attr("cx",x(ParsedData.Column1))
 .attr("cy",function(d){
   return y(ParsedData.Column2)})
 .attr("r",function(d){return 10;})
 .style('fill', function(d){ return mycolormap(ParsedData.Column3);});
- //ParsedData.Column1;
+
+ }
+else
+{
+window.alert("BaseStation");
+//CIRCLES= d3.selectAll("circle");
+d3.selectAll("circle").each(function(d,i)
+{  /*
+  console.log(d.m1);
+  d.m1=(parseInt(d.m1)+1000).toString();
+  console.log(d.m1);*/
+  BackObj={Id:d.node,Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseInt(d.m1),Column4:parseInt(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
+   console.log("BASESTATION Received this obj",obj); 
+ ParsedData=obj;
+ if(ParsedData.Id!="0")
+  {
+   d.m1=ParsedData.Column3;
+   console.log("AQQ",d.m1);
+  }
+},"json");//getting from server
+});
+window.alert();
+window.alert();
+var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
+d3.selectAll("circle").style("fill",function(d,i) { return mycolormap1(d.m1);} ) 
+//console.log(CIRCLES);
+
+//BScord[0].x -> x cord of BS1
+/*
+  d3.select(circles).attr("cx",x(ParsedData.Column1))
+.attr("cy",function(d){
+  return y(ParsedData.Column2)})
+.attr("r",function(d){return 30;})
+.style('fill', function(d){ return mycolormap(ParsedData.Column3);});
+*/
+   }
 
 }
 
 function loadMe(){
 // d3.text("testfile5.csv", fillData);
    SetSize();  
-   //window.alert();//sync async error
+
 }
- function fillData(text){
+ function fillData(text){ 
    console.log("Read this ",text);
   var data = d3.csv.parseRows(text).map(function(row) {
   return row.map(function(value) {

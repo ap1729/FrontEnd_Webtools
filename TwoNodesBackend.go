@@ -14,7 +14,11 @@ import (
 type rowdata struct {
 	Id                        string
 	Column1, Column2, Column3 float64
-	Column4                   float64
+	Column4, x1, y1 ,x2 ,y2   float64 
+        
+//Id is indication of Basestation or node
+//Column1 to 4 are x,y,m1 and m2 values originally
+//x1,x2,y1,y2 are x and y coordinates of basestation locations
 }
 
 func handlerroute(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +48,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
+                log.Println("Marshalled Data",rxdata)	
 		udpateData := EvaluateMore(rxdata)
 
 		txbytes, _ := json.Marshal(udpateData)
@@ -65,19 +69,38 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 func EvaluateMore(r rowdata) rowdata {
 	// log.Printf("I received this to process %#v", r)
 	// Actual algo goes here ....
-        var a,b,dist1,dist2 float64
-
+        
+      if r.Id!="0"{
+log.Printf("AAAAQ  	%f %f ",r.x1,r.x2);
+//as r.x1,r.x2,r.y1 and r.y2 are zero ,am manually setting it in next line
+       r.x1=7.5
+       r.y1=10
+       r.x2=22.5
+       r.y2=10
+        var a,b,dist1,dist2,BSx1,BSy1,BSx2,BSy2 float64
         a=(r.Column1)/30
         b=(r.Column2+5)/30
-
-	dist1=((a-0.25)*(a-0.25)+(b-0.5)*(b-0.5)) 
-	dist2=((a-0.75)*(a-0.75)+(b-0.5)*(b-0.5)) 
+        BSx1=(r.x1)/30
+        BSy1=(r.y1+5)/30
+	BSx2=(r.x2)/30
+	BSy2=(r.y2+5)/30
+        
+	dist1=((a-BSx1)*(a-BSx1)+(b-BSy1)*(b-BSy1)) 
+	dist2=((a-BSx2)*(a-BSx2)+(b-BSy2)*(b-BSy2)) 
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
         if r.Column3<0{r.Column3=-r.Column3} 
+         log.Printf("%f %f",r.x1,r.y1);
+       //   log.Printf("%f,%f,%f,%f,%f,%f	",BSx1,BSy1,r.Column1,r.Column2,a,b)
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
-    return r
+       } else { 
+ log.Println("BASESTATION!!!",r.Id)
+//Need to return bunch of data
+ } 
+       return r
+       
+
 }
 
 func main() {
