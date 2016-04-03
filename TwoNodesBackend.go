@@ -48,7 +48,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-                log.Println("Marshalled Data",rxdata)	
+                //log.Println("Marshalled Data",rxdata)	
 		udpateData := EvaluateMore(rxdata)
 
 		txbytes, _ := json.Marshal(udpateData)
@@ -71,7 +71,6 @@ func EvaluateMore(r rowdata) rowdata {
 	// Actual algo goes here ....
         
       if r.Id!="0"{
-log.Printf("AAAAQ  	%f %f ",r.X1,r.X2);
 //as r.X1,r.X2,r.Y1 and r.Y2 are zero ,am manually setting it in next line
      //  r.X1=7.5
      //r.Y1=10
@@ -90,12 +89,12 @@ log.Printf("AAAAQ  	%f %f ",r.X1,r.X2);
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
-        if r.Column3<0{r.Column3=-r.Column3} 
-         log.Printf("%f %f",r.X1,r.Y1);
+        if r.Column3<0{r.Column3=0} 
+   //      log.Printf("%f %f",r.X1,r.Y1);
        //   log.Printf("%f,%f,%f,%f,%f,%f	",BSX1,BSY1,r.Column1,r.Column2,a,b)
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
        } else { 
- log.Println("BASESTATION!!!",r.Id)
+ //log.Println("BASESTATION!!!",r.Id)
 //Need to return bunch of data
  } 
        return r

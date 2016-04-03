@@ -55,7 +55,7 @@ csv file :testfile4.csv
              <div class="panel-body">
               <p id="MapOutput">
                   Map
-                <!--To print the value of Form output  -->
+            
                </p>
              </div>
            </div>
@@ -164,6 +164,7 @@ d3.csv('testfile5.csv',
             // Create circle elements inside svg based on data
            // var cgroup = svg.append("g");
         //   window.alert();
+
             var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
             // Now work on updating the circles based on the data
             circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
@@ -288,29 +289,46 @@ else
 //CIRCLES= d3.selectAll("circle");
 
 
-
+var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
+   var m1min=0,m1max=300,f=0;
 d3.selectAll("circle").each(function(d,i)
 {  /*
   console.log(d.m1);
   d.m1=(parseInt(d.m1)+1000).toString();
   console.log(d.m1);*/
+ 
   BackObj={Id:d.node,Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
    console.log("BASESTATION Received this obj",obj); 
  ParsedData=obj;
  if(ParsedData.Id!="0")
   {
+    if(f==0)
+    {
+      f=1;
+      m1min=ParsedData.Column3;
+      m1max=ParsedData.Column3;
+      d.m1=ParsedData.Column3;
+    }
+    else
+    {
    d.m1=ParsedData.Column3;
-   //console.log("AQQ",d.m1);
+    if(m1min > ParsedData.Column3)
+      m1min = ParsedData.Column3;
+    if(m1max < ParsedData.Column3)
+      m1max = ParsedData.Column3;
+    }//console.log("ASQ",Math.min.apply(null,[d.m1]));
   }
 },"json");//getting from server
 });
 //var max = d3.selectAll("circle").max(function(d) { return d.m1; });
 //console.log(max);
-window.alert();
-
-var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
-d3.selectAll("circle").style("fill",function(d,i) {if(d.node!=0) return mycolormap1(d.m1); else return "blue"} ) 
+var mycolormap1 = d3.scale.linear().domain([m1min ,m1max]).range(["red", "green"]);
+window.alert();//for sync async error
+//d3.selectAll("circle").maximum
+//d3.max(d3.selectAll("circle").)
+d3.selectAll("circle").style("fill",function(d,i) {if(d.node!=0) return mycolormap1(d.m1); else return "blue"}); 
 //console.log(CIRCLES);
 
 //BScord[0].x -> x cord of BS1
