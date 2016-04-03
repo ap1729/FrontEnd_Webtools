@@ -92,7 +92,7 @@ csv file :testfile4.csv
   
   <script type="text/javascript">
   var xAxis,yAxis;
-  var xaxisobject;
+  var xaxisobject,zoom;
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
   var idtochange="";
   var BScord=[{x:7.50000,y:10.0000},{x:22.5000,y:10.00000}];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
@@ -120,7 +120,7 @@ function SetSize(){
     .orient("left")
     .ticks(10)
     .tickSize(-width);
-var zoom = d3.behavior.zoom()
+zoom = d3.behavior.zoom()
     .x(x)
     .y(y)
     .scaleExtent([0.01,10000 ])   //this controls maximum zooming amount
@@ -134,7 +134,10 @@ var drag = d3.behavior.drag()
     .on("dragend", dragended);
 svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom)
  .append("g").call(zoom);
-    //var cgroup = svg.append("g");
+    //var cgroup = svg.append("g"); 
+    svg.append("rect")
+    .attr("width", width+margin.left + margin.right )
+    .attr("height", height+margin.top + margin.bottom);
   svgContainer=svg.append("g");
 xaxisobject=svgContainer.append("g")
     .attr("class", "x axis")
@@ -249,6 +252,7 @@ var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
+console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
 BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
