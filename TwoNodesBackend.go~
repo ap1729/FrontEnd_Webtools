@@ -73,9 +73,9 @@ func EvaluateMore(r rowdata) rowdata {
       if r.Id!="0"{
 log.Printf("AAAAQ  	%f %f ",r.x1,r.x2);
 //as r.x1,r.x2,r.y1 and r.y2 are zero ,am manually setting it in next line
-       r.x1=7.5
-       r.y1=7.5
-       r.x2=7.5
+       r.x1=10
+       r.y1=8
+       r.x2=10
        r.y2=10
         var a,b,dist1,dist2,BSx1,BSy1,BSx2,BSy2 float64
         a=(r.Column1)/30

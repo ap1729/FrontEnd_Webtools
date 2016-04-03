@@ -46,8 +46,8 @@ csv file :testfile4.csv
         <div class="well">
            <div id="drawbox"> </div>
           </div>
-      <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
-      <button type="button" class="btn btn-default" >Plot Initial</button>   <!--onclick="doPlot()"-->
+     <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
+      <button type="button" class="btn btn-default" >Plot Initial</button>  onclick="doPlot()"--> 
         </div>
       </div>
         <div>
@@ -179,7 +179,7 @@ d3.csv('testfile5.csv',
              })
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
-            .style("fill",function(d,i) { return mycolormap(d.m1);} ) 
+            .style("fill",function(d,i) { if(d.node!=0) return mycolormap(d.m1); else return "blue"} ) 
             .call(drag);
             
              // setcolor();
@@ -297,9 +297,8 @@ $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
 },"json");//getting from server
 });
 window.alert();
-window.alert();
 var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
-d3.selectAll("circle").style("fill",function(d,i) { return mycolormap1(d.m1);} ) 
+d3.selectAll("circle").style("fill",function(d,i) {if(d.node!=0) return mycolormap1(d.m1); else return "blue"} ) 
 //console.log(CIRCLES);
 
 //BScord[0].x -> x cord of BS1
@@ -337,7 +336,7 @@ function loadMe(){
     m2=table[5];
  }
 
-
+loadMe();
 
 </script>
 </body>
