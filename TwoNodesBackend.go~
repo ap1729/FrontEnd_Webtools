@@ -13,12 +13,12 @@ import (
 // $.post("http://localhost:8080/update",JSON.stringify(Obj),"json")
 type rowdata struct {
 	Id                        string
-	Column1, Column2, Column3 ,Column4 float64
-        X1, Y1 ,X2 ,Y2   float64 
+	Column1, Column2, Column3 float64
+	Column4, x1, y1 ,x2 ,y2   float64 
         
 //Id is indication of Basestation or node
 //Column1 to 4 are x,y,m1 and m2 values originally
-//X1,X2,Y1,Y2 are x and y coordinates of basestation locations
+//x1,x2,y1,y2 are x and y coordinates of basestation locations
 }
 
 func handlerroute(w http.ResponseWriter, r *http.Request) {
@@ -71,28 +71,28 @@ func EvaluateMore(r rowdata) rowdata {
 	// Actual algo goes here ....
         
       if r.Id!="0"{
-log.Printf("AAAAQ  	%f %f ",r.X1,r.X2);
-//as r.X1,r.X2,r.Y1 and r.Y2 are zero ,am manually setting it in next line
-     //  r.X1=7.5
-     //r.Y1=10
-     //r.X2=22.5
-    //   r.Y2=10
-        var a,b,dist1,dist2,BSX1,BSY1,BSX2,BSY2 float64
+log.Printf("AAAAQ  	%f %f ",r.x1,r.x2);
+//as r.x1,r.x2,r.y1 and r.y2 are zero ,am manually setting it in next line
+       r.x1=10
+       r.y1=8
+       r.x2=10
+       r.y2=12
+        var a,b,dist1,dist2,BSx1,BSy1,BSx2,BSy2 float64
         a=(r.Column1)/30
         b=(r.Column2+5)/30
-        BSX1=(r.X1)/30
-        BSY1=(r.Y1+5)/30
-	BSX2=(r.X2)/30
-	BSY2=(r.Y2+5)/30
+        BSx1=(r.x1)/30
+        BSy1=(r.y1+5)/30
+	BSx2=(r.x2)/30
+	BSy2=(r.y2+5)/30
         
-	dist1=((a-BSX1)*(a-BSX1)+(b-BSY1)*(b-BSY1)) 
-	dist2=((a-BSX2)*(a-BSX2)+(b-BSY2)*(b-BSY2)) 
+	dist1=((a-BSx1)*(a-BSx1)+(b-BSy1)*(b-BSy1)) 
+	dist2=((a-BSx2)*(a-BSx2)+(b-BSy2)*(b-BSy2)) 
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
         if r.Column3<0{r.Column3=-r.Column3} 
-         log.Printf("%f %f",r.X1,r.Y1);
-       //   log.Printf("%f,%f,%f,%f,%f,%f	",BSX1,BSY1,r.Column1,r.Column2,a,b)
+         log.Printf("%f %f",r.x1,r.y1);
+       //   log.Printf("%f,%f,%f,%f,%f,%f	",BSx1,BSy1,r.Column1,r.Column2,a,b)
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
        } else { 
  log.Println("BASESTATION!!!",r.Id)

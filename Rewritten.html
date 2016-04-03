@@ -95,7 +95,7 @@ csv file :testfile4.csv
   var xaxisobject;
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
   var idtochange="";
-  var BScord=[{x:7.50000,y:10.0000},{x:22.5000,y:10.00000}];//basestation coords
+  var BScord=[{x:7.50000,y:10.0000},{x:22.5000,y:10.00000}];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
 var x = d3.scale.linear()
     .domain([-5, (30 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
@@ -166,7 +166,7 @@ d3.csv('testfile5.csv',
         //   window.alert();
             var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
             // Now work on updating the circles based on the data
-            circles.attr("r", function(d,i) {console.log(d.m1); return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
+            circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
             .attr("id",function(d,i){ 
                if(d.node==1) 
                  return "node1  "+d.col1;
@@ -219,11 +219,11 @@ function dragged(d) {
   //  d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
 
- //d.x=d3.event.sourceEvent.offsetX;
-//d.y=d3.event.sourceEvent.offsetY;
-d.x=d3.event.sourceEvent.clientX;//try putting -35 here
-d.y=d3.event.sourceEvent.clientY;
- console.log(d3.event);
+d.x=d3.event.sourceEvent.offsetX;
+d.y=d3.event.sourceEvent.offsetY;
+//d.x=d3.event.sourceEvent.clientX;//try putting -35 here
+//d.y=d3.event.sourceEvent.clientY;
+ console.log(d3.event.sourceEvent);
  d3.select(this).attr("cx", d.x).attr("cy", d.y);
  // d3.select(this).attr("cx", d[0] = d3.event.sourceEvent.x)
                //.attr("cy", d[1] = d3.event.sourceEvent.y);
@@ -235,10 +235,11 @@ d.y=d3.event.sourceEvent.clientY;
 }
 function dragended(d) {
      console.log(d,"ended ",d3.event,this);
-d.x=d3.event.sourceEvent.offsetX;
-d.y=d3.event.sourceEvent.offsetY;
- 
- d3.select(this).attr("cx", d.x).attr("cy", d.y);
+//d.x=d3.event.sourceEvent.offsetX;
+//d.y=d3.event.sourceEvent.offsetY;
+ //d.x=d3.event.sourceEvent.screenX-23;
+//d.y=d3.event.sourceEvent.screenY+26;
+ //d3.select(this).attr("cx", d.x).attr("cy", d.y);
  d3.select(this).classed("dragging", false);
   var x = d3.scale.linear()
     .domain([-5, (30 )]) // changes range of values for x axis
@@ -248,15 +249,20 @@ var y = d3.scale.linear()
     .range([height, 0]);
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //Backend Part here
-BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseInt(d.m1),Column4:parseInt(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
                   idtochange = "node2  "+d.col1;
                 else if(d.node==0)
-                  idtochange = "BaseStation "+d.col1;
-                else
+                  { idtochange = "BaseStation "+d.col1;
+                   BScord[d.col1].x= x.invert(d.x);
+                   BScord[d.col1].y= y.invert(d.y);
+                 }
+              else
                   idtochange = "ERROR";
+//window.alert(idtochange);
+
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
              
 }
@@ -278,25 +284,31 @@ if(ParsedData.Id!="0")
  }
 else
 {
-window.alert("BaseStation");
+
 //CIRCLES= d3.selectAll("circle");
+
+
+
 d3.selectAll("circle").each(function(d,i)
 {  /*
   console.log(d.m1);
   d.m1=(parseInt(d.m1)+1000).toString();
   console.log(d.m1);*/
-  BackObj={Id:d.node,Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseInt(d.m1),Column4:parseInt(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+  BackObj={Id:d.node,Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
    console.log("BASESTATION Received this obj",obj); 
  ParsedData=obj;
  if(ParsedData.Id!="0")
   {
    d.m1=ParsedData.Column3;
-   console.log("AQQ",d.m1);
+   //console.log("AQQ",d.m1);
   }
 },"json");//getting from server
 });
+//var max = d3.selectAll("circle").max(function(d) { return d.m1; });
+//console.log(max);
 window.alert();
+
 var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
 d3.selectAll("circle").style("fill",function(d,i) {if(d.node!=0) return mycolormap1(d.m1); else return "blue"} ) 
 //console.log(CIRCLES);
