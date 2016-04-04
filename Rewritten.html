@@ -95,7 +95,7 @@ csv file :testfile4.csv
   var xaxisobject,zoom;
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
   var idtochange="";
-  var BScord=[{x:7.50000,y:10.0000},{x:22.5000,y:10.00000}];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
+  var BScord=[];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
 var x = d3.scale.linear()
     .domain([-5, (30 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
@@ -174,12 +174,15 @@ d3.csv('testfile5.csv',
             for(i=0;i<rows.length;i++)
             {
               if(rows[i].node==0)
-               bs.push(rows[i]);
+               {
+                bs.push(rows[i]);
+                BScord.push({x:rows[i].x,y:rows[i].y});
+               }
               else
                 rows1.push(rows[i]);
               //above function for seperating basestations and nodes,bs has basestations and rows1 has normal nodes
             }
-            console.log(bs);
+            console.log(BScord);
             var circles = svgContainer.selectAll("circle").data(rows1).enter().append("circle");
             // Now work on updating the circles based on the data
             circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
@@ -262,11 +265,6 @@ d.y=d3.event.sourceEvent.offsetY;
 }
 function dragended(d) {
      console.log(d,"ended ",d3.event,this);
-//d.x=d3.event.sourceEvent.offsetX;
-//d.y=d3.event.sourceEvent.offsetY;
- //d.x=d3.event.sourceEvent.screenX-23;
-//d.y=d3.event.sourceEvent.screenY+26;
- //d3.select(this).attr("cx", d.x).attr("cy", d.y);
  d3.select(this).classed("dragging", false);
   var x = d3.scale.linear()
     .domain([-5, (30 )]) // changes range of values for x axis
@@ -371,23 +369,7 @@ function loadMe(){
    SetSize();  
 
 }
- function fillData(text){ 
-   console.log("Read this ",text);
-  var data = d3.csv.parseRows(text).map(function(row) {
-  return row.map(function(value) {
-  return +value;    //to convert text to numbers
-  });
-  });
-  console.log(data);
-  table=data;   //Taking data from respective rows
-  table1=data;
-    col1=table[0];
-  node=table[1]
-    x1=table[2];   
-    y1=table[3];
-    m1=table[4];
-    m2=table[5];
- }
+ 
 
 function dragstarted1(d) {
   d3.event.sourceEvent.stopPropagation();
@@ -453,6 +435,24 @@ BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloa
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
              
 }
+
+function fillData(text){ 
+   console.log("Read this ",text);
+  var data = d3.csv.parseRows(text).map(function(row) {
+  return row.map(function(value) {
+  return +value;    //to convert text to numbers
+  });
+  });
+  console.log(data);
+  table=data;   //Taking data from respective rows
+  table1=data;
+    col1=table[0];
+  node=table[1]
+    x1=table[2];   
+    y1=table[3];
+    m1=table[4];
+    m2=table[5];
+ }
 loadMe();
 
 </script>

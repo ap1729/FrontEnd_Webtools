@@ -94,6 +94,7 @@ func EvaluateMore(r rowdata) rowdata {
        //   log.Printf("%f,%f,%f,%f,%f,%f	",BSX1,BSY1,r.Column1,r.Column2,a,b)
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
        } else { 
+//Basesation stuff of saving session and BS coords
  //log.Println("BASESTATION!!!",r.Id)
 //Need to return bunch of data
  } 
