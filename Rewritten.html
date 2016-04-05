@@ -229,6 +229,7 @@ function zoomed() {
   //above line causes movement also
   
     }//above function causes zooming which is called in var zoom
+    
 function dragstarted(d) {
   d3.event.sourceEvent.stopPropagation();
   d3.select(this).classed("dragging", true);
@@ -275,7 +276,8 @@ var y = d3.scale.linear()
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+//console.log(parseInt(d.node));
+BackObj={Id:parseInt(d.node),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
@@ -318,7 +320,7 @@ d3.selectAll("circle").each(function(d,i)
   d.m1=(parseInt(d.m1)+1000).toString();
   console.log(d.m1);*/
  
-  BackObj={Id:d.node,Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+  BackObj={Id:parseInt(d.node),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
 
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
    console.log("BASESTATION Received this obj",obj); 
@@ -422,7 +424,7 @@ var y = d3.scale.linear()
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-BackObj={Id:d.node,Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={Id:parseInt(d.node),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                if(d.node==0)
                   { idtochange = "BaseStation "+d.col1;
                    BScord[d.col1].x= x.invert(d.x);
