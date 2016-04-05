@@ -28,11 +28,11 @@ var allRecords []TestRecord//global
 // Obj={id:"32",Column1:30,Column2:-45,Column3:-34,Column4:-40}
 // $.post("http://localhost:8080/update",JSON.stringify(Obj),"json")
 type rowdata struct {
-	Id                        int
+	Node,Col                        int
 	Column1, Column2, Column3 ,Column4 float64
         X1, Y1 ,X2 ,Y2   float64 
         
-//Id is indication of Basestation or node
+//node is indication of Basestation or node
 //Column1 to 4 are x,y,m1 and m2 values originally
 //X1,X2,Y1,Y2 are x and y coordinates of basestation locations
 }
@@ -85,7 +85,7 @@ func EvaluateMore(r rowdata) rowdata {
 	// log.Printf("I received this to process %#v", r)
 	// Actual algo goes here ....
         
-      if r.Id!=0{
+      if r.Node!=0{
 //as r.X1,r.X2,r.Y1 and r.Y2 are zero ,am manually setting it in next line
      //  r.X1=7.5
      //r.Y1=10
@@ -105,10 +105,10 @@ func EvaluateMore(r rowdata) rowdata {
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
         if r.Column3<0{r.Column3=0} 
-    allRecords[r.Id].x=r.X1
-allRecords[r.Id].y=r.Y1
-allRecords[r.Id].m1=r.Column3
-allRecords[r.Id].m2=r.Column4
+    allRecords[r.Col].x=r.X1
+allRecords[r.Col].y=r.Y1
+allRecords[r.Col].m1=r.Column3
+allRecords[r.Col].m2=r.Column4
 
 
 
@@ -118,7 +118,7 @@ allRecords[r.Id].m2=r.Column4
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
        } else { 
 //Basesation stuff of saving session and BS coords
- //log.Println("BASESTATION!!!",r.Id)
+ //log.Println("BASESTATION!!!")
 //Need to return bunch of data
  } 
        return r
@@ -173,7 +173,7 @@ csvfile, err := os.Open("testfile5.csv")
   allRecords = append(allRecords, oneRecord)
          }
          }//for loop of csv over
-fmt.Println(allRecords[0:3])
+//fmt.Println(allRecords[0:3])
          // second sanity check
 //Above part is csv parsing and storing all original values in allRecords object
 

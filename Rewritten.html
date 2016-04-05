@@ -274,10 +274,10 @@ var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
-console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
+//console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-//console.log(parseInt(d.node));
-BackObj={Id:parseInt(d.node),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
@@ -295,14 +295,14 @@ function onsuccess(obj) {
  console.log("Received this obj",obj); 
  ParsedData=obj;
 
-if(ParsedData.Id!="0")
+if(ParsedData.Node!=0)
 {
  var shape1=document.getElementById(idtochange); 
   d3.select(shape1).attr("cx",x(ParsedData.Column1))
 .attr("cy",function(d){
   return y(ParsedData.Column2)})
 .attr("r",function(d){return 10;})
-.style('fill', function(d){ return mycolormap(ParsedData.Column3);});
+.style('fill', function(d){ d.m1=ParsedData.Column3; return mycolormap(ParsedData.Column3);});
 
  }
 else
@@ -320,12 +320,12 @@ d3.selectAll("circle").each(function(d,i)
   d.m1=(parseInt(d.m1)+1000).toString();
   console.log(d.m1);*/
  
-  BackObj={Id:parseInt(d.node),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+  BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
 
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
    console.log("BASESTATION Received this obj",obj); 
  ParsedData=obj;
- if(ParsedData.Id!="0")
+ if(ParsedData.Node!=0)
   {
     if(f==0)
     {
@@ -346,7 +346,10 @@ $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
 },"json");//getting from server
 });
 //var max = d3.selectAll("circle").max(function(d) { return d.m1; });
-//console.log(max);
+console.log("AAAAAAAAA");
+console.log(m1min);
+console.log(m1max);
+//m1min and m1max are not updating!!
 var mycolormap1 = d3.scale.linear().domain([m1min ,m1max]).range(["red", "green"]);
 window.alert();//for sync async error
 //d3.selectAll("circle").maximum
@@ -422,9 +425,9 @@ var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
-console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
+//  console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-BackObj={Id:parseInt(d.node),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                if(d.node==0)
                   { idtochange = "BaseStation "+d.col1;
                    BScord[d.col1].x= x.invert(d.x);
