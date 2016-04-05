@@ -21,6 +21,7 @@ import (
          m2  float64
  }
 var allRecords []TestRecord//global
+var BSRecords []TestRecord
 //object for storing values
 
 
@@ -149,7 +150,7 @@ csvfile, err := os.Open("testfile5.csv")
          var oneRecord TestRecord
          
          for _, each := range rawCSVdata {
-              if(each[0]!="col1"){         //to ensure first row of csv does not parse in
+              if(each[0]!="col1" && each[1]!="0"){         //to ensure first row of csv does not parse in
                  oneRecord.col1 = each[0]
                  oneRecord.node = each[1]
  a, err := strconv.ParseFloat(each[2], 64)
@@ -171,13 +172,43 @@ csvfile, err := os.Open("testfile5.csv")
   }
 		
   allRecords = append(allRecords, oneRecord)
-         }
+         }else if(each[0]!="col1"){//basestations
+           oneRecord.col1 = each[0]
+                 oneRecord.node = each[1]
+ a, err := strconv.ParseFloat(each[2], 64)
+  if err==nil{
+   oneRecord.x=a
+//fmt.Printf("\nQQQQ%f\n",oneRecord.x)
+  }
+ b, err := strconv.ParseFloat(each[3], 64)
+  if err==nil{
+   oneRecord.y=b
+  }
+ c, err := strconv.ParseFloat(each[4], 64)
+  if err==nil{
+   oneRecord.m1=c
+  }
+ d, err := strconv.ParseFloat(each[5], 64)
+  if err==nil{
+   oneRecord.m2=d
+  }
+		
+  BSRecords = append(BSRecords, oneRecord)
+
+
+
+
+
+
+
+
+}
          }//for loop of csv over
 //fmt.Println(allRecords[0:3])
          // second sanity check
 //Above part is csv parsing and storing all original values in allRecords object
 
-
+fmt.Println(BSRecords)
 
 
 
