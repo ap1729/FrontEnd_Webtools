@@ -105,11 +105,12 @@ func EvaluateMore(r rowdata) rowdata {
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
+
         if r.Column3<0{r.Column3=0} 
-    allRecords[r.Col].x=r.X1
-allRecords[r.Col].y=r.Y1
-allRecords[r.Col].m1=r.Column3
-allRecords[r.Col].m2=r.Column4
+allRecords[r.Col-len(BSRecords)].x=r.X1
+allRecords[r.Col-len(BSRecords)].y=r.Y1
+allRecords[r.Col-len(BSRecords)].m1=r.Column3
+allRecords[r.Col-len(BSRecords)].m2=r.Column4
 
 
 
@@ -167,7 +168,7 @@ csvfile, err := os.Open("testfile5.csv")
    oneRecord.m1=c
   }
  d, err := strconv.ParseFloat(each[5], 64)
-  if err==nil{
+  if err==nil{	
    oneRecord.m2=d
   }
 		

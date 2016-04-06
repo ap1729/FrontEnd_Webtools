@@ -240,22 +240,22 @@ var x = d3.scale.linear()
 var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
-d.x=d3.event.sourceEvent.offsetX;
-d.y=d3.event.sourceEvent.offsetY;
+d.x=x.invert(d3.event.sourceEvent.offsetX);
+d.y=y.invert(d3.event.sourceEvent.offsetY);
 console.log(d3.event);
- d3.select(this).attr("cx", d.x).attr("cy", d.y);
+ d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
 }
 function dragged(d) {
  
   //  d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
 
-d.x=d3.event.sourceEvent.offsetX;
-d.y=d3.event.sourceEvent.offsetY;
+d.x=x.invert(d3.event.sourceEvent.offsetX);
+d.y=y.invert(d3.event.sourceEvent.offsetY);
 //d.x=d3.event.sourceEvent.clientX;//try putting -35 here
 //d.y=d3.event.sourceEvent.clientY;
  console.log(d3.event.sourceEvent);
- d3.select(this).attr("cx", d.x).attr("cy", d.y);
+ d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
  // d3.select(this).attr("cx", d[0] = d3.event.sourceEvent.x)
                //.attr("cy", d[1] = d3.event.sourceEvent.y);
 // d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
@@ -277,7 +277,7 @@ console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
 
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
@@ -294,12 +294,21 @@ function onsuccess(obj) {
  //on recieving backend
  console.log("Received this obj",obj); 
  ParsedData=obj;
-
+var x = d3.scale.linear()
+    .domain([-5, (30 )]) // changes range of values for x axis
+    .range([0, width]);
+var y = d3.scale.linear()
+    .domain([-5, 30 ]) // changes range of values for y axis
+    .range([height, 0]);
+console.log("QQQ",ParsedData);
 if(ParsedData.Node!=0)
 {
  var shape1=document.getElementById(idtochange); 
   d3.select(shape1).attr("cx",x(ParsedData.Column1))
 .attr("cy",function(d){
+  d.x=(ParsedData.Column1) ;
+  d.y= (ParsedData.Column2);
+  console.log("Updated",d.x,d.y);
   return y(ParsedData.Column2)})
 .attr("r",function(d){return 10;})
 .style('fill', function(d){ d.m1=ParsedData.Column3; return mycolormap(ParsedData.Column3);});
@@ -386,22 +395,23 @@ var x = d3.scale.linear()
 var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
-d.x=d3.event.sourceEvent.offsetX;
-d.y=d3.event.sourceEvent.offsetY;
+d.x=x.invert(d3.event.sourceEvent.offsetX);
+d.y=y.invert(d3.event.sourceEvent.offsetY);
 console.log(d3.event);
- d3.select(this).attr("x", d.x).attr("y", d.y);
+ d3.select(this).attr("x", x(d.x)).attr("y", y(d.y));
 }
 function dragged1(d) {
  
   //  d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
 
-d.x=d3.event.sourceEvent.offsetX;
-d.y=d3.event.sourceEvent.offsetY;
+d.x=x.invert(d3.event.sourceEvent.offsetX);
+d.y=y.invert(d3.event.sourceEvent.offsetY);
+
 //d.x=d3.event.sourceEvent.clientX;//try putting -35 here
 //d.y=d3.event.sourceEvent.clientY;
  console.log(d3.event.sourceEvent);
- d3.select(this).attr("x", d.x).attr("y", d.y);
+ d3.select(this).attr("x", x(d.x)).attr("y", y(d.y));
  // d3.select(this).attr("cx", d[0] = d3.event.sourceEvent.x)
                //.attr("cy", d[1] = d3.event.sourceEvent.y);
 // d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
@@ -424,14 +434,14 @@ function dragended1(d) {
 var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
-console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
+console.log('Am I at ',d.x,d.y) ;
 //  console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:x.invert(d.x),Column2:y.invert(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                if(d.node==0)
                   { idtochange = "BaseStation "+d.col1;
-                   BScord[d.col1].x= x.invert(d.x);
-                   BScord[d.col1].y= y.invert(d.y);
+                   BScord[d.col1].x= d.x;
+                   BScord[d.col1].y= d.y;
                  }
               else
                   idtochange = "ERROR";
