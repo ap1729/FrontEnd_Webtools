@@ -92,6 +92,14 @@ func EvaluateMore(r rowdata) rowdata {
      //r.Y1=10
      //r.X2=22.5
     //   r.Y2=10
+        var bsx,bsy [2]float64
+        
+         for i := 0; i < len(BSRecords); i++ {
+          bsx[i]=BSRecords[i].x
+	  bsy[i]=BSRecords[i].y
+       // log.Printf("%f %f \n",bsx[i],bsy[i]),//now need to run loop to calculate values again
+ 	} 
+//log.Printf(bsx,bsy)
         var a,b,dist1,dist2,BSX1,BSY1,BSX2,BSY2 float64
         a=(r.Column1)/30
         b=(r.Column2+5)/30
@@ -209,7 +217,7 @@ csvfile, err := os.Open("testfile5.csv")
          // second sanity check
 //Above part is csv parsing and storing all original values in allRecords object
 
-fmt.Println(BSRecords)
+fmt.Println(BSRecords,len(BSRecords))  //printing positions of all basestations
 
 
 

@@ -249,13 +249,15 @@ function dragged(d) {
  
   //  d.x=d3.event.sourceEvent.offsetX;
 //d.y=d3.event.sourceEvent.offsetY;
+//if(d3.event.sourceEvent.offsetX>20  && d3.event.sourceEvent.offsetY>20)  ///to prevent stuckat dragging
 
 d.x=x.invert(d3.event.sourceEvent.offsetX);
 d.y=y.invert(d3.event.sourceEvent.offsetY);
 //d.x=d3.event.sourceEvent.clientX;//try putting -35 here
 //d.y=d3.event.sourceEvent.clientY;
- console.log(d3.event.sourceEvent);
+ console.log(d3.event.sourceEvent.offsetX);
  d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
+ 
  // d3.select(this).attr("cx", d[0] = d3.event.sourceEvent.x)
                //.attr("cy", d[1] = d3.event.sourceEvent.y);
 // d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
