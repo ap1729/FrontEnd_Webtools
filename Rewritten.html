@@ -279,7 +279,7 @@ console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
 
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                 if(d.node==1) 
                  idtochange = "node1  "+d.col1;
                else if(d.node==2)
@@ -331,7 +331,7 @@ d3.selectAll("circle").each(function(d,i)
   d.m1=(parseInt(d.m1)+1000).toString();
   console.log(d.m1);*/
  
-  BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+  BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
 
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
    console.log("BASESTATION Received this obj",obj); 
@@ -439,7 +439,7 @@ var y = d3.scale.linear()
 console.log('Am I at ',d.x,d.y) ;
 //  console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2),x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
+BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
                if(d.node==0)
                   { idtochange = "BaseStation "+d.col1;
                    BScord[d.col1].x= d.x;

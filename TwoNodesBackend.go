@@ -31,7 +31,7 @@ var BSRecords []TestRecord
 type rowdata struct {
 	Node,Col                        int
 	Column1, Column2, Column3 ,Column4 float64
-        X1, Y1 ,X2 ,Y2   float64 
+        //X1, Y1 ,X2 ,Y2   float64 
         
 //node is indication of Basestation or node
 //Column1 to 4 are x,y,m1 and m2 values originally
@@ -93,30 +93,46 @@ func EvaluateMore(r rowdata) rowdata {
      //r.X2=22.5
     //   r.Y2=10
         var bsx,bsy [2]float64
-        
+         var a,b,dist1 float64
+        a=(r.Column1)/30
+        b=(r.Column2+5)/30
+        r.Column3=500.0
+	r.Column4=0.0
          for i := 0; i < len(BSRecords); i++ {
           bsx[i]=BSRecords[i].x
 	  bsy[i]=BSRecords[i].y
        // log.Printf("%f %f \n",bsx[i],bsy[i]),//now need to run loop to calculate values again
+
+        dist1=((a-(bsx[i]/30))*(a-(bsx[i]/30))+(b-((bsy[i]+5)/30))*(b-((bsy[i]+5)/30))) 
+	//dist2=((a-BSX2)*(a-BSX2)+(b-BSY2)*(b-BSY2)) 
+     
+	r.Column4+=(0.2)*((1/dist1))//+(1/dist2))
+	r.Column3+=80*math.Log(math.Abs(dist1))
+  
+
  	} 
+      if r.Column3<0{r.Column3=0  } 
 //log.Printf(bsx,bsy)
-        var a,b,dist1,dist2,BSX1,BSY1,BSX2,BSY2 float64
+       
+        
+        /*
+  var a,b,dist1,dist2,BSX1,BSY1,BSX2,BSY2 float64
         a=(r.Column1)/30
         b=(r.Column2+5)/30
-        BSX1=(r.X1)/30
+BSX1=(r.X1)/30
         BSY1=(r.Y1+5)/30
 	BSX2=(r.X2)/30
 	BSY2=(r.Y2+5)/30
-        
+
 	dist1=((a-BSX1)*(a-BSX1)+(b-BSY1)*(b-BSY1)) 
 	dist2=((a-BSX2)*(a-BSX2)+(b-BSY2)*(b-BSY2)) 
      
 	r.Column4=(0.2)*((1/dist1)+(1/dist2))
 	r.Column3=500+80*math.Log(math.Abs(dist1*dist2))
-
-        if r.Column3<0{r.Column3=0} 
-allRecords[r.Col-len(BSRecords)].x=r.X1
-allRecords[r.Col-len(BSRecords)].y=r.Y1
+ */
+        //if r.Column3<0{r.Column3=0  } 
+allRecords[r.Col-len(BSRecords)].x=r.Column1
+allRecords[r.Col-len(BSRecords)].y=r.Column2
 allRecords[r.Col-len(BSRecords)].m1=r.Column3
 allRecords[r.Col-len(BSRecords)].m2=r.Column4
 
@@ -127,6 +143,10 @@ allRecords[r.Col-len(BSRecords)].m2=r.Column4
        //   log.Printf("%f,%f,%f,%f,%f,%f	",BSX1,BSY1,r.Column1,r.Column2,a,b)
  //log.Printf("Returned %f %f %f %f",r.Column1,r.Column2,r.Column3,r.Column4)
        } else { 
+BSRecords[r.Col].x=r.Column1;
+BSRecords[r.Col].y=r.Column2;
+
+
 //Basesation stuff of saving session and BS coords
  //log.Println("BASESTATION!!!")
 //Need to return bunch of data
