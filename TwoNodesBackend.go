@@ -92,23 +92,23 @@ func EvaluateMore(r rowdata) rowdata {
      //r.Y1=10
      //r.X2=22.5
     //   r.Y2=10
-        var bsx,bsy [2]float64
+  
+       // var bsx,bsy [3]float64  // the size of 
          var a,b,dist1 float64
         a=(r.Column1)/30
         b=(r.Column2+5)/30
         r.Column3=500.0
 	r.Column4=0.0
          for i := 0; i < len(BSRecords); i++ {
-          bsx[i]=BSRecords[i].x
-	  bsy[i]=BSRecords[i].y
+        //  bsx[i]=BSRecords[i].x
+	 // bsy[i]=BSRecords[i].y
        // log.Printf("%f %f \n",bsx[i],bsy[i]),//now need to run loop to calculate values again
 
-        dist1=((a-(bsx[i]/30))*(a-(bsx[i]/30))+(b-((bsy[i]+5)/30))*(b-((bsy[i]+5)/30))) 
-	//dist2=((a-BSX2)*(a-BSX2)+(b-BSY2)*(b-BSY2)) 
+        dist1=((a-(BSRecords[i].x/30))*(a-(BSRecords[i].x/30))+(b-((BSRecords[i].y+5)/30))*(b-((BSRecords[i].y+5)/30))) 
      
-	r.Column4+=(0.2)*((1/dist1))//+(1/dist2))
+	r.Column4+=(0.2)*((1/dist1))
 	r.Column3+=80*math.Log(math.Abs(dist1))
-  
+  //above two lines come from calculation formulae
 
  	} 
       if r.Column3<0{r.Column3=0  } 
