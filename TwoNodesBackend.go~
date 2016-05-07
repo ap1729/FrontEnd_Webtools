@@ -22,7 +22,7 @@ import (
  }
 var allRecords []TestRecord//global
 var BSRecords []TestRecord           
-//object for storing values
+//object for storing values , allRecords for Nodes and BS for basestations
 
 // E.g for sending from browser
 // Obj={id:"32",Column1:30,Column2:-45,Column3:-34,Column4:-40}
@@ -34,7 +34,7 @@ type rowdata struct {
         
 //node is indication of Basestation or node
 //Column1 to 4 are x,y,m1 and m2 values originally
-}
+}//data which is coming from user
 
 func handlerroute(w http.ResponseWriter, r *http.Request) {
 
@@ -108,7 +108,7 @@ allRecords[r.Col-len(BSRecords)].x=r.Column1
 allRecords[r.Col-len(BSRecords)].y=r.Column2
 allRecords[r.Col-len(BSRecords)].m1=r.Column3
 allRecords[r.Col-len(BSRecords)].m2=r.Column4
-
+//updating values in backend 
 
        } else { 
 //basestations data
@@ -199,12 +199,6 @@ csvfile, err := os.Open("testfile5.csv")
 //Above part is csv parsing and storing all original values in allRecords object
 
 fmt.Println(BSRecords,len(BSRecords))  //printing positions of all basestations
-
-
-
-
-
-
 
 	log.Println("Started Server at :8080")
 	http.HandleFunc("/update", handlerroute)
