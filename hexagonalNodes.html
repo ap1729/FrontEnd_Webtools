@@ -26,7 +26,7 @@ svg {
 
 
 .over {
-    fill: red !important;
+    fill: orange!important;
     fill-opacity: 0.8 !important;
 }
 
@@ -81,8 +81,8 @@ div.visible {
         <div>
            <div class="panel panel-default">
              <div class="panel-body">
-              <p id="MapOutput">
-                  Map
+              <p id="Output">
+                  Output
             
                </p>
              </div>
@@ -257,7 +257,7 @@ d3.csv('testfile5.csv',
 // d3 mouse events
 function mouseOver(d, i) { //tooltip to be used for circles 
     d3.select(this).classed('over', true);
-    tooltip.text(d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected    )
+    tooltip.text('('+x(d.x).toFixed(1)+","+y(d.y).toFixed(1)+')'+" " +(d.m1))  //d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected  
         .classed('visible', true);
 }
 
@@ -279,7 +279,7 @@ function click(d, i) { // on mouse click ,to be used for circles to show SINR pr
         d.type = selected ? 'regular' : 'selected';
         d.lastSelected = +d3.event.timeStamp;
         
-        tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected);
+        //tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected);
 }
 function zoomed() {
   // svg.select(".x.axis").call(xAxis);
@@ -546,7 +546,7 @@ window.onload = function() {
     initialize();
 };
 
-var size =  120, // hexagon size
+var size =  130, // hexagon size
     radius = 25, // map radius
     tilted = false; // true is horizontal alignment
 
