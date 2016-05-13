@@ -154,7 +154,7 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('Nodelocations.csv',//'Nodelocations.csv', 
+d3.csv('Nodelocations1.csv',//'Nodelocations.csv', 
         // accessor function
         function(d) {
             return {
@@ -172,8 +172,9 @@ d3.csv('Nodelocations.csv',//'Nodelocations.csv',
             var svg = d3.select("svg");
             var i=0;
             for(i=0;i<rows.length;i++)
-            {
-              if(rows[i].node==0)
+            { 
+
+              if(rows[i].node[0]=='B' && rows[i].node[1]=='S')
                {
                 bs.push(rows[i]);
                 BScord.push({x:rows[i].x,y:rows[i].y});
@@ -199,15 +200,23 @@ d3.csv('Nodelocations.csv',//'Nodelocations.csv',
              })
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
-            .style("fill",function(d,i) { if(d.node!=0) return mycolormap(d.m1); else return "blue"} ) 
+            .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
+                                         else if(d.node[2]=='2') return "orange";//for UE2
+                                        else if(d.node[2]=='3') return "red";//for UE3
+                                         else if(d.node[2]=='4') return "yellow";//for UE4
+                                          else return "blue";} ) // to change colour of each basestation user 
             .call(drag);
             
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
             rect.attr("x",function(d,i){ return x(d.x)+5  ;})
             .attr("y",function(d,i){return y(d.y)-7.5;})
-            .attr("width",15)
-            .attr("height",15)
-            .style("fill","blue")
+            .attr("width",7)
+            .attr("height",7)
+            .style("fill",function(d,i) { if(d.node[2]=='1') return "green";//for UE1
+                                         else if(d.node[2]=='2') return "orange";//for UE2
+                                        else if(d.node[2]=='3') return "red";//for UE3
+                                         else if(d.node[2]=='4') return "yellow";//for UE4
+                                          else return "blue";} ) 
             .attr("id",function(d,i){return "BaseStation "+d.col1;})
             .call(drag1);
 
