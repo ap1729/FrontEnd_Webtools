@@ -97,10 +97,10 @@ csv file :testfile4.csv
   var idtochange="";
   var BScord=[];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
 var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
+    .domain([-2200, (2400 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
 var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
+    .domain([-2000, 2000 ]) // changes range of values for y axis
     .range([400, 0]);//400 is height value defined in SetSize()
 
 
@@ -154,7 +154,7 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('testfile5.csv', 
+d3.csv('Nodelocations.csv',//'Nodelocations.csv', 
         // accessor function
         function(d) {
             return {
@@ -182,10 +182,11 @@ d3.csv('testfile5.csv',
                 rows1.push(rows[i]);
               //above function for seperating basestations and nodes,bs has basestations and rows1 has normal nodes
             
-}            console.log(BScord);
+}            
+            console.log(BScord);
             var circles = svgContainer.selectAll("circle").data(rows1).enter().append("circle");
             // Now work on updating the circles based on the data
-            circles.attr("r", function(d,i) { return (10);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
+            circles.attr("r", function(d,i) { return (3.5);})  //window.alert(d.x);window.alert(d.y);window.alert(d.m1);window.alert(d.m2);window.alert(d.node);window.alert(d.col1);
             .attr("id",function(d,i){ 
                if(d.node==1) 
                  return "node1  "+d.col1;
