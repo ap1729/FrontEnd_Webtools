@@ -212,7 +212,7 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('Nodelocations1.csv', 
+d3.csv('Nodelatest.csv', 
         // accessor function
         function(d) {
             return {
@@ -297,13 +297,13 @@ function mouseOver1(d,i){
   //function for basestation , mouse hover
    //d3.select(this).classed('over', true);
     //window.alert();
-    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.m1))  //d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected  
+    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.col1))  //d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected  
        .classed('visible', true);
 }
 function mouseOver(d, i) { //tooltip to be used for circles 
   //function for circle, mouse hover
     d3.select(this).classed('over', true);
-    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.m1))  //d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected  
+    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.col1))  //d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected  
         .classed('visible', true);
     PlotBarGraph();//to plot bar graph for SIR profile
 }
@@ -809,8 +809,8 @@ var y = d3.scale.linear()
   .style("fill","none")
   .style("stroke","blue")
   .on('mousewheel', mouseScroll) // webkit
-  .on('DOMMouseScroll', mouseScroll); // firefox
-
+  .on('DOMMouseScroll', mouseScroll) // firefox
+ .attr('pointer-events', 'none');
 
 
         /*

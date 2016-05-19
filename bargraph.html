@@ -1,0 +1,192 @@
+<html>
+<head>
+  <style>
+     .axis path,.axis line 
+     {
+        fill: none;
+      stroke: #777;
+      shape-rendering: crispEdges;
+     }
+     .axis text
+        {
+            font-family: 'Arial';
+            font-size: 13px;
+        }
+        .tick
+        {
+            stroke-dasharray: 1, 2;
+        }
+        .bar
+        {
+            fill: FireBrick;
+        }
+        
+  </style>
+</head>
+
+<script src="/d3/d3.min.js"></script>
+
+<svg id="visualisation" width="1000" height="500"></svg>
+
+<body>
+        
+       
+<script>
+InitChart();
+function gettopthree(arrayData){  //sorting to top 3 function
+//  arrayData.sort(function(a, b) {
+//         return parseFloat(b.value) - parseFloat(a.value);
+//         return d3.descending((b.value), (a.value));
+//                });
+ //return arrayData.slice(0); 
+
+arrayData.sort(function(a,b){
+  if(a.y < b.y){
+    return 1;
+  }
+  if(a.y > b.y){
+    return -1;
+  }
+  return 0;
+});
+return arrayData.slice(0,12);
+}
+
+function InitChart() {
+
+  var barData = [{
+    'x': 1,
+    'y': -10
+  }, {
+    'x': 12,
+    'y': -30
+  }, {
+    'x': 6,
+    'y': -12
+  }, {
+    'x': 7,
+    'y': -20
+  }, {
+    'x': 2,
+    'y': 0
+  }, {
+    'x': 8,
+    'y': -160
+  },{
+    'x': 11,
+    'y': -15
+  }, {
+    'x': 3,
+    'y': -210
+  }, {
+    'x': 9,
+    'y': -116
+  }, {
+    'x': 4,
+    'y': -43
+  }, {
+    'x': 10,
+    'y': -35
+  }, {
+    'x': 5,
+    'y': -60
+  }];
+
+var key = function(d){
+  return d.y;
+}
+barData = gettopthree(barData);
+  var vis = d3.select('#visualisation'),
+    WIDTH = 700,
+    HEIGHT = 600,
+    MARGINS = {
+      top: 100,
+      right: 20,
+      bottom: 40,
+      left: 50
+    },
+    xRange = d3.scale.ordinal().rangeRoundBands([MARGINS.left, WIDTH - MARGINS.right], 0.1).domain(barData.map(function (d) {
+      return d.x;
+    })),
+
+
+    yRange = d3.scale.linear().range([MARGINS.bottom,HEIGHT - MARGINS.top]).domain([0,d3.min(barData, function (d) {
+        
+        return d.y;
+      })
+    ]),
+
+    xAxis = d3.svg.axis()
+      .scale(xRange)
+      .tickSize(5)
+      .orient("top"),
+
+    yAxis = d3.svg.axis()
+      .scale(yRange)
+      .tickSize(5)
+      .orient("left");
+
+
+  vis.append('svg:g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0,' + ( MARGINS.bottom) + ')')
+    .call(xAxis);
+
+  vis.append('svg:g')
+    .attr('class', 'y axis')
+    .attr('transform' ,'translate(' + (MARGINS.left) + ',0)')
+    .call(yAxis);
+
+vis.selectAll("rect")
+      .data(barData)
+      .enter()
+        .append('rect')
+        .attr('class', function(d){return d.y < 0 ? "negative" : "positive";})
+        .attr({
+          x: function(d){
+            return xRange(d.x);
+          },
+          y: function(d){
+            return yRange(Math.max(0, d.y)); 
+          },
+          width: xRange.rangeBand(),
+          height: function(d){
+            return Math.abs(yRange(d.y) - yRange(0)); 
+          }
+          })
+          .attr('fill','GRAY');
+
+/*vis.selectAll("text")
+   .data(barData)
+   .enter()
+   .append('text')
+   .attr('class','textlabel')
+   .attr('x',function(d){
+     return xRange(d["x"])+(xrange.rangeBand()/2);
+   })
+   .attr('y',function(d){
+     return yRange(d["y"]);
+   })
+   .attr('fill','green')
+   .text(function(d){
+     return d;
+   })
+   ;
+*/
+
+vis.selectAll("text").
+  data(barData).
+  enter().
+  append("svg:text").
+  attr("x", function(datum, index) { return xRange(index) + 40; }).
+  attr("y", function(datum) { return HEIGHT - y(datum.books); }).
+  attr("dx", -40/2).
+  attr("dy", "1.2em").
+  attr("text-anchor", "middle").
+  text(function(datum) { return datum.Y;}).
+  attr("fill", "BLUE");
+}
+</script>
+</body>
+</html>
+
