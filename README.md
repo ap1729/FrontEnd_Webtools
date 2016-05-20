@@ -12,5 +12,5 @@
 - `Level1.html`
 - `Extra feature is that on clicking level1 button, each UE connects to the strongest Basestation and changes colour to that operator`
 - `Level0 button,on clicking reverts back to original colours` 
-
-
+- `View Top BS check box shows top interfering basestations of UE(on clicking) by increasing size of BS appropriately`
+- `Reset button resets to level 0 and defaults the basestation size`
