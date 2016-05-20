@@ -296,14 +296,14 @@ return arrayData.slice(0,10); //top x values in  .slice(0,x)
 function InitChart(rowno) {
 var barData=[];
 d3.select("#BarGraph").remove();
-console.log(rowno);
+//console.log(rowno);
 d3.csv("Converted.csv", ///home/Desktop/x/
         // accessor function
         function(d) {
           barData=[];
           for(i=0;i<76;i++) //for all 76 columns,228 for sectoring
           {
-          barData.push({'x':i,'y': parseFloat(d[rowno-75][i])}); //0 to 75 are basestations 
+          barData.push({'x':i,'y': parseFloat(d[rowno-76][i])}); //As UE1-76 is mapped to 0 
           }
 
       
@@ -419,20 +419,23 @@ d3.csv("Converted.csv", ///home/Desktop/x/
 temp=0;
 
 max=-300;
-        for(i=0;i<1957;i++) //for all rows
-         { temp=0;
+        for(i=0;i<1957;i++) //for all rows in Converted.CSV
+         { 
+           
+           temp=0;
            max=parseFloat(d[i][0]);
            for(j=0;j<76;j++)//for all 76 columns,228 for sectoring
           {
-          if(parseFloat(d[i][j])>max)
-           {
-            temp=j;
-            max=d[i][j];
-           }//finding maximum index
+            if(parseFloat(d[i][j])>max)
+             {
+              temp=j;
+              max=parseFloat(d[i][j]);
+              }//finding maximum index
           }
         list.push(temp);
+        //console.log(i,temp,max);
          }  
- //        console.log(list);
+      //console.log(list);
       
 
 //list now contains the col no:s of minimum path loss
@@ -443,7 +446,7 @@ max=-300;
 str2="#BS";//for BS
 str1="";//for UE
 //******* UE1 ********
-for(i=0;i<1900;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 similarly 19 for all other 3
+for(i=0;i<1900;i++)//i=0 to 1900 for UE1 similarly 19 for all other 3
 {
  str3=str2+list[i].toString();// read the basestation from list
  //console.log(str3);
@@ -456,7 +459,7 @@ str1='#UE1-'+(i+76).toString()
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
                                         else if(bs[list[i]].node[2]=='3') return "red";//for UE3
                                          else if(bs[list[i]].node[2]=='4') return "yellow";//for UE4
-                                          else return "blue";});//for error 
+                                          else {console.log("ERRORBLUE");return "blue";}});//for error 
 
 }
 
