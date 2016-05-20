@@ -278,6 +278,8 @@ function mouseOver(d, i) {
 
 
 function PlotBarGraph(rowno){
+  //function which plots bar graph
+  //also increases top contributing basestations sizes 
 InitChart(rowno);
 function gettopthree(arrayData){  
 //returns top x , the number in .slice(0,x);
@@ -313,13 +315,13 @@ var key = function(d){
 barData = gettopthree(barData);
 
 if(document.getElementById("TopBS").checked == true)
-{//button is also clicked, to enhance those basestations
+{//button is also clicked, to enhance size of those basestations
   //console.log(barData[0].y);
   var Bsid="";
   for(i=0;i<10;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+barData[i].x.toString();
-    d3.select(Bsid).attr("width",(27-2*i));// to change attributes of max basestations
+    d3.select(Bsid).attr("width",(27-2*i)).attr("height",(27-2*i));// to change attributes of max basestations
   }
 }
   vis = d3.select('#visual').append('svg').attr("id","BarGraph"),
@@ -521,7 +523,7 @@ for(i=1938;i<1957;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 simila
  //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
  //d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE3-'+(i+bs.length).toString()
+str1='#UE4-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
@@ -530,15 +532,7 @@ str1='#UE3-'+(i+bs.length).toString()
                                           else return "blue";});//for error 
 
 }
-
-
-
-
-
-
-
 }
-
         );//d3.csv ends here
 
 }
@@ -557,7 +551,7 @@ function level0()
 function Reset()
 {
   level0();
-   svgContainer.selectAll("rect").attr("width",7);
+   svgContainer.selectAll("rect").attr("width",7).attr("height",7);
 }
 
 
