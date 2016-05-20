@@ -33,9 +33,9 @@ svg {
 
 
 .over {
-    fill: black!important;  /* to show selected on hover*/
+    fill: black!important;  /* to show selected on hover*/    
     fill-opacity: 0.8 !important;
-}
+  }
 
 
 div.tooltip {
@@ -117,6 +117,7 @@ div.visible {
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
   var idtochange="";
   var BScord=[];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
+  var level=0;//which level it is currently in
 var x = d3.scale.linear()
     .domain([-2200, (2300 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
@@ -231,7 +232,7 @@ d3.csv('Nodelocations.csv',
             .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
                                          else if(d.node[2]=='2') return "orange";//for UE2
                                         else if(d.node[2]=='3') return "red";//for UE3
-                                         else if(d.node[2]=='4') return "yellow";//for UE4
+                                         else if(d.node[2]=='4') return "brown";//for UE4
                                           else return "blue";} ) // to change colour of each basestation user 
            // .call(drag)
             .on('mouseover', mouseOver) 
@@ -247,7 +248,7 @@ d3.csv('Nodelocations.csv',
             .style("fill",function(d,i) { if(d.node[2]=='1') return "green";//for BS1
                                          else if(d.node[2]=='2') return "orange";//for BS2
                                         else if(d.node[2]=='3') return "red";//for Bs3
-                                         else if(d.node[2]=='4') return "yellow";//for BS4
+                                         else if(d.node[2]=='4') return "brown";//for BS4
                                           else return "blue";} ) 
             .attr("id",function(d,i){return "BS"+d.col1;})
             .on('mouseover', mouseOver1) ;
@@ -266,21 +267,72 @@ d3.csv('Nodelocations.csv',
 // d3 mouse events
 function mouseOver1(d,i){
   //function for basestation , mouse hover
-    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.col1))   
+    tooltip.text("BS" +(d.col1))   
        .classed('visible', true);
 }
 function mouseOver(d, i) {  
   //function for circle,tooltip on mouse hover
     d3.select(this).classed('over', true);
-    tooltip.text('('+parseFloat(d.x).toFixed(1)+","+parseFloat(d.y).toFixed(1)+')'+" " +(d.col1))  
+    if(level==0)
+    {
+    tooltip.text("UE" +(d.col1))  
         .classed('visible', true);
+      }
+      else if(level==1)
+      {
+         var currop="";
+         if(this.style.fill=='lime')
+         {
+           currop=1;//from definition
+         }
+      else if(this.style.fill=='orange')
+         {
+           currop=2;//from definition
+         }
+      else if(this.style.fill=='red')
+         {
+           currop=3;//from definition
+         }
+        else if(this.style.fill=='brown')
+         {
+           currop=4;//from definition
+         }
+
+        tooltip.text("UE" +(d.col1)+" Def:"+d.node[2]+" Curr:"+currop).classed('visible', true);
+      }
+      else
+        console.log("Level undefined error");
 }
 
+function mouseMove(d, i) {
+    tooltip.style('top', (d3.event.pageY - 20) + 'px')
+        .style('left', (d3.event.pageX + 20) + 'px');
+}
 
-function PlotBarGraph(rowno){
+function mouseOut(d, i) {
+    d3.select(this).classed('over', false);
+    tooltip.classed('visible', false);
+}
+
+function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
+
+PlotBarGraph(d.col1,d.node[2]);//to plot bar graph for SIR profile
+    var element = d3.select(this),
+        selected = element.classed('selected');
+        
+        element.classed('selected', !selected);
+        d.type = selected ? 'regular' : 'selected';
+        
+        if(d.type=="selected")
+          d3.select(this).attr("r",10);
+        else
+          d3.select(this).attr("r",3.5);
+      }
+
+function PlotBarGraph(rowno,curroper){
   //function which plots bar graph
   //also increases top contributing basestations sizes 
-InitChart(rowno);
+InitChart(rowno,curroper);
 function gettopthree(arrayData){  
 //returns top x , the number in .slice(0,x);
 arrayData.sort(function(a,b){
@@ -295,7 +347,7 @@ arrayData.sort(function(a,b){
 return arrayData.slice(0,10); //top x values in  .slice(0,x) 
 }
 
-function InitChart(rowno) {
+function InitChart(rowno,curroper) {
 var barData=[];
 d3.select("#BarGraph").remove();
 //console.log(rowno);
@@ -312,12 +364,35 @@ d3.csv("Converted.csv", ///home/Desktop/x/
 var key = function(d){
   return d.y;
 }
-barData = gettopthree(barData);
+barData = gettopthree(barData);//function which sorts top 10,defualt is level 1
+if(level==0)
+{//need to make the default operator as first value
+  i=0;
+  console.log("CURR: ",curroper);
+  while(i<10)
+  {
+    //console.log(Math.floor((barData[i].x)/19)+1);  // as operator count starts from 1
+    
+   if((Math.floor((barData[i].x)/19)+1)==curroper)
+   {
+     console.log("A",i);
+    break;
+   }
+   
+   i+=1;
+  }
+}
 
 if(document.getElementById("TopBS").checked == true)
 {//button is also clicked, to enhance size of those basestations
   //console.log(barData[0].y);
   var Bsid="";
+  for(i=0;i<bs.length;i++)
+  {// to make all rect same size
+    Bsid='#BS'+i.toString();
+    d3.select(Bsid).attr("width",7).attr("height",7);
+  }
+
   for(i=0;i<10;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+barData[i].x.toString();
@@ -390,28 +465,8 @@ if(document.getElementById("TopBS").checked == true)
  }
 }
 
-function mouseMove(d, i) {
-    tooltip.style('top', (d3.event.pageY - 20) + 'px')
-        .style('left', (d3.event.pageX + 20) + 'px');
-}
-
-function mouseOut(d, i) {
-    d3.select(this).classed('over', false);
-    tooltip.classed('visible', false);
-}
-
-function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
-
-PlotBarGraph(d.col1);//to plot bar graph for SIR profile
-    var element = d3.select(this),
-        selected = element.classed('selected');
-        
-        element.classed('selected', !selected);
-        d.type = selected ? 'regular' : 'selected';
 
 
-
-}
 function zoomed() {
   var translate = d3.event.translate,
             scale = d3.event.scale;
@@ -423,8 +478,9 @@ function zoomed() {
 
 
 function level1()
-{//see line 215
+{
   //do level 1 stuff here
+  level=1;
 var circles = svgContainer.selectAll("circle").data(rows1);
 //console.log(circles);
 list=[];
@@ -433,7 +489,6 @@ d3.csv("Converted.csv", ///home/Desktop/x/
         // accessor function
         function(d) {
 temp=0;
-
 max=-300;
         for(i=0;i<1957;i++) //for all rows in Converted.CSV
          { 
@@ -473,7 +528,7 @@ str1='#UE1-'+(i+bs.length).toString()
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
                                         else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "yellow";//for UE4
+                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
                                           else {console.log("ERRORBLUE");return "blue";}});//for error 
 
 }
@@ -492,7 +547,7 @@ str1='#UE2-'+(i+bs.length).toString()
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
                                         else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "yellow";//for UE4
+                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
                                           else return "blue";});//for error 
 
 }
@@ -510,7 +565,7 @@ str1='#UE3-'+(i+bs.length).toString()
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
                                         else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "yellow";//for UE4
+                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
                                           else return "blue";});//for error 
 
 }
@@ -528,7 +583,7 @@ str1='#UE4-'+(i+bs.length).toString()
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
                                         else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "yellow";//for UE4
+                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
                                           else return "blue";});//for error 
 
 }
@@ -540,6 +595,7 @@ str1='#UE4-'+(i+bs.length).toString()
 
 function level0()
 {
+  level=0;
  var circles = svgContainer.selectAll("circle").data(rows1)
  .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
                                          else if(d.node[2]=='2') return "orange";//for UE2
