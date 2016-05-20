@@ -81,7 +81,7 @@ div.visible {
         <div class="well">
            <div id="drawbox"> 
           </div>
-           <button type="button" class="btn btn-default" onclick="">Level0</button>
+           <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
             
           </div>
@@ -301,9 +301,9 @@ d3.csv("Converted.csv", ///home/Desktop/x/
         // accessor function
         function(d) {
           barData=[];
-          for(i=0;i<76;i++) //for all 76 columns,228 for sectoring
+          for(i=0;i<bs.length;i++) //for all 76 columns,228 for sectoring
           {
-          barData.push({'x':i,'y': parseFloat(d[rowno-76][i])}); //As UE1-76 is mapped to 0 
+          barData.push({'x':i,'y': parseFloat(d[rowno-bs.length][i])}); //As UE1-76 is mapped to 0 
           }
 
       
@@ -424,7 +424,7 @@ max=-300;
            
            temp=0;
            max=parseFloat(d[i][0]);
-           for(j=0;j<76;j++)//for all 76 columns,228 for sectoring
+           for(j=0;j<bs.length;j++)//bs.length=76, multiply by 3 fr sectoring//for all 76 columns,228 for sectoring
           {
             if(parseFloat(d[i][j])>max)
              {
@@ -436,7 +436,7 @@ max=-300;
         //console.log(i,temp,max);
          }  
       //console.log(list);
-      
+            
 
 //list now contains the col no:s of minimum path loss
 //Note that UE's are from UE1-76 onwards
@@ -448,12 +448,11 @@ str1="";//for UE
 //******* UE1 ********
 for(i=0;i<1900;i++)//i=0 to 1900 for UE1 similarly 19 for all other 3
 {
- str3=str2+list[i].toString();// read the basestation from list
- //console.log(str3);
+ str3=str2+list[i].toString();// Make the basestation id from list
  //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
 // d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE1-'+(i+76).toString()
+str1='#UE1-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
@@ -472,7 +471,7 @@ for(i=1900;i<1919;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 simila
 // console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
  //d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE2-'+(i+76).toString()
+str1='#UE2-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
@@ -490,7 +489,7 @@ for(i=1920;i<1938;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 simila
  //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
  //d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE3-'+(i+76).toString()
+str1='#UE3-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
@@ -508,7 +507,7 @@ for(i=1938;i<1957;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 simila
  //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
  //d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE3-'+(i+76).toString()
+str1='#UE3-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
    .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
                                          else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
@@ -531,7 +530,15 @@ str1='#UE3-'+(i+76).toString()
 }
 
 
-
+function level0()
+{
+ var circles = svgContainer.selectAll("circle").data(rows1)
+ .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
+                                         else if(d.node[2]=='2') return "orange";//for UE2
+                                        else if(d.node[2]=='3') return "red";//for UE3
+                                         else if(d.node[2]=='4') return "yellow";//for UE4
+                                          else return "blue";} ) ; 
+}
 
 
 
