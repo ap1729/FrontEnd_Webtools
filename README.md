@@ -4,6 +4,7 @@
 - `go run httpserver.go`
 - `Open BarGraphData.html`
 - `Open Level1.html`
+
 # What it does
 - `BarGraphData.html`
 - `This code opens an already existing file with BS and UE coordinates and plots in a hexagonal grid`
