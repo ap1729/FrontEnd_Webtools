@@ -83,7 +83,8 @@ div.visible {
           </div>
            <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
-            
+           View Top BS: <input type="checkbox" id="TopBS">
+          <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
           </div>
           <!--<button type="button" class="btn btn-default" onclick="">Level1</button> -->
      <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
@@ -123,7 +124,6 @@ var y = d3.scale.linear()
     .domain([-2200, 2300 ]) // changes range of values for y axis
     .range([900, 0]);//400 is height value defined in SetSize()
 var rows1=[],bs=[];//stores rows and bs data
-
 function SetSize(){
      margin = {top: 10, right: 10, bottom: 10, left: -20},
     width = 1200 //1200/to change dimensions of graph  seen///- margin.left - margin.right,
@@ -280,7 +280,7 @@ function mouseOver(d, i) {
 function PlotBarGraph(rowno){
 InitChart(rowno);
 function gettopthree(arrayData){  
-
+//returns top x , the number in .slice(0,x);
 arrayData.sort(function(a,b){
   if(a.y < b.y){
     return 1;
@@ -304,13 +304,24 @@ d3.csv("Converted.csv", ///home/Desktop/x/
           for(i=0;i<bs.length;i++) //for all 76 columns,228 for sectoring
           {
           barData.push({'x':i,'y': parseFloat(d[rowno-bs.length][i])}); //As UE1-76 is mapped to 0 
-          }
+          } //in above line y part the input signal strength has to be added which in this case is 46 dbm
 
       
 var key = function(d){
   return d.y;
 }
 barData = gettopthree(barData);
+
+if(document.getElementById("TopBS").checked == true)
+{//button is also clicked, to enhance those basestations
+  //console.log(barData[0].y);
+  var Bsid="";
+  for(i=0;i<10;i++) //top 10 ,hence this loop 
+  {
+   Bsid="#BS"+barData[i].x.toString();
+    d3.select(Bsid).attr("width",(27-2*i));// to change attributes of max basestations
+  }
+}
   vis = d3.select('#visual').append('svg').attr("id","BarGraph"),
     WIDTH = 500,//change width and height to change size of bar graph
     HEIGHT = 500,
@@ -395,6 +406,9 @@ PlotBarGraph(d.col1);//to plot bar graph for SIR profile
         
         element.classed('selected', !selected);
         d.type = selected ? 'regular' : 'selected';
+
+
+
 }
 function zoomed() {
   var translate = d3.event.translate,
@@ -540,7 +554,11 @@ function level0()
                                           else return "blue";} ) ; 
 }
 
-
+function Reset()
+{
+  level0();
+   svgContainer.selectAll("rect").attr("width",7);
+}
 
 
 
