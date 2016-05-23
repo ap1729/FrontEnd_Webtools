@@ -10,10 +10,15 @@ var y = d3.scale.linear()
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Level 1</title>   
-    <script type="text/javascript" src="/d3/d3.min.js"></script> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Final 2</title>
+    <!-- Bootstrap CSS -->
+  <!--  <link href="/css/bootstrap.min.css" rel="stylesheet"> when I do this tooltip vanishes-->
+
     <style type="text/css">
+
 svg {
     border: none;
     background: white;
@@ -85,7 +90,15 @@ div.visible {
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
            View Top BS: <input type="checkbox" id="TopBS">
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
+            No of BS <input id="TopBSno" type="number" step="0.01"> 
+            Noise <input id="noise" type="number" step="0.01">  
+            No.IC<input id="topx" type="number" step="0.01">  
           </div>
+          <form id="putdata">
+                ROI <input id="LastSIR" type="number" step="0.01">   
+                Pre SINR <input id="PreSINR" type="number" step="0.01"> 
+                Post SINR <input id="PostSINR" type="number" step="0.01">              
+              </form>
           <!--<button type="button" class="btn btn-default" onclick="">Level1</button> -->
      <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
       <button type="button" class="btn btn-default" >Plot Initial</button>  onclick="doPlot()"--> 
@@ -97,12 +110,13 @@ div.visible {
               <p id="Output">
               <svg id="visual" width="1000" height="500"></svg>
                   Output
-            
+               
                </p>
              </div>
            </div>
 
         </div>
+
 
   <!-- jQuery -->
   <script src="js/jquery.js"></script>
@@ -115,16 +129,26 @@ div.visible {
   var xAxis,yAxis,tooltip;
   var xaxisobject,zoom;
   var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
-  var idtochange="";
-  var BScord=[];//basestation coords ,plan is to take this directly from first couple of rows of csv file ,Id =0, and marke them with rectangle or something
+
+  var rows1=[],bs=[];//stores rows and bs data
+  var oper=[];//array to store how many operators are there and how many Ue's in each,oper index starts from 0
+  var bsno=[];//array to store how many bs for eacch operator
   var level=0;//which level it is currently in
+  var topBsno=10;//no of Bs to show on click and in bar graph
+  var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
+  var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
+ // var BScord=[];//basestation coords 
+  //var idtochange=""; // for dragging , unnecessary
+  console.log(opercolor);
+  
+
 var x = d3.scale.linear()
     .domain([-2200, (2300 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
 var y = d3.scale.linear()
     .domain([-2200, 2300 ]) // changes range of values for y axis
     .range([900, 0]);//400 is height value defined in SetSize()
-var rows1=[],bs=[];//stores rows and bs data
+
 function SetSize(){
      margin = {top: 10, right: 10, bottom: 10, left: -20},
     width = 1200 //1200/to change dimensions of graph  seen///- margin.left - margin.right,
@@ -168,8 +192,6 @@ svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + marg
 
 svgContainer=svg.append("g").attr("id","svgContainer").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
- visual=d3.select("#drawbox").append("svg").attr("width",200).attr("height",200);
-
 xaxisobject=svgContainer.append("g")
     .attr("class", "x axis")
     .attr("transform",  function(d) {
@@ -197,27 +219,79 @@ d3.csv('Nodelocations.csv',
                  };        } ,
        
         function (err, rows) {
-          console.log(rows);
-          ;
+          //console.log(rows);  
+          var operno=1,ueno=0;//operator no and no of ue's for each operator 
+          var operbsno=1,bsno1=0;//operator no and no of bs for each operator       
             var svg = d3.select("svg");
             var i=0;
-            for(i=0;i<rows.length;i++)
+            for(i=0;i<rows.length;i++) 
             {
               if(rows[i].node[0]=='B' && rows[i].node[1]=='S')
                {
-                bs.push(rows[i]);
-                BScord.push({x:rows[i].x,y:rows[i].y});
+                bs.push(rows[i]);//basestation
+                
+                 if(operbsno==rows[i].node[2])
+                 {
+                  bsno1++;
+                 }
+              else
+               {
+                   bsno.push({'operno':operbsno,'bsno':bsno1});
+                   operbsno++;
+                   bsno1=1;
+                 }
+
+
+               // BScord.push({x:rows[i].x,y:rows[i].y});
                }
               else
-                rows1.push(rows[i]);
+              {
+                rows1.push(rows[i]);//operators
+                //assuming UE's are in order
+               if(operno==rows[i].node[2])
+                 {
+                  ueno++;
+                 }
+            else
+               {
+             oper.push({'operno':operno,'ueno':ueno});
+              operno++;
+               ueno=1;
+               }
+
+               // console.log(rows[i].col1);
+              }
               //above function for seperating basestations and nodes,bs has basestations and rows1 has normal nodes
             
-}            console.log(BScord);
+}       
+oper.push({'operno':operno,'ueno':ueno});//for last operator
+bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
+console.log(oper);
+console.log(bsno);
+            console.log("UE",rows1);
+            console.log("BS",bs);
+
+
+
+//Testing           
+   /* //  ue as rect
+        var rect2= svgContainer.selectAll("rect").data(rows1).enter().append("rect");
+            rect2.attr("x",function(d,i){// console.log(d.col1); 
+                                         return x(d.x);})
+            .attr("y",function(d,i){return y(d.y);})
+            .attr("width",10)
+            .attr("height",10)
+            .style("fill",function(d,i) {  return "black";} ) 
+            .attr("id",function(d,i){return "test"+d.col1;})
+            .on('mouseover', mouseOver1) ;
+ */           
+
             var circles = svgContainer.selectAll("circle").data(rows1).enter().append("circle");
             circles.attr("r", function(d,i) { return (3.5);}) 
             .attr("id",function(d,i){ 
+              /*
                if(d.node[2]==1) 
-                 return "UE1-"+d.col1;
+                 return "UE1-"+d.col1;  
                else if(d.node[2]==2)
                   return "UE2-"+d.col1;
                 else if(d.node[2]==3)
@@ -226,38 +300,65 @@ d3.csv('Nodelocations.csv',
                   return "UE4-"+d.col1;
                 else
                    return "ERROR";
+                 */
+              return "UE"+d.node[2].toString()+"-"+d.col1
+
              })
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
-            .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
+            .style("fill",function(d,i) { /*if(d.node[2]=='1') return "lime";//for UE1
                                          else if(d.node[2]=='2') return "orange";//for UE2
                                         else if(d.node[2]=='3') return "red";//for UE3
                                          else if(d.node[2]=='4') return "brown";//for UE4
-                                          else return "blue";} ) // to change colour of each basestation user 
+                                        else if(d.node[2]=='5') return "yellow";
+                                          else return "blue";*/
+                                          return opercolor[parseInt(d.node[2])-1].color;
+                                          } ) // to change colour of each basestation user 
            // .call(drag)
             .on('mouseover', mouseOver) 
             .on('mousemove', mouseMove)
             .on('mouseout', mouseOut)
             .on('mousedown', click);
-            
+
+
+
+            //testing
+          /* bs as circles
+            var circles = svgContainer.selectAll("circle").data(bs).enter().append("circle");
+            circles.attr("r", function(d,i) { console.log(d.col1);return (3.5);}) 
+            .attr("id",function(d,i){ 
+              return "TESTBS"+d.col1;
+             })
+            .attr("cx",function(d,i) { return x(d.x); })
+            .attr("cy",function(d,i) { return y(d.y); })  
+            .style("fill",function(d,i) { return "blue"} ) // to change colour of each basestation user 
+           // .call(drag)
+            .on('mouseover', mouseOver);
+        */
+
+           
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
             rect.attr("x",function(d,i){ return x(d.x);})
             .attr("y",function(d,i){return y(d.y);})
             .attr("width",7)
             .attr("height",7)
-            .style("fill",function(d,i) { if(d.node[2]=='1') return "green";//for BS1
+            .style("fill",function(d,i) { /*if(d.node[2]=='1') return "green";//for BS1
                                          else if(d.node[2]=='2') return "orange";//for BS2
                                         else if(d.node[2]=='3') return "red";//for Bs3
                                          else if(d.node[2]=='4') return "brown";//for BS4
-                                          else return "blue";} ) 
+                                         else if(d.node[2]=='5') return "yellow";
+                                          else return "blue";*/
+                                        return bscolor[parseInt(d.node[2])-1].color;
+                                        } ) 
             .attr("id",function(d,i){return "BS"+d.col1;})
             .on('mouseover', mouseOver1) ;
-            // .call(drag1);
- 
+            // .call(drag1);*/
+  
             //Origin , 0,0 ,temporary
             var rect1=svgContainer.append("rect");
              rect1.attr("x",x(0)).attr("y",y(0)).style("fill","blue").attr("width",7).attr("height",7);
              
+            
 
 
             }
@@ -272,9 +373,10 @@ function mouseOver1(d,i){
 }
 function mouseOver(d, i) {  
   //function for circle,tooltip on mouse hover
+
     d3.select(this).classed('over', true);
     if(level==0)
-    {
+    { 
     tooltip.text("UE" +(d.col1))  
         .classed('visible', true);
       }
@@ -297,7 +399,10 @@ function mouseOver(d, i) {
          {
            currop=4;//from definition
          }
-
+        else if(this.style.fill=='yellow')
+        {
+         currop=5;
+        }
         tooltip.text("UE" +(d.col1)+" Def:"+d.node[2]+" Curr:"+currop).classed('visible', true);
       }
       else
@@ -315,6 +420,10 @@ function mouseOut(d, i) {
 }
 
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
+
+topBSno=document.getElementById("TopBSno").value;
+if(topBSno=="")
+ topBSno=10;
 
 PlotBarGraph(d.col1,d.node[2]);//to plot bar graph for SIR profile
     var element = d3.select(this),
@@ -344,7 +453,46 @@ arrayData.sort(function(a,b){
   }
   return 0;
 });
-return arrayData.slice(0,10); //top x values in  .slice(0,x) 
+;
+sirdata=arrayData.slice(0,topBSno);
+last=0;total=0;
+
+for(i=topBSno;i<arrayData.length;i++)
+{
+ last+=arrayData[i].y;
+}
+
+for(i=0;i<topBSno;i++)
+{
+  total+=arrayData[i].y;
+}
+ total+=last;
+document.getElementById("LastSIR").value = last;
+
+//Pre and Post Processing SINR Calculation to be done below
+var PrS,PoS;
+noise=document.getElementById("noise").value;
+if(noise=="")
+ noise=0; 
+ //window.alert("Noise not filled");
+PrS = (arrayData[0].y)/(total+noise);
+document.getElementById("PreSINR").value = PrS;
+
+total1=total;
+topx=document.getElementById("topx").value// topx in post processing SINR
+if(topx=="")
+ topx=0;
+for(i=1;i<=topx;i++)
+{
+  total1-=arrayData[i].y;
+}
+ 
+PoS=(arrayData[0].y)/(total1+noise);
+document.getElementById("PostSINR").value = PoS;
+
+
+
+return sirdata;
 }
 
 function InitChart(rowno,curroper) {
@@ -357,30 +505,54 @@ d3.csv("Converted.csv", ///home/Desktop/x/
           barData=[];
           for(i=0;i<bs.length;i++) //for all 76 columns,228 for sectoring
           {
-          barData.push({'x':i,'y': parseFloat(d[rowno-bs.length][i])}); //As UE1-76 is mapped to 0 
+          barData.push({'x':i,'y': 46.00+parseFloat(d[rowno-bs.length][i])}); //As UE1-76 is mapped to 0 
           } //in above line y part the input signal strength has to be added which in this case is 46 dbm
-
+          //46 is the power input to be added, to be taken as field input
       
 var key = function(d){
   return d.y;
 }
 barData = gettopthree(barData);//function which sorts top 10,defualt is level 1
+//console.log(last);
+//SIR profile
 if(level==0)
 {//need to make the default operator as first value
   i=0;
-  console.log("CURR: ",curroper);
-  while(i<10)
+  temp=0;
+ // console.log("CURR: ",curroper);
+  while(i<topBSno)
   {
-    //console.log(Math.floor((barData[i].x)/19)+1);  // as operator count starts from 1
+     //operator count starts from 1
     
-   if((Math.floor((barData[i].x)/19)+1)==curroper)
+      
+    var curroper1,total=0,total1=0;
+       for(curroper1=0;curroper1<bsno.length;curroper1++)
+       {
+         total+=bsno[curroper1].bsno;
+         console.log(total1,barData[i].x,total);
+         if(barData[i].x<total && barData[i].x>=total1)
+          break;
+         
+         total1+=bsno[curroper1].bsno;
+       }
+       
+console.log(curroper1+1); 
+  
+   if(curroper1+1==curroper)
    {
-     console.log("A",i);
+     //console.log("A",i);
+     temp=barData[i];
+     for(j=i;j>0;j--)
+     {
+      barData[j]=barData[j-1];
+     }
     break;
    }
    
    i+=1;
   }
+  barData[0]=temp;  //finishing the cyclic shift
+
 }
 
 if(document.getElementById("TopBS").checked == true)
@@ -393,12 +565,14 @@ if(document.getElementById("TopBS").checked == true)
     d3.select(Bsid).attr("width",7).attr("height",7);
   }
 
-  for(i=0;i<10;i++) //top 10 ,hence this loop 
+  for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+barData[i].x.toString();
     d3.select(Bsid).attr("width",(27-2*i)).attr("height",(27-2*i));// to change attributes of max basestations
   }
-}
+}//top rect being enlarged
+
+//plotting
   vis = d3.select('#visual').append('svg').attr("id","BarGraph"),
     WIDTH = 500,//change width and height to change size of bar graph
     HEIGHT = 500,
@@ -516,77 +690,27 @@ max=-300;
 
 str2="#BS";//for BS
 str1="";//for UE
-//******* UE1 ********
-for(i=0;i<1900;i++)//i=0 to 1900 for UE1 similarly 19 for all other 3
-{
+
+  
+//testing start
+ for(j=0;j<oper.length;j++) // loop over all operators
+ {
+ for(i=0;i<oper[j].ueno;i++)//loops for ueno for each oper
+ {
  str3=str2+list[i].toString();// Make the basestation id from list
  //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
 // d3.select(str3).attr("width",30);//to check visually, delete later
 
-str1='#UE1-'+(i+bs.length).toString()
+str1='#UE'+(j+1).toString()+'-'+(i+bs.length).toString()
  d3.select(str1)//.attr("r",10)//temporary to check,delete later
-   .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
-                                         else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
-                                        else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
-                                          else {console.log("ERRORBLUE");return "blue";}});//for error 
+   .style("fill",function(){  
+                        return opercolor[parseInt(bs[list[i]].node[2])-1].color ;           
+                            });
 
-}
+  }
+ } 
 
 
-//******* UE2 ********
-for(i=1900;i<1919;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 similarly 19 for all other 3
-{
- str3=str2+list[i].toString();// read the basestation from list
- //console.log(str3);
-// console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
- //d3.select(str3).attr("width",30);//to check visually, delete later
-
-str1='#UE2-'+(i+bs.length).toString()
- d3.select(str1)//.attr("r",10)//temporary to check,delete later
-   .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
-                                         else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
-                                        else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
-                                          else return "blue";});//for error 
-
-}
-
-//******* UE3 ********
-for(i=1920;i<1938;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 similarly 19 for all other 3
-{
- str3=str2+list[i].toString();// read the basestation from list
- //console.log(str3);
- //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
- //d3.select(str3).attr("width",30);//to check visually, delete later
-
-str1='#UE3-'+(i+bs.length).toString()
- d3.select(str1)//.attr("r",10)//temporary to check,delete later
-   .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
-                                         else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
-                                        else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
-                                          else return "blue";});//for error 
-
-}
-
-//******* UE4 ********
-for(i=1938;i<1957;i++)//replace 10 with list.length.//i=0 to 1900 for UE1 similarly 19 for all other 3
-{
- str3=str2+list[i].toString();// read the basestation from list
- //console.log(str3);
- //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
- //d3.select(str3).attr("width",30);//to check visually, delete later
-
-str1='#UE4-'+(i+bs.length).toString()
- d3.select(str1)//.attr("r",10)//temporary to check,delete later
-   .style("fill",function(){ if(bs[list[i]].node[2]=='1') return "lime";//for UE1
-                                         else if(bs[list[i]].node[2]=='2') return "orange";//for UE2
-                                        else if(bs[list[i]].node[2]=='3') return "red";//for UE3
-                                         else if(bs[list[i]].node[2]=='4') return "brown";//for UE4
-                                          else return "blue";});//for error 
-
-}
 }
         );//d3.csv ends here
 
