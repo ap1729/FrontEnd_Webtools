@@ -63,7 +63,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-                //log.Println("Marshalled Data",rxdata)	
+                log.Println("Marshalled Data",rxdata)	
 		udpateData := EvaluateMore(rxdata)
 		txbytes, _ := json.Marshal(udpateData)
 

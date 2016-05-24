@@ -15,7 +15,7 @@ var y = d3.scale.linear()
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Final 2</title>
     <!-- Bootstrap CSS -->
-  <!--  <link href="/css/bootstrap.min.css" rel="stylesheet"> when I do this tooltip vanishes-->
+    <!--<link href="/css/bootstrap.min.css" rel="stylesheet">   when I do this tooltip vanishes-->
 
     <style type="text/css">
 
@@ -128,11 +128,11 @@ div.visible {
   <script type="text/javascript">
   var xAxis,yAxis,tooltip;
   var xaxisobject,zoom;
-  var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
+ // var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
 
   var rows1=[],bs=[];//stores rows and bs data
   var oper=[];//array to store how many operators are there and how many Ue's in each,oper index starts from 0
-  var bsno=[];//array to store how many bs for eacch operator
+  var bsno=[];//array to store how many bs for each operator
   var level=0;//which level it is currently in
   var topBsno=10;//no of Bs to show on click and in bar graph
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
@@ -172,22 +172,22 @@ zoom = d3.behavior.zoom()
     .center([x(1000), y(100)])
     .size([3000, 3000])
     .on("zoom", zoomed);
-var drag = d3.behavior.drag()
+/*var drag = d3.behavior.drag()
     .origin(function(d) { return d; })
     .on("dragstart", dragstarted)
     .on("drag", dragged)
-    .on("dragend", dragended);
+    .on("dragend", dragended);*/
 
 tooltip = d3.select('body')
         .append('div')
         .classed('tooltip', true);
 
 //for basestations
-var drag1 = d3.behavior.drag()  
+/*var drag1 = d3.behavior.drag()  
     .origin(function(d) { return d; })
     .on("dragstart", dragstarted1)
     .on("drag", dragged1)
-    .on("dragend", dragended1);    
+    .on("dragend", dragended1);  */  
 svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom).attr("pointer-events",'all').call(zoom);;
 
 svgContainer=svg.append("g").attr("id","svgContainer").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -266,8 +266,8 @@ d3.csv('Nodelocations.csv',
 }       
 oper.push({'operno':operno,'ueno':ueno});//for last operator
 bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
-console.log(oper);
-console.log(bsno);
+//console.log(oper);
+//console.log(bsno);
             console.log("UE",rows1);
             console.log("BS",bs);
 
@@ -419,9 +419,22 @@ function mouseOut(d, i) {
     tooltip.classed('visible', false);
 }
 
+function onsuccess(obj){
+
+console.log(obj); 
+}
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
+   //to send node info to backend and do appropriate calculations
+  console.log(d.col1);
+BackObj={node:parseInt(d.col1-bs.length),level:level};//as d.col1 starts from no after basestation
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+
+//above change the backend code and do parsing
+
 
 topBSno=document.getElementById("TopBSno").value;
+
+
 if(topBSno=="")
  topBSno=10;
 
@@ -470,6 +483,7 @@ for(i=0;i<topBSno;i++)
 document.getElementById("LastSIR").value = last;
 
 //Pre and Post Processing SINR Calculation to be done below
+//NOT YET DONE ! IMPORTANT
 var PrS,PoS;
 noise=document.getElementById("noise").value;
 if(noise=="")
@@ -497,7 +511,7 @@ return sirdata;
 
 function InitChart(rowno,curroper) {
 var barData=[];
-d3.select("#BarGraph").remove();
+d3.select("#BarGraph").remove();  
 //console.log(rowno);
 d3.csv("Converted.csv", ///home/Desktop/x/
         // accessor function
@@ -529,14 +543,14 @@ if(level==0)
        for(curroper1=0;curroper1<bsno.length;curroper1++)
        {
          total+=bsno[curroper1].bsno;
-         console.log(total1,barData[i].x,total);
+       //  console.log(total1,barData[i].x,total);
          if(barData[i].x<total && barData[i].x>=total1)
           break;
          
          total1+=bsno[curroper1].bsno;
        }
        
-console.log(curroper1+1); 
+//console.log(curroper1+1); 
   
    if(curroper1+1==curroper)
    {
@@ -718,7 +732,7 @@ str1='#UE'+(j+1).toString()+'-'+(i+bs.length).toString()
 
 
 function level0()
-{
+{ //level 0 reset
   level=0;
  var circles = svgContainer.selectAll("circle").data(rows1)
  .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
@@ -736,134 +750,11 @@ function Reset()
 
 
 
-function dragstarted(d) {
-  d3.event.sourceEvent.stopPropagation();
-  d3.select(this).classed("dragging", true);
-  console.log(d,d3.event);
-var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
-    .range([0, width]);
-var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
-    .range([height, 0]);
-d.x=x.invert(d3.event.sourceEvent.offsetX);
-d.y=y.invert(d3.event.sourceEvent.offsetY);
-console.log(d3.event);
- d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
-}
-function dragged(d) {
 
-d.x=x.invert(d3.event.sourceEvent.offsetX);
-d.y=y.invert(d3.event.sourceEvent.offsetY);
-// console.log(d3.event.sourceEvent.offsetX);
- d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
-}
-function dragended(d) {
-     console.log(d,"ended ",d3.event,this);
- d3.select(this).classed("dragging", false);
-  var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
-    .range([0, width]);
-var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
-    .range([height, 0]);
-console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
-//console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
-//Backend Part here
 
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
-                if(d.node==1) 
-                 idtochange = "node1  "+d.col1;
-               else if(d.node==2)
-                  idtochange = "node2  "+d.col1;
-              else
-                  idtochange = "ERROR";
-//window.alert(idtochange);
 
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-             
-}
  
-function onsuccess(obj) {
- //on recieving backend
- console.log("Received this obj",obj); 
- ParsedData=obj;
-var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
-    .range([0, width]);
-var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
-    .range([height, 0]);
-console.log("QQQ",ParsedData);
-if(ParsedData.Node!=0)
-{
- var shape1=document.getElementById(idtochange); 
-  d3.select(shape1).attr("cx",x(ParsedData.Column1))
-.attr("cy",function(d){
-  d.x=(ParsedData.Column1) ;
-  d.y= (ParsedData.Column2);
-  console.log("Updated",d.x,d.y);
-  return y(ParsedData.Column2)})
-.attr("r",function(d){return 10;})
-.style('fill', function(d){ d.m1=ParsedData.Column3; return mycolormap(ParsedData.Column3);});
 
- }
-else
-{
-//CIRCLES= d3.selectAll("circle");
-var mycolormap1 = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
-   var m1min=0,m1max=300,f=0;
-
-d3.selectAll("circle").each(function(d,i)
-{  
- BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
-
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),function(obj){
-   console.log("BASESTATION Received this obj",obj); 
- ParsedData=obj;
- if(ParsedData.Node!=0)
-  {
-    if(f==0)
-    {
-      f=1;
-      m1min=ParsedData.Column3;
-      m1max=ParsedData.Column3;
-      d.m1=ParsedData.Column3;
-    }
-    else
-    {
-   d.m1=ParsedData.Column3;
-    if(m1min > ParsedData.Column3)
-      m1min = ParsedData.Column3;
-    if(m1max < ParsedData.Column3)
-      m1max = ParsedData.Column3;
-    }//console.log("ASQ",Math.min.apply(null,[d.m1]));
-  }
-},"json");//getting from server
-});
-//var max = d3.selectAll("circle").max(function(d) { return d.m1; });
-
-//console.log(m1min);
-//console.log(m1max);
-//m1min and m1max are not updating!!
-var mycolormap1 = d3.scale.linear().domain([m1min ,m1max]).range(["red", "green"]);
-window.alert();//for sync async error
-//d3.selectAll("circle").maximum
-//d3.max(d3.selectAll("circle").)
-d3.selectAll("circle").style("fill",function(d,i) {if(d.node!=0) return mycolormap1(d.m1); else return "blue"}); 
-//console.log(CIRCLES);
-
-//BScord[0].x -> x cord of BS1
-/*
-  d3.select(circles).attr("cx",x(ParsedData.Column1))
-.attr("cy",function(d){
-  return y(ParsedData.Column2)})
-.attr("r",function(d){return 30;})
-.style('fill', function(d){ return mycolormap(ParsedData.Column3);});
-*/
-   }
-
-}
 
 function loadMe(){
 // d3.text("testfile5.csv", fillData);
@@ -872,75 +763,11 @@ function loadMe(){
 }
  
 
-function dragstarted1(d) {
-  d3.event.sourceEvent.stopPropagation();
-  d3.select(this).classed("dragging", true);
-  console.log(d,d3.event);
-var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
-    .range([0, width]);
-var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
-    .range([height, 0]);
-d.x=x.invert(d3.event.sourceEvent.offsetX);
-d.y=y.invert(d3.event.sourceEvent.offsetY);
-console.log(d3.event);
- d3.select(this).attr("x", x(d.x)).attr("y", y(d.y));
-}
-function dragged1(d) {
- 
-  //  d.x=d3.event.sourceEvent.offsetX;
-//d.y=d3.event.sourceEvent.offsetY;
 
-d.x=x.invert(d3.event.sourceEvent.offsetX);
-d.y=y.invert(d3.event.sourceEvent.offsetY);
-// console.log(d3.event.sourceEvent);
- d3.select(this).attr("x", x(d.x)).attr("y", y(d.y));
 
-}
-function dragended1(d) {
-     console.log(d,"ended ",d3.event,this);
- d3.select(this).classed("dragging", false);
-  var x = d3.scale.linear()
-    .domain([-5, (30 )]) // changes range of values for x axis
-    .range([0, width]);
-var y = d3.scale.linear()
-    .domain([-5, 30 ]) // changes range of values for y axis
-    .range([height, 0]);
-console.log('Am I at ',d.x,d.y) ;
-//  console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
-//Backend Part here
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
-               if(d.node==0)
-                  { idtochange = "BaseStation "+d.col1;
-                   BScord[d.col1].x= d.x;
-                   BScord[d.col1].y= d.y;
-                 }
-              else
-                  idtochange = "ERROR";
-//window.alert(idtochange);
 
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-             
-}
 
-function fillData(text){ 
-   console.log("Read this ",text);
-  var data = d3.csv.parseRows(text).map(function(row) {
-  return row.map(function(value) {
-  return +value;    //to convert text to numbers
-  });
-  });
-  console.log(data);
-  table=data;   //Taking data from respective rows
-  table1=data;
-    col1=table[0];
-  node=table[1]
-    x1=table[2];   
-    y1=table[3];
-    m1=table[4];
-    m2=table[5];
- }
+
 loadMe(); // This is the function that calls everything
 
 
@@ -1067,6 +894,8 @@ function mouseOut(d, i) {
 }
 
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
+
+  
     var element = d3.select(this),
         selected = element.classed('selected');
         element.classed('selected', !selected);
