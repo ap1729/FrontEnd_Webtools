@@ -138,6 +138,7 @@ div.visible {
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var currselected; //latest selected circle
+  var wcount=0;//window number
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
   console.log(opercolor);
@@ -394,7 +395,7 @@ if(document.getElementById("TopBS").checked == true)
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+obj.Bsid[i].toString();
-    d3.select(Bsid).attr("width",(130+obj.SIR[i]) ).attr("height",(130+obj.SIR[i]));// to change attributes of max basestations
+    d3.select(Bsid).attr("width",(125+obj.SIR[i]) ).attr("height",(125+obj.SIR[i]));// to change attributes of max basestations
   }
 }//top rect being enlarged
  
@@ -412,7 +413,7 @@ PlotBarGraph(barData);
 
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
    //to send node info to backend and do appropriate calculations
-   //newwindow();
+   
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
  topBSno=10;
@@ -425,6 +426,9 @@ $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");
 
 //above change the backend code and do parsing
 
+
+wcount++;
+newwindow();//plot on graph
 
     var element = d3.select(this),
         selected = element.classed('selected');
@@ -810,8 +814,20 @@ function getVisibleData() {
 
 
 function newwindow(){
-  //function to open a new window
-   var myWindow = window.open("", "", "width=500,height=500");
+  //function to open a new window and put graph
+   //var myWindow = window.open("", "", "width=500,height=500");
+   
+ 
+  var embedded_svg = document.getElementById("visual");
+  console.log(embedded_svg);
+  var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
+
+  var transplanted_svg = svg_win.document.importNode(embedded_svg, true);
+  var blank_root = svg_win.document.documentElement;
+        svg_win.document.removeChild(blank_root);
+        svg_win.document.appendChild(transplanted_svg);
+         wcount++;
+ //var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
 }
 
 
