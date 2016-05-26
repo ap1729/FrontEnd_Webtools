@@ -412,6 +412,7 @@ PlotBarGraph(barData);
 
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
    //to send node info to backend and do appropriate calculations
+   //newwindow();
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
  topBSno=10;
@@ -810,6 +811,7 @@ function getVisibleData() {
 
 function newwindow(){
   //function to open a new window
+   var myWindow = window.open("", "", "width=500,height=500");
 }
 
 

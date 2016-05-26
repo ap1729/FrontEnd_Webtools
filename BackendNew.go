@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-   //     "math"
+        "math"
         "encoding/csv"
          "fmt"
          "os"
@@ -259,11 +259,66 @@ if currop1== currop{
    //  sort.Float64s(row)//function which sorts data in ascending order
 
 //Ramanan Code here
+var received_power_db_arr = [76]float64{} //array variable to store received power from the base station (hardcoded no. of base station)
+var other_received_power_lin_arr = [76]float64{} //array variable to store received power linear scale from the other base station (hardcoded /no. of base station)
+var pre_processing_sinr_db float64
+var post_processing_sinr_db float64
+var sum_interferers_lin float64 =0
+//fmt.Println(values)
+for i := 0; i < 76; i++ {
+	received_power_db_arr[i] = values[i]+46.0 //pathloss+hardcoded transmit power (for one UE)
+	values[i] = received_power_db_arr[i]
+	}
+max_received_power_dB := received_power_db_arr[0]
+for i := 1; i < 76; i++ {
+	other_received_power_lin_arr[i] = math.Pow(10,received_power_db_arr[i]/10) //converting to linear scale	
+	sum_interferers_lin +=  other_received_power_lin_arr[i]
+	}
+//fmt.Println("\n",received_power_db_arr)
+//fmt.Println("\n\n\n\n\n\n",other_received_power_lin_arr)
+//fmt.Println("\n\n\n\n\n\n",sum_interferers_lin)	
+pre_processing_sinr_db = max_received_power_dB-10*math.Log10(sum_interferers_lin + math.Pow(10,-9)) //noise level -90dBm hardcoded
+//fmt.Println("\n\n\n\n\n\n pre-processing SINR",pre_processing_sinr_db)
+//post processign SINR calculation
+var sum_interferers_cancel_lin float64 =0
+var num_interferers_cancel int = 3 //number of interferers cancelled hardcoded
+for i := num_interferers_cancel+1; i < 76; i++ {
+	other_received_power_lin_arr[i] = math.Pow(10,received_power_db_arr[i]/10) //converting to linear scale	
+	sum_interferers_cancel_lin +=  other_received_power_lin_arr[i]
+	}
+post_processing_sinr_db = max_received_power_dB-10*math.Log10(sum_interferers_cancel_lin + math.Pow(10,-9)) //noise level -90dBm hardcoded
+//fmt.Println("\n\n\n\n\n\n post-processing SINR",post_processing_sinr_db)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
      var returnobj returndata
      returnobj.SIR=values[0:r.TopBsno]
-     returnobj.PrS=13.13
-     returnobj.PoS=57.57
+     returnobj.PrS=pre_processing_sinr_db
+     returnobj.PoS=post_processing_sinr_db
      returnobj.Bsid=keys[0:r.TopBsno]
      fmt.Println(returnobj)
 
