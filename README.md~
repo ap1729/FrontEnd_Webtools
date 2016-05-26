@@ -2,14 +2,13 @@
 
 # Testing
 - `go run httpserver.go`
-- `Open Level1.html`
-- `Open Final1.html`
-- `Open Final2.html`
+- `go run BackendNew.go`
+- `Open LevelBackend.html`
+- `Port should be changed to 8080`
 
 # What it does
-- `Level1.html`
-- `Extra feature is that on clicking level1 button, each UE connects to the strongest Basestation and changes colour to that operator`
-- `Level0 button,on clicking reverts back to original colours` 
-- `View Top BS check box shows top interfering basestations of UE(on clicking) by increasing size of BS appropriately`
-- `Reset button resets to level 0 and defaults the basestation size`
-- `Final1.html`
+- `It shows all UE's and BS mapped to color for each operator`
+- `On clicking a ue ,it shows the SIR profile (backend does calculation)`
+- `On clicking level1 button ,ue's change color to strongest bs(backend does calculation)`
+- `On clicking level0 button ,it reverts back to level 0 (default)` 
+- `If view top bs checkbox is selected and ue is selected then top bs can be seen`
