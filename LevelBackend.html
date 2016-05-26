@@ -13,7 +13,7 @@ var y = d3.scale.linear()
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Final 2</title>
+    <title>Level 1  + Backend</title>
     <!-- Bootstrap CSS -->
     <!--<link href="/css/bootstrap.min.css" rel="stylesheet">   when I do this tooltip vanishes-->
 
@@ -90,9 +90,9 @@ div.visible {
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
            View Top BS: <input type="checkbox" id="TopBS">
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" step="0.01"> 
+            No of BS <input id="TopBSno" type="number" step="1"> 
             Noise <input id="noise" type="number" step="0.01">  
-            No.IC<input id="topx" type="number" step="0.01">  
+            No.IC<input id="topx" type="number" step="c1">  
           </div>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01">   
@@ -137,6 +137,7 @@ div.visible {
   var topBsno=10;//no of Bs to show on click and in bar graph
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
+  var currselected; //latest selected circle
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
   console.log(opercolor);
@@ -271,47 +272,18 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             console.log("UE",rows1);
             console.log("BS",bs);
 
-
-
-//Testing           
-   /* //  ue as rect
-        var rect2= svgContainer.selectAll("rect").data(rows1).enter().append("rect");
-            rect2.attr("x",function(d,i){// console.log(d.col1); 
-                                         return x(d.x);})
-            .attr("y",function(d,i){return y(d.y);})
-            .attr("width",10)
-            .attr("height",10)
-            .style("fill",function(d,i) {  return "black";} ) 
-            .attr("id",function(d,i){return "test"+d.col1;})
-            .on('mouseover', mouseOver1) ;
- */           
+          
 
             var circles = svgContainer.selectAll("circle").data(rows1).enter().append("circle");
             circles.attr("r", function(d,i) { return (3.5);}) 
             .attr("id",function(d,i){ 
-              /*
-               if(d.node[2]==1) 
-                 return "UE1-"+d.col1;  
-               else if(d.node[2]==2)
-                  return "UE2-"+d.col1;
-                else if(d.node[2]==3)
-                  return "UE3-"+d.col1;
-                  else if(d.node[2]==4)
-                  return "UE4-"+d.col1;
-                else
-                   return "ERROR";
-                 */
-              return "UE"+d.node[2].toString()+"-"+d.col1
+           
+              return "UE"+d.col1//original "UE"+d.node[2].toString()+"-"+d.col1
 
              })
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
-            .style("fill",function(d,i) { /*if(d.node[2]=='1') return "lime";//for UE1
-                                         else if(d.node[2]=='2') return "orange";//for UE2
-                                        else if(d.node[2]=='3') return "red";//for UE3
-                                         else if(d.node[2]=='4') return "brown";//for UE4
-                                        else if(d.node[2]=='5') return "yellow";
-                                          else return "blue";*/
+            .style("fill",function(d,i) { 
                                           return opercolor[parseInt(d.node[2])-1].color;
                                           } ) // to change colour of each basestation user 
            // .call(drag)
@@ -320,34 +292,13 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .on('mouseout', mouseOut)
             .on('mousedown', click);
 
-
-
-            //testing
-          /* bs as circles
-            var circles = svgContainer.selectAll("circle").data(bs).enter().append("circle");
-            circles.attr("r", function(d,i) { console.log(d.col1);return (3.5);}) 
-            .attr("id",function(d,i){ 
-              return "TESTBS"+d.col1;
-             })
-            .attr("cx",function(d,i) { return x(d.x); })
-            .attr("cy",function(d,i) { return y(d.y); })  
-            .style("fill",function(d,i) { return "blue"} ) // to change colour of each basestation user 
-           // .call(drag)
-            .on('mouseover', mouseOver);
-        */
-
            
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
             rect.attr("x",function(d,i){ return x(d.x);})
             .attr("y",function(d,i){return y(d.y);})
             .attr("width",7)
             .attr("height",7)
-            .style("fill",function(d,i) { /*if(d.node[2]=='1') return "green";//for BS1
-                                         else if(d.node[2]=='2') return "orange";//for BS2
-                                        else if(d.node[2]=='3') return "red";//for Bs3
-                                         else if(d.node[2]=='4') return "brown";//for BS4
-                                         else if(d.node[2]=='5') return "yellow";
-                                          else return "blue";*/
+            .style("fill",function(d,i) { 
                                         return bscolor[parseInt(d.node[2])-1].color;
                                         } ) 
             .attr("id",function(d,i){return "BS"+d.col1;})
@@ -357,9 +308,6 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             //Origin , 0,0 ,temporary
             var rect1=svgContainer.append("rect");
              rect1.attr("x",x(0)).attr("y",y(0)).style("fill","blue").attr("width",7).attr("height",7);
-             
-            
-
 
             }
               
@@ -427,153 +375,11 @@ console.log(obj);
 //obj.PrS is pre SINR
 //obj.PoS is post SINR
 //obj.Bsid is top x basestation id's
-}
-function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
-   //to send node info to backend and do appropriate calculations
-topBSno=document.getElementById("TopBSno").value;
-if(topBSno=="")
- topBSno=10;
 
+document.getElementById("LastSIR").value=obj.ROI;
+document.getElementById("PostSINR").value=obj.PoS;
+document.getElementById("PreSINR").value=obj.PrS;
 
-BackObj={node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
-console.log(JSON.stringify(BackObj));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-
-//above change the backend code and do parsing
-
-
-
-
-PlotBarGraph(d.col1,d.node[2]);//to plot bar graph for SIR profile
-    var element = d3.select(this),
-        selected = element.classed('selected');
-        
-        element.classed('selected', !selected);
-        d.type = selected ? 'regular' : 'selected';
-        
-        if(d.type=="selected")
-          d3.select(this).attr("r",10);
-        else
-          d3.select(this).attr("r",3.5);
-      }
-
-function PlotBarGraph(rowno,curroper){
-  //function which plots bar graph
-  //also increases top contributing basestations sizes 
-InitChart(rowno,curroper);
-function gettopthree(arrayData){  
-//returns top x , the number in .slice(0,x);
-arrayData.sort(function(a,b){
-  if(a.y < b.y){
-    return 1;
-  }
-  if(a.y > b.y){
-    return -1;
-  }
-  return 0;
-});
-;
-sirdata=arrayData.slice(0,topBSno);
-last=0;total=0;
-
-for(i=topBSno;i<arrayData.length;i++)
-{
- last+=arrayData[i].y;
-}
-
-for(i=0;i<topBSno;i++)
-{
-  total+=arrayData[i].y;
-}
- total+=last;
-document.getElementById("LastSIR").value = last;
-
-//Pre and Post Processing SINR Calculation to be done below
-//NOT YET DONE ! IMPORTANT
-var PrS,PoS;
-noise=document.getElementById("noise").value;
-if(noise=="")
- noise=0; 
- //window.alert("Noise not filled");
-PrS = (arrayData[0].y)/(total+noise);
-document.getElementById("PreSINR").value = PrS;
-
-total1=total;
-topx=document.getElementById("topx").value// topx in post processing SINR
-if(topx=="")
- topx=0;
-for(i=1;i<=topx;i++)
-{
-  total1-=arrayData[i].y;
-}
- 
-PoS=(arrayData[0].y)/(total1+noise);
-document.getElementById("PostSINR").value = PoS;
-
-
-
-return sirdata;
-}
-
-function InitChart(rowno,curroper) {
-var barData=[];
-d3.select("#BarGraph").remove();  
-//console.log(rowno);
-d3.csv("Converted.csv", ///home/Desktop/x/
-        // accessor function
-        function(d) {
-          barData=[];
-          for(i=0;i<bs.length;i++) //for all 76 columns,228 for sectoring
-          {
-          barData.push({'x':i,'y': 46.00+parseFloat(d[rowno-bs.length][i])}); //As UE1-76 is mapped to 0 
-          } //in above line y part the input signal strength has to be added which in this case is 46 dbm
-          //46 is the power input to be added, to be taken as field input
-      
-var key = function(d){
-  return d.y;
-}
-barData = gettopthree(barData);//function which sorts top 10,defualt is level 1
-//console.log(last);
-//SIR profile
-if(level==0)
-{//need to make the default operator as first value
-  i=0;
-  temp=0;
- // console.log("CURR: ",curroper);
-  while(i<topBSno)
-  {
-     //operator count starts from 1
-    
-      
-    var curroper1,total=0,total1=0;
-       for(curroper1=0;curroper1<bsno.length;curroper1++)
-       {
-         total+=bsno[curroper1].bsno;
-       //  console.log(total1,barData[i].x,total);
-         if(barData[i].x<total && barData[i].x>=total1)
-          break;
-         
-         total1+=bsno[curroper1].bsno;
-       }
-       
-//console.log(curroper1+1); 
-  
-   if(curroper1+1==curroper)
-   {
-     //console.log("A",i);
-     temp=barData[i];
-     for(j=i;j>0;j--)
-     {
-      barData[j]=barData[j-1];
-     }
-    break;
-   }
-   
-   i+=1;
-  }
-  barData[0]=temp;  //finishing the cyclic shift
-
-}
 
 if(document.getElementById("TopBS").checked == true)
 {//button is also clicked, to enhance size of those basestations
@@ -587,10 +393,62 @@ if(document.getElementById("TopBS").checked == true)
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
-   Bsid="#BS"+barData[i].x.toString();
-    d3.select(Bsid).attr("width",(27-2*i)).attr("height",(27-2*i));// to change attributes of max basestations
+   Bsid="#BS"+obj.Bsid[i].toString();
+    d3.select(Bsid).attr("width",(130+obj.SIR[i]) ).attr("height",(130+obj.SIR[i]));// to change attributes of max basestations
   }
 }//top rect being enlarged
+ 
+ var barData=[];
+  for(i=0;i<obj.Bsid.length;i++)
+  {
+    barData.push({'x':obj.Bsid[i],'y':obj.SIR[i]});
+  }
+
+PlotBarGraph(barData);
+
+}
+
+
+
+function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
+   //to send node info to backend and do appropriate calculations
+topBSno=document.getElementById("TopBSno").value;
+if(topBSno=="")
+ topBSno=10;
+else
+  topBSno=parseInt(topBSno);
+currselected=d.col1.toString()-bs.length;
+BackObj={type:"A",node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+console.log(JSON.stringify(BackObj));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+
+//above change the backend code and do parsing
+
+
+    var element = d3.select(this),
+        selected = element.classed('selected');
+        
+        element.classed('selected', !selected);
+        d.type = selected ? 'regular' : 'selected';
+        
+        if(d.type=="selected")
+          d3.select(this).attr("r",10);
+        else
+          d3.select(this).attr("r",3.5);
+      }
+
+function PlotBarGraph(barData){
+  //function which plots bar graph
+  //also increases top contributing basestations sizes 
+InitChart(barData);
+
+function InitChart(barData) {
+
+d3.select("#BarGraph").remove();  
+     
+var key = function(d){
+  return d.y;
+}
 
 //plotting
   vis = d3.select('#visual').append('svg').attr("id","BarGraph"),
@@ -655,7 +513,7 @@ if(document.getElementById("TopBS").checked == true)
           }
           })
           .attr('fill','GRAY');
-                }  );
+               
  }
 }
 
@@ -670,69 +528,35 @@ function zoomed() {
     }//above function causes zooming which is called in var zoom
     
 
+function onsuccess1(obj)
+{
+ console.log(obj);
+ /*
+ var circles=svgContainer.selectAll("circle").data(obj.Changecolor)
+      .style("fill",function(d){return opercolor[d].color; });//works but data shouldn't be changed
+*/
+//UE id starts from UE76
+str1="#UE";
+ for(i=0;i<obj.Changecolor.length;i++)
+   {
+    str2=str1+(i+76).toString();//UE id starts from UE76
+    d3.select(str2).style("fill",opercolor[obj.Changecolor[i]].color);
+   }
+
+}
+
 
 function level1()
 {
-  //do level 1 stuff here
-  level=1;
-var circles = svgContainer.selectAll("circle").data(rows1);
-//console.log(circles);
-list=[];
-var temp,min;
-d3.csv("Converted.csv", ///home/Desktop/x/
-        // accessor function
-        function(d) {
-temp=0;
-max=-300;
-        for(i=0;i<1957;i++) //for all rows in Converted.CSV
-         { 
-           
-           temp=0;
-           max=parseFloat(d[i][0]);
-           for(j=0;j<bs.length;j++)//bs.length=76, multiply by 3 fr sectoring//for all 76 columns,228 for sectoring
-          {
-            if(parseFloat(d[i][j])>max)
-             {
-              temp=j;
-              max=parseFloat(d[i][j]);
-              }//finding maximum index
-          }
-        list.push(temp);
-        //console.log(i,temp,max);
-         }  
-      //console.log(list);
-            
+level=1
+console.log("BBBBBB",currselected);//row no 
+BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
+console.log(JSON.stringify(BackObj));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
+BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+console.log(JSON.stringify(BackObj1));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 
-//list now contains the col no:s of minimum path loss
-//Note that UE's are from UE1-76 onwards
-//what needs to be done is that loop over all circles and change the colour attribute by
-// looking at corresponding value in list and the corresponding basestation to that 
-
-str2="#BS";//for BS
-str1="";//for UE
-
-  
-//testing start
- for(j=0;j<oper.length;j++) // loop over all operators
- {
- for(i=0;i<oper[j].ueno;i++)//loops for ueno for each oper
- {
- str3=str2+list[i].toString();// Make the basestation id from list
- //console.log(bs[list[i]].node[2]);  //this is the number to change the colour of circles,i.e BSId 1 to 4 to represent each operator
-// d3.select(str3).attr("width",30);//to check visually, delete later
-
-str1='#UE'+(j+1).toString()+'-'+(i+bs.length).toString()
- d3.select(str1)//.attr("r",10)//temporary to check,delete later
-   .style("fill",function(){  
-                        return opercolor[parseInt(bs[list[i]].node[2])-1].color ;           
-                            });
-
-  }
- } 
-
-
-}
-        );//d3.csv ends here
 
 }
 
@@ -741,11 +565,10 @@ function level0()
 { //level 0 reset
   level=0;
  var circles = svgContainer.selectAll("circle").data(rows1)
- .style("fill",function(d,i) { if(d.node[2]=='1') return "lime";//for UE1
-                                         else if(d.node[2]=='2') return "orange";//for UE2
-                                        else if(d.node[2]=='3') return "red";//for UE3
-                                         else if(d.node[2]=='4') return "yellow";//for UE4
-                                          else return "blue";} ) ; 
+ .style("fill",function(d,i) { return opercolor[parseInt(d.node[2])-1].color;} ) ; 
+ BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+console.log(JSON.stringify(BackObj1));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
 
 function Reset()
@@ -763,7 +586,6 @@ function Reset()
 
 
 function loadMe(){
-// d3.text("testfile5.csv", fillData);
    SetSize();  
 
 }
@@ -882,61 +704,8 @@ var y = d3.scale.linear()
  
   grid.exit().remove();
 }
-// d3 mouse events
-function mouseOver(d, i) { //tooltip to be used for circles 
-    d3.select(this).classed('over', true);
-    tooltip.text(d.id+ ' (' + d.coordinates + ')  ' + d.lastSelected    )
-        .classed('visible', true);
-}
 
-function mouseMove(d, i) {
-    tooltip.style('top', (d3.event.pageY - 20) + 'px')
-        .style('left', (d3.event.pageX + 20) + 'px');
-}
 
-function mouseOut(d, i) {
-    d3.select(this).classed('over', false);
-    tooltip.classed('visible', false);
-}
-
-function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
-
-  
-    var element = d3.select(this),
-        selected = element.classed('selected');
-        element.classed('selected', !selected);
-        d.type = selected ? 'regular' : 'selected';
-        d.lastSelected = +d3.event.timeStamp;
-        tooltip.text(d.id + ' (' + d.coordinates + ') / ' + d.lastSelected);
-}
-// Custom drag behavior (replacing 'zoom')
-function mouseDrag() {
-    var m0 = d3.svg.mouse(this),
-        that = this,
-        previousMove = [0, 0];
-    
-    d3.select('body').on('mousemove', function() {
-        var m1 = d3.svg.mouse(that),
-            shift = d3.event.shiftKey,
-            ctrl = d3.event.ctrlKey,
-            alt = d3.event.altKey,
-            x = ctrl ? 0 : m1[0] - m0[0] - previousMove[0],
-            y = shift ? 0 : m1[1] - m0[1] - previousMove[1];
-        
-        move(x, y);
-        previousMove[0] += x;
-        previousMove[1] += y;
-    });
-    
-    d3.select('body').on('mouseup', function() {
-        d3.select('body')
-            .on('mousemove', null)
-            .on('mouseup', null);
-    });
-    
-    d3.event.preventDefault();
-}
-//
 
 function move(x, y) {
     translate[0] += x;
@@ -1037,6 +806,13 @@ function getVisibleData() {
 }
 
 })();
+
+
+function newwindow(){
+  //function to open a new window
+}
+
+
 
     </script>
 
