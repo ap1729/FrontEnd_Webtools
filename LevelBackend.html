@@ -109,16 +109,16 @@ div.visible {
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
            View Top BS: <input type="checkbox" id="TopBS">
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" step="1">  
-            No.IC<input id="topx" type="number" step="c1">
+            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1">  
+            No.IC<input id="topx" type="number" style="width: 40px;" step="1">
             POPUP ACTIVE: <input type="checkbox" id="popup"> 
              <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
              <button type="button" class="btn btn-default" onclick="FR3()">FR3</button>
           </div>
           <form id="putdata">
-                ROI <input id="LastSIR" type="number" step="0.01">   
-                Pre SINR <input id="PreSINR" type="number" step="0.01"> 
-                Post SINR <input id="PostSINR" type="number" step="0.01">              
+                ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >   
+                Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
+                Post SINR <input id="PostSINR" type="number" step="0.01" style="width: 65px;">              
               </form>
           <!--<button type="button" class="btn btn-default" onclick="">Level1</button> -->
      <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
@@ -407,6 +407,7 @@ console.log(obj);
 //obj.Bsid is top x basestation id's
 obj.PoS=Math.round(obj.PoS * 100) / 100;
 obj.PrS=Math.round(obj.PrS * 100) / 100;
+obj.ROI=Math.round(obj.ROI * 100) / 100;
 document.getElementById("LastSIR").value=obj.ROI;
 document.getElementById("PostSINR").value=obj.PoS;
 document.getElementById("PreSINR").value=obj.PrS;
