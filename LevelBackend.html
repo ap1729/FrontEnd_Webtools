@@ -15,7 +15,20 @@ var y = d3.scale.linear()
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Level 1  + Backend</title>
     <!-- Bootstrap CSS -->
-    <!--<link href="/css/bootstrap.min.css" rel="stylesheet">   when I do this tooltip vanishes-->
+
+  <script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">   
+    <script src="/bower_components/d3/d3.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script> 
+
+<script type="text/javascript">
+    $(function () {
+        $("[rel='tooltip']").tooltip();
+    });
+</script>
+
 
     <style type="text/css">
 
@@ -43,19 +56,11 @@ svg {
   }
 
 
-div.tooltip {
-    background: white;
-    padding: 0px 2px;
-    position: absolute;
-    z-index: 10;
-    visibility: hidden;
-    font-size: 0.8em;
-    font-family: sans-serif;
-}
 
 div.visible {
     visibility: visible !important;
 }
+
 
     </style>
     <script type="text/javascript">
@@ -80,7 +85,21 @@ div.visible {
    </style>
   </head>
   <body>
-   <h1 class="text-center">Graph</h1>
+  <div class="navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">MOSSSAIC</a>
+      <ul class="nav navbar-nav">
+        <li class="active">
+          <a href="#">Reload</a>
+        </li>
+        <li>
+          <a href="#">Help</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+   <h1 class="text-center">Hexagonal Grid</h1>
     <div class="panel panel-default">
       <div class="panel-body">
         <div class="well">
@@ -90,9 +109,11 @@ div.visible {
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
            View Top BS: <input type="checkbox" id="TopBS">
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" step="1"> 
-            Noise <input id="noise" type="number" step="0.01">  
-            No.IC<input id="topx" type="number" step="c1">  
+            No of BS <input id="TopBSno" type="number" step="1">  
+            No.IC<input id="topx" type="number" step="c1">
+            POPUP ACTIVE: <input type="checkbox" id="popup"> 
+             <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
+             <button type="button" class="btn btn-default" onclick="FR3()">FR3</button>
           </div>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01">   
@@ -108,25 +129,34 @@ div.visible {
            <div class="panel panel-default">
              <div class="panel-body">
               <p id="Output">
-              <svg id="visual" width="1000" height="500"></svg>
-                  Output
+
+              <svg id="visual" width="1000" height="500">
+   
+
+              </svg>
+             <!--  <svg id="text" x="0" y="15"height="30" width="20"><text fill="RED">Nothing clicked</text> </svg>                 -->
                
                </p>
              </div>
            </div>
-
+<canvas id="canvas"></canvas>
         </div>
 
 
   <!-- jQuery -->
   <script src="js/jquery.js"></script>
   <!-- Bootstrap JavaScript -->
-  <script src="/js/bootstrap.min.js"></script>
+
  <!-- <script src="//d3js.org/d3.v3.min.js"></script> -->  <!-- Needs internet -->
    <script type="text/javascript" src="/d3/d3.min.js"></script> 
-  
+  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script> 
+ 
+
   <script type="text/javascript">
-  var xAxis,yAxis,tooltip;
+  var canvas=document.getElementById("canvas");
+  var ctx=canvas.getContext("2d"); //for plotting curve
+
+  var xAxis,yAxis;
   var xaxisobject,zoom;
  // var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
 
@@ -139,6 +169,7 @@ div.visible {
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var currselected; //latest selected circle
   var wcount=0;//window number
+
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
   console.log(opercolor);
@@ -180,9 +211,7 @@ zoom = d3.behavior.zoom()
     .on("drag", dragged)
     .on("dragend", dragended);*/
 
-tooltip = d3.select('body')
-        .append('div')
-        .classed('tooltip', true);
+
 
 //for basestations
 /*var drag1 = d3.behavior.drag()  
@@ -291,25 +320,27 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .on('mouseover', mouseOver) 
             .on('mousemove', mouseMove)
             .on('mouseout', mouseOut)
-            .on('mousedown', click);
+            .on('click', click)
+            .attr("data-toggle","tooltip");
 
            
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
-            rect.attr("x",function(d,i){ return x(d.x);})
-            .attr("y",function(d,i){return y(d.y);})
+            rect.attr("x",function(d,i){ return x(d.x)+3.5;})
+            .attr("y",function(d,i){return y(d.y)+3.5;})  //this 3.5 is to make the point as center of rectangle
             .attr("width",7)
             .attr("height",7)
             .style("fill",function(d,i) { 
                                         return bscolor[parseInt(d.node[2])-1].color;
                                         } ) 
             .attr("id",function(d,i){return "BS"+d.col1;})
-            .on('mouseover', mouseOver1) ;
+            .on('mouseover', mouseOver1)
+            .attr("data-toggle","tooltip") ;
             // .call(drag1);*/
   
             //Origin , 0,0 ,temporary
             var rect1=svgContainer.append("rect");
-             rect1.attr("x",x(0)).attr("y",y(0)).style("fill","blue").attr("width",7).attr("height",7);
-
+             rect1.attr("x",x(0)+3.5).attr("y",y(0)+3.5).style("fill","blue").attr("width",7).attr("height",7) .attr("data-toggle","tooltip");
+            // .attr("data-toggle","tooltip").attr("title","AP");
             }
               
               );
@@ -317,17 +348,16 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
 // d3 mouse events
 function mouseOver1(d,i){
   //function for basestation , mouse hover
-    tooltip.text("BS" +(d.col1))   
-       .classed('visible', true);
+  //window.alert(0);
+   d3.select(this).attr("title","BS" +(d.col1));
 }
 function mouseOver(d, i) {  
   //function for circle,tooltip on mouse hover
-
+//window.alert(1);
     d3.select(this).classed('over', true);
     if(level==0)
     { 
-    tooltip.text("UE" +(d.col1))  
-        .classed('visible', true);
+       d3.select(this).attr("title","UE"+d.col1);
       }
       else if(level==1)
       {
@@ -352,20 +382,19 @@ function mouseOver(d, i) {
         {
          currop=5;
         }
-        tooltip.text("UE" +(d.col1)+" Def:"+d.node[2]+" Curr:"+currop).classed('visible', true);
+        d3.select(this).attr("title","UE" +(d.col1)+" Def:"+d.node[2]+" Curr:"+currop);
+
       }
       else
         console.log("Level undefined error");
 }
 
 function mouseMove(d, i) {
-    tooltip.style('top', (d3.event.pageY - 20) + 'px')
-        .style('left', (d3.event.pageX + 20) + 'px');
+    
 }
 
 function mouseOut(d, i) {
-    d3.select(this).classed('over', false);
-    tooltip.classed('visible', false);
+   d3.select(this).classed('over', false);
 }
 
 function onsuccess(obj){
@@ -376,7 +405,8 @@ console.log(obj);
 //obj.PrS is pre SINR
 //obj.PoS is post SINR
 //obj.Bsid is top x basestation id's
-
+obj.PoS=Math.round(obj.PoS * 100) / 100;
+obj.PrS=Math.round(obj.PrS * 100) / 100;
 document.getElementById("LastSIR").value=obj.ROI;
 document.getElementById("PostSINR").value=obj.PoS;
 document.getElementById("PreSINR").value=obj.PrS;
@@ -395,7 +425,7 @@ if(document.getElementById("TopBS").checked == true)
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+obj.Bsid[i].toString();
-    d3.select(Bsid).attr("width",(125+obj.SIR[i]) ).attr("height",(125+obj.SIR[i]));// to change attributes of max basestations
+    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);// to change attributes of max basestations
   }
 }//top rect being enlarged
  
@@ -405,7 +435,7 @@ if(document.getElementById("TopBS").checked == true)
     barData.push({'x':obj.Bsid[i],'y':obj.SIR[i]});
   }
 
-PlotBarGraph(barData);
+PlotBarGraph(barData,obj.PrS,obj.PoS);
 
 }
 
@@ -420,15 +450,30 @@ if(topBSno=="")
 else
   topBSno=parseInt(topBSno);
 currselected=d.col1.toString()-bs.length;
-BackObj={type:"A",node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+
+topx=document.getElementById("topx").value;
+
+
+
+if(topx=="")
+ topx=3;
+else
+  topx=parseInt(topx);
+
+
+
+BackObj={type:"A",node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno,noise:-90,topx:topx };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
 //above change the backend code and do parsing
 
-
+if(document.getElementById("popup").checked == true)
+{
 wcount++;
-newwindow();//plot on graph
+newwindow(d.col1);//plot on graph
+
+}
 
     var element = d3.select(this),
         selected = element.classed('selected');
@@ -442,7 +487,7 @@ newwindow();//plot on graph
           d3.select(this).attr("r",3.5);
       }
 
-function PlotBarGraph(barData){
+function PlotBarGraph(barData,prs,pos){
   //function which plots bar graph
   //also increases top contributing basestations sizes 
 InitChart(barData);
@@ -457,29 +502,25 @@ var key = function(d){
 
 //plotting
   vis = d3.select('#visual').append('svg').attr("id","BarGraph"),
-    WIDTH = 500,//change width and height to change size of bar graph
-    HEIGHT = 500,
+    WIDTH = 700,//change width and height to change size of bar graph
+    HEIGHT = 500,PADDING=100,
     MARGINS = {
-      top: 100,
+      top: 20,
       right: 20,
-      bottom: 40,
-      left: 50
+      bottom: 20,
+      left: 70
     },
     xRange = d3.scale.ordinal().rangeRoundBands([MARGINS.left, WIDTH - MARGINS.right], 0.1).domain(barData.map(function (d) {
       return (d.x);
     })),
 
 
-    yRange = d3.scale.linear().range([MARGINS.bottom,HEIGHT - MARGINS.top]).domain([0,d3.min(barData, function (d) {
-        
-        return d.y;
-      })
-    ]),
+     yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([-100,0]),
 
     xAxis = d3.svg.axis()
       .scale(xRange)
       .tickSize(5)
-      .orient("top"),
+      ,
 
     yAxis = d3.svg.axis()
       .scale(yRange)
@@ -492,7 +533,7 @@ var key = function(d){
 
  vis.append('svg:g')
     .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + ( MARGINS.bottom) + ')')
+    .attr('transform', 'translate(0,'  + (HEIGHT - MARGINS.bottom) +  ')')
     .call(xAxis);
 
   vis.append('svg:g')
@@ -504,33 +545,121 @@ var key = function(d){
       .data(barData)
       .enter()
         .append('rect')
-        .attr('class', function(d){return d.y < 0 ? "negative" : "positive";})
-        .attr({
-          x: function(d){
-            return xRange(d.x);
-          },
-          y: function(d){
-            return yRange(Math.max(0, d.y)); 
-          },
-          width: xRange.rangeBand(),
-          height: function(d){
-            return Math.abs(yRange(d.y) - yRange(0)); 
-          }
-          })
-          .attr('fill','GRAY');
-               
+        .attr('x', function (d) {
+      return xRange(d.x);
+    })
+    .attr('y', function (d) {
+      return yRange(d.y);
+    })
+    .attr('width', xRange.rangeBand())
+    .attr('height', function (d) {
+      return ((HEIGHT - MARGINS.bottom) - yRange(d.y)-45);
+    })
+    .attr('fill', 'grey');
+    
+
+    vis.append("line")                  
+  .attr("class", 'd3-dp-line')
+    .attr({ x1: MARGINS.left , y1: HEIGHT-65, x2: WIDTH-MARGINS.right, y2: HEIGHT-65 })
+    .style("stroke-dasharray", ("10, 10"))
+    .style("stroke-opacity", 2)
+    .style("stroke-width",3)
+    .style("stroke", "red");
+
+ 
+    
+vis.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ (MARGINS.left -35) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+    .text("Magnitude in dB");
+
+    
+
+
+    vis.append("text")
+    .attr("text-anchor", "right")  // this makes it easy to centre the text as the transform is applied to the anchor
+    .attr("transform", "translate("+ WIDTH +","+(HEIGHT - MARGINS.top+20)+")")  // centre below axis
+    .text("BS ID");
+
+    
+
+    
+    vis.append("text")
+    .attr("text-anchor", "right")  // this makes it easy to centre the text as the transform is applied to the anchor
+    .attr("transform", "translate("+ WIDTH +","+(HEIGHT - 65)+")")  // centre below axis
+    .text("Noise floor");
+
+
+vis.append("text")                  
+  .attr("x",(WIDTH/4)-40)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text("UE: ");
+
+
+vis.append("text")                  
+  .attr("x", (WIDTH/4)+50)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text("Level: ");
+
+vis.append("text")                  
+  .attr("x", WIDTH/2+30)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text("Pre SINR: ");
+
+vis.append("text")                  
+  .attr("x", WIDTH*(3/4))
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text("Post SINR: ");
+
+
+vis.append("text")                  
+  .attr("x", (WIDTH/4))
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text(currselected+76);
+
+vis.append("text")                  
+  .attr("x", (WIDTH/4)+80)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text(level);
+
+vis.append("text")                  
+  .attr("x", (WIDTH/2)+100)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text(prs);
+
+vis.append("text")                  
+  .attr("x", WIDTH*(3/4)+60)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text(pos);               
  }
 }
 
 
 
 function zoomed() {
+  //does pan +zoom
+ 
+ 
+  
+    //console.log("Normal",d3.mouse(this),window.event);
   var translate = d3.event.translate,
             scale = d3.event.scale;
         svg.selectAll("circle").attr("transform", "translate(" + translate + ")scale(" + scale + ")");
         svg.selectAll("rect").attr("transform", "translate(" + translate + ")scale(" + scale + ")");
         svg.selectAll('.tile').attr("transform", "translate(" + translate + ")scale(" + scale + ")");
-    }//above function causes zooming which is called in var zoom
+    
+
+     
+
+  }//above function causes zooming which is called in var zoom
     
 
 function onsuccess1(obj)
@@ -554,11 +683,22 @@ str1="#UE";
 function level1()
 {
 level=1
-console.log("BBBBBB",currselected);//row no 
+//console.log("BBBBBB",currselected);//row no 
 BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
-BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+
+topx=document.getElementById("topx").value;
+
+
+
+if(topx=="")
+ topx=3;
+else
+  topx=parseInt(topx);
+
+
+BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 
@@ -574,6 +714,24 @@ function level0()
  BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
+
+
+topx=document.getElementById("topx").value;
+
+
+
+if(topx=="")
+ topx=3;
+else
+  topx=parseInt(topx);
+
+
+BackObj2={type:"A",node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
+console.log(JSON.stringify(BackObj2));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj2),onsuccess,"json");//getting from server
+
+
+
 }
 
 function Reset()
@@ -582,25 +740,9 @@ function Reset()
    svgContainer.selectAll("rect").attr("width",7).attr("height",7);
 }
 
-
-
-
-
-
- 
-
-
 function loadMe(){
    SetSize();  
-
 }
- 
-
-
-
-
-
-
 loadMe(); // This is the function that calls everything
 
 
@@ -625,9 +767,7 @@ var translate = [0, 0];
 
 function initialize() {
   
-   tooltip = d3.select('body')
-        .append('div')
-        .classed('tooltip', true);
+
 
     fillMap();
     position();
@@ -644,7 +784,7 @@ function fillMap() {
           
             data.push({
                 id: id++,
-                coordinates: [i, j],
+                coordinates: [i-2, j],  //i-2 to centralise hexagons
 
                 type: 'regular',
                // resource: Math.random() < .005
@@ -669,6 +809,7 @@ function position() {
             j = d.coordinates[1],
               x = stepX * i + (offset * j ) + w / 2 ,
               y = stepY * j  + h / 2;
+  //            console.log("AAA",x,y);
         d.centroid = [Math.round(x * 1e2) / 1e2, Math.round(y * 1e2) / 1e2]; //centre of hexagon
         d.visible = 1;//visible everywhere
     });
@@ -812,25 +953,209 @@ function getVisibleData() {
 
 })();
 
-
-function newwindow(){
+var node;
+function newwindow(idno){
   //function to open a new window and put graph
    //var myWindow = window.open("", "", "width=500,height=500");
-   
- 
-  var embedded_svg = document.getElementById("visual");
+
+
+ // node = document.createTextNode(str);
+
+//var element = document.getElementById("text");
+//console.log(d3.select("#text")[0][0].firstChild.data); //when using <h1 id =text>
+//d3.select("#text")[0][0].firstChild.data=str;
+
+
+//console.log(element);
+//element.appendChild(node);
+
+  var embedded_svg = document.getElementById("Output");//visual
   console.log(embedded_svg);
+ 
   var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
+  //var title=svg_win.document.createElement("title")
 
   var transplanted_svg = svg_win.document.importNode(embedded_svg, true);
   var blank_root = svg_win.document.documentElement;
         svg_win.document.removeChild(blank_root);
         svg_win.document.appendChild(transplanted_svg);
-         wcount++;
- //var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
+ 
+   
+    //    svg_win.document.title("window"+wcount);
+         wcount++;     
+
+
 }
 
 
+
+
+function CDF()
+{
+ BackObj={type:"C"};
+ console.log(BackObj);
+ $.post("http://localhost:8080/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
+}
+
+  function va(arr, i, j){
+            return [arr[2*j]-arr[2*i], arr[2*j+1]-arr[2*i+1]]
+          }
+ function ctlpts(x1,y1,x2,y2,x3,y3) {
+           // var t = $("tension").value;
+
+         //   var v = va(arguments, 0, 2);
+      //      var d01 = dista(arguments, 0, 1);
+         //   var d12 = dista(arguments, 1, 2);
+        //    var d012 = d01 + d12;
+            return [x2 , y2 ,
+                    x2 , y2  ];
+          }
+
+function plotcdf(obj)
+{//cdf to be plotted here
+ console.log(obj,"is recieved");
+ canvas.width = parseInt(1300);
+            canvas.height = parseInt(2000);
+var xpts=[];
+var ypts=obj.Y;
+xscale=(canvas.width-200)/ypts.length;
+yScale = (canvas.height - 60) ;
+//grid
+ctx.beginPath();
+ctx.strokeStyle="#009933"; // color of grid lines
+for(i=0;i<ypts.length/2;i++)
+{
+   //vertical
+  ctx.moveTo(90+2*i*xscale,200);
+  ctx.lineTo(90+2*i*xscale,1000);
+  ctx.stroke();
+
+ 
+}
+/*
+for(i=0;i<ypts.length/2;i++)
+{
+  //horizontal
+  ctx.moveTo(yScale);
+  ctx.lineTo();
+  ctx.stroke();
+}*/
+
+
+
+
+ctx.strokeStyle="#db1e26";//red
+
+//console.log
+for(var i=0;i<ypts.length;i++ )
+{
+
+ xpts.push(i*xscale + 90);
+ ypts[i]=200+(1-ypts[i])*800;
+ //cos left top corrner is 0,0 and y axis is reversed
+ showPt(i*xscale +90 , ypts[i], "black");
+}
+
+cps = []; // There will be two control points for each "middle" point, 1 ... len-2e
+ for (var i = 0; i < xpts.length - 2; i += 1) {
+  cps = cps.concat(ctlpts(xpts[i], ypts[i], 
+  xpts[i+1], ypts[i+1], 
+  xpts[i+2], ypts[i+2]));
+drawCurvedPath(cps, xpts,ypts);
+  }
+
+//now curve plotted,to put grid,axis and lablels
+
+
+
+
+
+ctx.moveTo(0, 50);
+
+ 
+for(i=0;i<xpts.length/2;i++)
+{//x axis points
+  var x = i * xscale;
+  ctx.fillText(Math.round(obj.X[2*i]), 2*x+90,1040);
+
+ ctx.moveTo(x, 50);
+}
+
+var count =  0;
+
+  for (i=200;i<=1000;i+=50) {
+   
+  //  console.log(1.25-(ypts[count]/800));
+    ctx.fillText((1000-i)/800,50,i)  ;
+    ctx.moveTo(50,i)
+    ctx.lineTo(canvas.width-100,i);
+    ctx.stroke();
+    count++;
+  }
+
+//new window
+
+var dataUrl = canvas.toDataURL();
+
+window.open(dataUrl, "toDataURL() image", "width=600, height=200");
+
+
+}
+
+
+ function showPt(x,y,fillStyle) {
+            ctx.save();
+            ctx.beginPath();
+            if (fillStyle) {
+              ctx.fillStyle = fillStyle;
+            }
+            ctx.arc(x, y, 5, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.restore();
+          }
+function drawCurvedPath(cps, xpts,ypts){
+            var len = xpts.length ; // number of points
+            
+            
+              ctx.beginPath();
+              ctx.moveTo(xpts[0], ypts[0]);
+              // from point 0 to point 1 is a quadratic
+              ctx.quadraticCurveTo(cps[0], cps[1], xpts[1], ypts[1]);
+              // for all middle points, connect with bezier
+              for (var i = 2; i < len-1; i += 1) {
+                // console.log("to", pts[2*i], pts[2*i+1]);
+                ctx.bezierCurveTo(
+                  cps[(2*(i-1)-1)*2], cps[(2*(i-1)-1)*2+1],
+                  cps[(2*(i-1))*2], cps[(2*(i-1))*2+1],
+                  xpts[i], ypts[i]);
+              }
+              ctx.quadraticCurveTo(
+                cps[(2*(i-1)-1)*2], cps[(2*(i-1)-1)*2+1],
+                xpts[i], ypts[i]);
+              ctx.stroke();
+            
+          }
+
+
+
+function FR3()
+{
+  if(topx=="")
+ topx=3;
+else
+  topx=parseInt(topx);
+
+ BackObj={type:"D",node:currselected,level:level,topx:topx};
+ console.log(BackObj);
+ $.post("http://localhost:8080/update",JSON.stringify(BackObj),fr3front,"json");//getting from server
+
+}
+function fr3front(obj){
+console.log(obj);
+document.getElementById("PreSINR").value=obj.PrS;
+document.getElementById("PostSINR").value=obj.PoS;
+document.getElementById("LastSIR").value=obj.ROI;
+}
 
     </script>
 
