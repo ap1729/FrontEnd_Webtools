@@ -13,7 +13,7 @@ var y = d3.scale.linear()
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Level 1  + Backend</title>
+    <title>Sectoring</title>
     <!-- Bootstrap CSS -->
 
   <script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
@@ -237,7 +237,7 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('Nodelocations.csv',//Sectorlocations.csv'
+d3.csv('Sectorlocations.csv',//Sectorlocations.csv'
         // accessor function
         function(d) {
             return {
@@ -325,10 +325,24 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
 
            
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
-            rect.attr("x",function(d,i){ return x(d.x)+3.5;})
-            .attr("y",function(d,i){return y(d.y)+3.5;})  //this 3.5 is to make the point as center of rectangle
-            .attr("width",7)
-            .attr("height",7)
+            rect.attr("x",function(d,i){
+                        if(d.col1%3==0) 
+                            return x(d.x);
+                   else if(d.col1%3==1)
+                            return x(d.x)+3.1;
+                        else 
+                           return x(d.x)-3;
+                              })
+            .attr("y",function(d,i){
+                     if(d.col1%3==0) 
+                            return y(d.y)-5;
+                   else if(d.col1%3==1)
+                            return y(d.y)+1;
+                        else 
+                           return y(d.y)+1;
+                           })  //this 3.5 is to make the point as center of rectangle
+            .attr("width",6)
+            .attr("height",6)
             .style("fill",function(d,i) { 
                                         return bscolor[parseInt(d.node[2])-1].color;
                                         } ) 
@@ -621,7 +635,7 @@ vis.append("text")
   .attr("x", (WIDTH/4))
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
-    .text(currselected+76);
+    .text(currselected+228);
 
 vis.append("text")                  
   .attr("x", (WIDTH/4)+80)
@@ -670,11 +684,11 @@ function onsuccess1(obj)
  var circles=svgContainer.selectAll("circle").data(obj.Changecolor)
       .style("fill",function(d){return opercolor[d].color; });//works but data shouldn't be changed
 */
-//UE id starts from UE76
+//UE id starts from UE228
 str1="#UE";
  for(i=0;i<obj.Changecolor.length;i++)
    {
-    str2=str1+(i+76).toString();//UE id starts from UE76
+    str2=str1+(i+228).toString();//UE id starts from UE228
     d3.select(str2).style("fill",opercolor[obj.Changecolor[i]].color);
    }
 
@@ -685,6 +699,7 @@ function level1()
 {
 level=1
 //console.log("BBBBBB",currselected);//row no 
+//node 13 is dummy
 BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server

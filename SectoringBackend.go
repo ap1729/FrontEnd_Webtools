@@ -178,7 +178,7 @@ type returndata struct{
         PoS float64
         ROI float64
         Bsid []int
-        Operno []int //for bar graph
+       Operno []int //for bar graph
 }// structure for returning data to front end for SIR
 
 type returndata1 struct{
@@ -187,37 +187,9 @@ type returndata1 struct{
 }// structure for returning data to front end for level1
 
 type returndata2 struct{
-    Pre_sinr_level0_X []float64
-    Pre_sinr_level0_Y []float64
-    Post_sinr_level0_X []float64
-    Post_sinr_level0_Y []float64
-    Pre_sinr_level1_X []float64
-    Pre_sinr_level1_Y []float64 
-    Post_sinr_level1_X []float64
-    Post_sinr_level1_Y []float64 	
+    X []float64
+    Y []float64
 }//structure for returning data to front end for CDF
-//ramanan cdf changes end
-
-//ramanan cdf changes begin global variables and structures declaration
-var total_num_ue_CDF int = 100                            // total number of UE for CDF calculation is hardcoded
-/*type sinr_values struct{                                  //structure to hold SINR
-    sinr_arr_dB []float64			//SINR array
- min_sinr_dB int				//max SINR
- max_sinr_dB int				//min SINR
-}*/
-type sinr_x_cdf_y struct{                                  //structure to hold SINR CDF
- sinr_dB_x  []float64			//SINR in db x-axis
- cdf_y  []float64				//cdf y-axis
-}
-type sinr_x_cdf_y_l0_l1 struct{                                  //structure to hold SINR CDF
- pre_sinr_dB_x  []float64			//pre procesing SINR in db x-axis
- pre_cdf_y  []float64				//pre cdf y-axis
- post_sinr_dB_x  []float64			//post procesing SINR in db x-axis
- post_cdf_y  []float64				//post cdf y-axis
-}
-
-//ramanan cdf changes end
-
 
 type returndata3 struct{
     PrS float64
@@ -271,7 +243,6 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 //pass SIR function
   //log.Println("DETECTED")
        updateData =SIR(rxdata)
-//fmt.Println("UPDATE",updateData)
        txbytes, _ := json.Marshal(updateData)
         nbytes, werr := w.Write(txbytes)
 		_ = nbytes
@@ -331,22 +302,22 @@ txbytes3, _ := json.Marshal(updateData3)
 
 }
 
-
 func operatorbybs(bsid int) int{
 //which operator by passing bsid
 lb:=0
 ub:=0
 i:=0
 for i=0;i<len(op);i++{
- ub+=op[i].bsno
+ ub+=op[i].bsno //sectoring
  if bsid>=lb && bsid<ub{
    break
   }
- lb+=op[i].bsno
+ lb+=op[i].bsno//sectoring
  }
 
 return i
 }
+
 
 
 
@@ -367,8 +338,8 @@ values:= []float64{}
      keys =append(keys,key)
      values =append(values,value)
   } 
-// fmt.Println("KeYS",keys) 
-// fmt.Println(values)
+ //fmt.Println("KeYS",len(keys)) 
+ //fmt.Println(values)
 temp1:=0
 temp2:=0.0
   for i:=0;i< len(keys);i++{
@@ -385,8 +356,8 @@ temp2:=0.0
    }
  //  fmt.Println("\n",i)
  } 
-fmt.Println(keys)
-fmt.Println(values)
+//fmt.Println(keys)
+//fmt.Println(values)
 
 
 if r.Level==0{
@@ -489,13 +460,13 @@ for i := num_interferers_cancel+1; i < len(bs); i++ {
 post_processing_sinr_db = max_received_power_dB-10*math.Log10(sum_interferers_cancel_lin + math.Pow(10,r.Noise/10)) //noise level -90dBm hardcoded
 //fmt.Println("\n\n\n\n\n\n post-processing SINR",post_processing_sinr_db)
 
+     var returnobj returndata
 
-  var returnobj returndata
 
 for i:=0;i<r.TopBsno;i++{
 returnobj.Operno=append(returnobj.Operno,operatorbybs(keys[i]))
 }
-      returnobj.SIR=values[0:r.TopBsno]
+     returnobj.SIR=values[0:r.TopBsno]
      returnobj.PrS=pre_processing_sinr_db
      returnobj.PoS=post_processing_sinr_db
      returnobj.Bsid=keys[0:r.TopBsno]
@@ -514,16 +485,19 @@ var returnobj1 returndata1
           
 max:=0.0
 id:=0
+
+
 //Using 2D array Pathloss[][]
 for i:=0;i<len(Pathloss);i++ {
 //loop for each row
   max=Pathloss[i][0]
   id=0
-  for j:=0;j<len(bs);j++{
+  for j:=0;j<len(bs);j++{ 
 //for all elements in one row
    if max<Pathloss[i][j]{
      id=j       
      max=Pathloss[i][j]
+
    }
 
   }
@@ -536,12 +510,13 @@ for i:=0;i<len(op);i++{
  ub+=op[i].bsno
  if lb<=id && id<ub{
     returnobj1.Changecolor=append(returnobj1.Changecolor,i)      //adding to array to return
+ fmt.Println("\n",i," ",operatorbybs(id))
   break
    }
 
  lb+=op[i].bsno
  }
-
+fmt.Println(i,"  ",id, "   ",i	)
 
 }
 //fmt.Println(id,max,"\n")
@@ -633,11 +608,12 @@ return returnobj3
 
 
 
+
 func main() {
 
 //Nodelocations csv file
 
-csvfile1, err1 := os.Open("Nodelocations.csv")
+csvfile1, err1 := os.Open("Sectorlocations.csv")
 
          if err1 != nil {
                  fmt.Println(err1)
@@ -664,7 +640,7 @@ op =append(op,one)
            uecount:=0
            uecurrop:=1
 for _, each1 := range rawCSVdata1 {
-    
+    //fmt.Println("AAA",each1)
              if count!=0{//to not print first row
 //each is of formatof col1,node,x,y,m1,m2
   var oneRecord TestRecord
@@ -751,7 +727,7 @@ uecurrop+=1
 
 
 //pathloss csv
-csvfile, err := os.Open("Converted.csv")
+csvfile, err := os.Open("SIR.csv")
          if err != nil {
                  fmt.Println(err)
                  os.Exit(1)
@@ -771,11 +747,11 @@ csvfile, err := os.Open("Converted.csv")
          // now, safe to move raw CSV data to struct
         count=0
          for _, each := range rawCSVdata {
+
              if count!=0{//to not print first row
            //   fmt.Printf("row",each) 
               temp:=[]float64{} 
-                for i := 0; i < len(bs); i++ { //this part is hardcoded ,later will make it indpt
-              
+                for i := 0; i < len(bs); i++ { 
                a, err := strconv.ParseFloat(each[i], 64)            
                  if err==nil{
                      temp= append(temp,a)
@@ -788,7 +764,7 @@ csvfile, err := os.Open("Converted.csv")
 
          }//for loop of csv parse is over
 
-
+fmt.Println(len(Pathloss[0]))
 fmt.Println("operator info",op)
 fmt.Println("BS no",len(bs)) // no of basestations
 fmt.Println("UE no",len(ue)) // no of ues
