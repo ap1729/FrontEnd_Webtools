@@ -187,10 +187,36 @@ type returndata1 struct{
 }// structure for returning data to front end for level1
 
 type returndata2 struct{
-    X []float64
-    Y []float64
+    Pre_sinr_level0_X []float64
+    Pre_sinr_level0_Y []float64
+    Post_sinr_level0_X []float64
+    Post_sinr_level0_Y []float64
+    Pre_sinr_level1_X []float64
+    Pre_sinr_level1_Y []float64 
+    Post_sinr_level1_X []float64
+    Post_sinr_level1_Y []float64 	
 }//structure for returning data to front end for CDF
+//ramanan cdf changes end
 
+//ramanan cdf changes begin global variables and structures declaration
+var total_num_ue_CDF int = 100                            // total number of UE for CDF calculation is hardcoded
+/*type sinr_values struct{                                  //structure to hold SINR
+    sinr_arr_dB []float64			//SINR array
+ min_sinr_dB int				//max SINR
+ max_sinr_dB int				//min SINR
+}*/
+type sinr_x_cdf_y struct{                                  //structure to hold SINR CDF
+ sinr_dB_x  []float64			//SINR in db x-axis
+ cdf_y  []float64				//cdf y-axis
+}
+type sinr_x_cdf_y_l0_l1 struct{                                  //structure to hold SINR CDF
+ pre_sinr_dB_x  []float64			//pre procesing SINR in db x-axis
+ pre_cdf_y  []float64				//pre cdf y-axis
+ post_sinr_dB_x  []float64			//post procesing SINR in db x-axis
+ post_cdf_y  []float64				//post cdf y-axis
+}
+
+//ramanan cdf changes end
 type returndata3 struct{
     PrS float64
     PoS float64
@@ -527,63 +553,6 @@ return returnobj1
 }
 
 
-func CDF() returndata2{
-
-var returnobj2 returndata2
-//Get pre and post SINR
-var temp rowdata
-var getdata returndata
-
-        temp.Type="A"
-	temp.Node=0    //which ue  
-        temp.Level=0
-        temp.TopBsno=10 
-	temp.Noise=-90
-        temp.Topx=3
-//Ramanan changes begin
-total_num_ue_CDF := 100                            // total number of UE for CDF calculation is hardcoded
-var pre_sinr_arr_dB = []float64{} //array variable to store pre processing SINR for number of UEs considered
-var post_sinr_arr_dB = []float64{} //array variable to store post processing SINR for number of UEs considered
-//getdata has PrS ,PoS
-//fmt.Println("\nBBB",getdata.PrS,"  ",getdata.PoS,"\n")
-for i:=0;i<total_num_ue_CDF;i++{ // number of UEs used for caculate CDF hardcoded
-getdata = SIR(temp)
-pre_sinr_arr_dB = append(pre_sinr_arr_dB,getdata.PrS)
-post_sinr_arr_dB=append(post_sinr_arr_dB,getdata.PoS)
-temp.Node+=1
-}
-//fmt.Println("\n pre_sinr_arr_dB \n",pre_sinr_arr_dB,"\n")
-sort.Float64s(pre_sinr_arr_dB)//function which sorts data in ascending order
-//fmt.Println("\n pre_sinr_arr_dB_after_sorting \n",pre_sinr_arr_dB,"\n")
-var min_pre_sinr_dB int
-var max_pre_sinr_dB int
-min_pre_sinr_dB = int(math.Floor(pre_sinr_arr_dB[0]))
-max_pre_sinr_dB = int(math.Ceil(pre_sinr_arr_dB[total_num_ue_CDF-1]))
-//fmt.Println("\n post_sinr_arr_dB \n",post_sinr_arr_dB,"\n")
-//fmt.Println("\n check \n",max_pre_sinr_dB-min_pre_sinr_dB+1)
-//fmt.Println("\n min_sinr_dB \n",min_pre_sinr_dB,"\n")
-//fmt.Println("\n max_sinr_dB \n",max_pre_sinr_dB,"\n")
-var pre_sinr_cdf float64
-cdf_threshold:=min_pre_sinr_dB   // %%%%%%%%%%%%%%threshold is kept as integer as of now%%%%%%%%%%%%%%%%
-//for i:=0;i<(max_pre_sinr_dB-min_pre_sinr_dB+1);i++{ // x axis range
-for cdf_threshold <= max_pre_sinr_dB{ // x axis range  
-returnobj2.X = append(returnobj2.X,float64(cdf_threshold))
-pre_sinr_count_ue := 0
-for j:=0;j<total_num_ue_CDF;j++{ //  calculateCDF
-if pre_sinr_arr_dB[j] <= float64(cdf_threshold){ 	  
-pre_sinr_count_ue = pre_sinr_count_ue+1
-}
-}
-pre_sinr_cdf = float64(pre_sinr_count_ue)/float64(total_num_ue_CDF)
-//fmt.Println("\n check values \n",pre_sinr_cdf)
-returnobj2.Y=append(returnobj2.Y,pre_sinr_cdf)
-cdf_threshold = cdf_threshold+1
-}
-//fmt.Println("\n pre processing sinr cdf level0\n ",returnobj2.X,"\n",returnobj2.Y)
-return returnobj2 
-
-//Ramanan changes end 
-}
 
 func FR3(r rowdata) returndata3 {
 var returnobj3 returndata3
@@ -599,7 +568,106 @@ return returnobj3
 
 
 
+func CDF() returndata2{
+var returnobj2 returndata2
+//Get pre and post SINR
+var temp rowdata
+        temp.Type="A"
+	temp.Node=0    //which ue  
+        temp.Level=0
+        temp.TopBsno=10 
+	temp.Noise=-90
+        temp.Topx=3
+//ramanan cdf changes begin
+var cal_cdf_l0_l1_obj sinr_x_cdf_y_l0_l1
+cal_cdf_l0_l1_obj = cal_cdf_l0_l1(temp)
+returnobj2.Pre_sinr_level0_X = append(returnobj2.Pre_sinr_level0_X,cal_cdf_l0_l1_obj.pre_sinr_dB_x...) 
+returnobj2.Pre_sinr_level0_Y = append(returnobj2.Pre_sinr_level0_Y,cal_cdf_l0_l1_obj.pre_cdf_y...) 
+returnobj2.Post_sinr_level0_X = append(returnobj2.Post_sinr_level0_X,cal_cdf_l0_l1_obj.post_sinr_dB_x...) 
+returnobj2.Post_sinr_level0_Y = append(returnobj2.Post_sinr_level0_Y,cal_cdf_l0_l1_obj.post_cdf_y...) 
 
+// CDF for level1
+var temp_level1 rowdata
+        temp_level1.Type="A"
+	temp_level1.Node=0    //which ue  
+        temp_level1.Level=1
+        temp_level1.TopBsno=10 
+	temp_level1.Noise=-90
+        temp_level1.Topx=3
+
+var cal_cdf_l0_l1_obj_temp sinr_x_cdf_y_l0_l1
+cal_cdf_l0_l1_obj_temp = cal_cdf_l0_l1(temp_level1)
+returnobj2.Pre_sinr_level1_X = append(returnobj2.Pre_sinr_level1_X,cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x...) 
+returnobj2.Pre_sinr_level1_Y = append(returnobj2.Pre_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.pre_cdf_y...) 
+returnobj2.Post_sinr_level1_X = append(returnobj2.Post_sinr_level1_X,cal_cdf_l0_l1_obj_temp.post_sinr_dB_x...) 
+returnobj2.Post_sinr_level1_Y = append(returnobj2.Post_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.post_cdf_y...) 
+
+//fmt.Println("\n pre_sinr_level1 \n",returnobj2.Pre_sinr_level1_X,"\n\n  ",returnobj2.Pre_sinr_level1_Y,"\n")
+//fmt.Println("\n post_sinr_level1 \n",returnobj2.Post_sinr_level1_X,"\n\n  ",returnobj2.Post_sinr_level1_Y,"\n")
+return returnobj2 
+
+//ramanan cdf changes end
+}
+
+//ramanan cdf changes begin
+func cal_cdf_l0_l1(temp_obj rowdata) sinr_x_cdf_y_l0_l1{
+var getdata returndata
+var cdf_object sinr_x_cdf_y_l0_l1
+var cal_cdf_obj sinr_x_cdf_y
+var pre_sinr_arr_dB = []float64{} //array variable to store pre processing SINR for number of UEs considered
+var post_sinr_arr_dB = []float64{} //array variable to store post processing SINR for number of UEs considered
+//getdata has PrS ,PoS
+//fmt.Println("\nBBB",getdata.PrS,"  ",getdata.PoS,"\n")
+//var temp_pre_sinr sinr_values
+//var temp_post_sinr sinr_values
+for i:=0;i<total_num_ue_CDF;i++{ // number of UEs used for caculate CDF hardcoded
+getdata = SIR(temp_obj)
+pre_sinr_arr_dB = append(pre_sinr_arr_dB,getdata.PrS)
+post_sinr_arr_dB=append(post_sinr_arr_dB,getdata.PoS)
+temp_obj.Node+=1
+}
+//************** for pre processing SINR *********************************//
+cal_cdf_obj = cal_cdf(pre_sinr_arr_dB)
+cdf_object.pre_sinr_dB_x = append(cdf_object.pre_sinr_dB_x,cal_cdf_obj.sinr_dB_x...)
+cdf_object.pre_cdf_y = append(cdf_object.pre_cdf_y,cal_cdf_obj.cdf_y...)
+//************** for post processing SINR *********************************//
+cal_cdf_obj = cal_cdf(post_sinr_arr_dB)
+cdf_object.post_sinr_dB_x = append(cdf_object.post_sinr_dB_x,cal_cdf_obj.sinr_dB_x...)
+cdf_object.post_cdf_y = append(cdf_object.post_cdf_y,cal_cdf_obj.cdf_y...)
+return cdf_object
+}
+
+func cal_cdf(sinr_values_arr []float64) sinr_x_cdf_y{
+var cdf_obj sinr_x_cdf_y
+//fmt.Println("\n pre_sinr_arr_dB_before_sorting \n",sinr_values_arr,"\n")
+sort.Float64s(sinr_values_arr)//function which sorts data in ascending order
+var min_sinr_dB int
+var max_sinr_dB int
+min_sinr_dB = int(math.Floor(sinr_values_arr[0]))
+max_sinr_dB = int(math.Ceil(sinr_values_arr[total_num_ue_CDF-1]))
+
+var sinr_cdf float64
+cdf_threshold:=min_sinr_dB   // %%%%%%%%%%%%%%threshold is kept as integer as of now%%%%%%%%%%%%%%%%
+for cdf_threshold <= max_sinr_dB{ // x axis range  
+cdf_obj.sinr_dB_x = append(cdf_obj.sinr_dB_x,float64(cdf_threshold))
+sinr_count_ue := 0
+for j:=0;j<total_num_ue_CDF;j++{ //  calculateCDF
+if sinr_values_arr[j] <= float64(cdf_threshold){ 	  
+sinr_count_ue = sinr_count_ue+1
+}
+}
+sinr_cdf = float64(sinr_count_ue)/float64(total_num_ue_CDF)
+//fmt.Println("\n check values \n",pre_sinr_cdf)
+cdf_obj.cdf_y=append(cdf_obj.cdf_y,sinr_cdf)
+cdf_threshold = cdf_threshold+1
+}
+
+
+return cdf_obj
+}
+
+
+//ramanan cdf changes end
 
 
 
