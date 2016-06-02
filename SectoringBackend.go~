@@ -510,7 +510,7 @@ for i:=0;i<len(op);i++{
  ub+=op[i].bsno
  if lb<=id && id<ub{
     returnobj1.Changecolor=append(returnobj1.Changecolor,i)      //adding to array to return
- //fmt.Println("\n",i," ",operatorbybs(id))
+ fmt.Println("\n",i," ",operatorbybs(id))
   break
    }
 
@@ -727,7 +727,7 @@ uecurrop+=1
 
 
 //pathloss csv
-csvfile, err := os.Open("SIR.csv")
+csvfile, err := os.Open(".csv")
          if err != nil {
                  fmt.Println(err)
                  os.Exit(1)

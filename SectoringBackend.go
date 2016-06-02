@@ -727,7 +727,7 @@ uecurrop+=1
 
 
 //pathloss csv
-csvfile, err := os.Open("SIR.csv")
+csvfile, err := os.Open("sectorloss.csv")
          if err != nil {
                  fmt.Println(err)
                  os.Exit(1)
