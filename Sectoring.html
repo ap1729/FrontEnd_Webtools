@@ -109,8 +109,8 @@ div.visible {
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
            View Top BS: <input type="checkbox" id="TopBS">
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1">  
-            No.IC<input id="topx" type="number" style="width: 40px;" step="1">
+            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10">  
+            No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3">
             POPUP ACTIVE: <input type="checkbox" id="popup"> 
              <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
              <button type="button" class="btn btn-default" onclick="FR3()">FR3</button>
@@ -435,14 +435,29 @@ if(document.getElementById("TopBS").checked == true)
   for(i=0;i<bs.length;i++)
   {// to make all rect same size
     Bsid='#BS'+i.toString();
-    d3.select(Bsid).attr("width",7).attr("height",7);
+    d3.select(Bsid).attr("width",6).attr("height",6);
   }
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
    Bsid="#BS"+obj.Bsid[i].toString();
    console.log(Bsid);
-    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);// to change attributes of max basestations
+   if(Bsid[i]%3==0)
+   {
+    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);// to change attributes of max basestations
+   }
+   else if(Bsid[i]%3==1)
+   {
+  d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);    
+
+   }
+else
+{
+
+  d3.select(Bsid).attr("width",6 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);
+}
+
+
   }
 }//top rect being enlarged
  
@@ -586,7 +601,7 @@ var key = function(d){
 vis.append("text")
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+ (MARGINS.left -35) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-    .text("Magnitude in dB");
+    .text("Magnitude in dBm");
 
     
 
@@ -700,7 +715,13 @@ function level1()
 level=1
 //console.log("BBBBBB",currselected);//row no 
 //node 13 is dummy
-BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
+topBSno=document.getElementById("TopBSno").value;
+if(topBSno=="")
+ topBSno=10;
+else
+  topBSno=parseInt(topBSno);
+
+BackObj={type:"B",node:13,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 
@@ -714,7 +735,7 @@ else
   topx=parseInt(topx);
 
 
-BackObj1={type:"A",node:currselected,level:level,TopBSno:topBsno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
+BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 
@@ -757,6 +778,9 @@ function Reset()
 }
 
 function loadMe(){
+  document.getElementById("LastSIR").disabled = true;
+    document.getElementById("PreSINR").disabled = true;
+     document.getElementById("PostSINR").disabled = true;
    SetSize();  
 }
 loadMe(); // This is the function that calls everything
@@ -1031,7 +1055,7 @@ function plotcdf(obj)
 {//cdf to be plotted here
  console.log(obj,"is recieved");
  canvas.width = parseInt(2000);
-            canvas.height = parseInt(2000);
+ canvas.height = parseInt(2000);
             
 
 plotcurve(obj.Pre_sinr_level0_X,obj.Pre_sinr_level0_Y,"Pre Processing Level0 CDF curve");
@@ -1039,6 +1063,8 @@ plotcurve(obj.Pre_sinr_level1_X,obj.Pre_sinr_level1_Y,"Pre Processing Level1 CDF
 plotcurve(obj.Post_sinr_level0_X,obj.Post_sinr_level0_Y,"Post Processing Level0 CDF curve");
 plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"Post Processing Level1 CDF curve");
 ctx.clearRect(0, 0, canvas.width, canvas.height);
+canvas.width = parseInt(0);
+canvas.height = parseInt(2000);
 
 //plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"PoS1");
 }

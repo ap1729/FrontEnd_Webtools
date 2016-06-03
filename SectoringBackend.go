@@ -293,7 +293,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		}                  
 
                 } else if string(data[9])=="C"{
-                 updateData2 = CDF()
+                 updateData2 = CDF(rxdata)
              //CDF plot
                     txbytes2, _ := json.Marshal(updateData2)
                nbytes2, werr2 := w.Write(txbytes2)
@@ -568,7 +568,7 @@ return returnobj3
 
 
 
-func CDF() returndata2{
+func CDF(r rowdata) returndata2{
 var returnobj2 returndata2
 //Get pre and post SINR
 var temp rowdata
@@ -577,7 +577,7 @@ var temp rowdata
         temp.Level=0
         temp.TopBsno=10 
 	temp.Noise=-90
-        temp.Topx=3
+        temp.Topx=r.Topx
 //ramanan cdf changes begin
 var cal_cdf_l0_l1_obj sinr_x_cdf_y_l0_l1
 cal_cdf_l0_l1_obj = cal_cdf_l0_l1(temp)
@@ -593,7 +593,7 @@ var temp_level1 rowdata
         temp_level1.Level=1
         temp_level1.TopBsno=10 
 	temp_level1.Noise=-90
-        temp_level1.Topx=3
+        temp_level1.Topx=r.Topx
 
 var cal_cdf_l0_l1_obj_temp sinr_x_cdf_y_l0_l1
 cal_cdf_l0_l1_obj_temp = cal_cdf_l0_l1(temp_level1)

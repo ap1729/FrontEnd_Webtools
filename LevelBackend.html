@@ -107,16 +107,16 @@ div.visible {
           </div>
            <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
-           View Top BS: <input type="checkbox" id="TopBS">
+           View Top BS: <input type="checkbox" id="TopBS" >
           <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1">  
-            No.IC<input id="topx" type="number" style="width: 40px;" step="1">
+            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10">  
+            No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3">
             POPUP ACTIVE: <input type="checkbox" id="popup"> 
              <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
              <button type="button" class="btn btn-default" onclick="FR3()">FR3</button>
           </div>
           <form id="putdata">
-                ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >   
+                ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
                 Post SINR <input id="PostSINR" type="number" step="0.01" style="width: 65px;">              
               </form>
@@ -456,8 +456,6 @@ currselected=d.col1.toString()-bs.length;
 
 topx=document.getElementById("topx").value;
 
-
-
 if(topx=="")
  topx=3;
 else
@@ -572,7 +570,7 @@ var key = function(d){
 vis.append("text")
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+ (MARGINS.left -35) +","+(HEIGHT/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-    .text("Magnitude in dB");
+    .text("Magnitude in dBm");
 
     
 
@@ -685,6 +683,11 @@ function level1()
 {
 level=1
 //console.log("BBBBBB",currselected);//row no 
+topBSno=document.getElementById("TopBSno").value;
+if(topBSno=="")
+ topBSno=10;
+else
+  topBSno=parseInt(topBSno);
 BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
@@ -742,6 +745,9 @@ function Reset()
 }
 
 function loadMe(){
+   document.getElementById("LastSIR").disabled = true;
+    document.getElementById("PreSINR").disabled = true;
+     document.getElementById("PostSINR").disabled = true;
    SetSize();  
 }
 loadMe(); // This is the function that calls everything
@@ -993,7 +999,15 @@ function newwindow(idno){
 
 function CDF()
 {
- BackObj={type:"C"};
+topx=document.getElementById("topx").value;
+if(topx=="")
+ topx=3;
+else
+  topx=parseInt(topx);
+
+ BackObj={type:"C",topx:topx};
+
+
  console.log(BackObj);
  $.post("http://localhost:8080/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
 }
@@ -1047,9 +1061,16 @@ for(i=0;i<ypts.length/2;i++)
   ctx.moveTo(90+2*i*xscale,200);
   ctx.lineTo(90+2*i*xscale,1800);
   ctx.stroke();
-
- 
 }
+for (i=200;i<=1800;i+=50) {
+  //horizontal lines for grid
+  ctx.moveTo(90,i);
+    ctx.lineTo(canvas.width-100,i);
+    ctx.stroke();
+    count++;
+  }
+
+
 
 ctx.strokeStyle="#db1e26";//red
 
@@ -1095,12 +1116,10 @@ var count =  0;
    
   //  console.log(1.25-(ypts[count]/800));
     ctx.fillText(Math.round((1800-i)/16)/100,20,i)  ;
-    ctx.moveTo(90,i)
-    //horizontal grid lineg
-    ctx.lineTo(canvas.width-100,i);
-    ctx.stroke();
-    count++;
+    
+
   }
+
 
 //new window
 
@@ -1149,6 +1168,7 @@ function drawCurvedPath(cps, xpts,ypts){
 
 function FR3()
 {
+  topx=document.getElementById("topx").value;
   if(topx=="")
  topx=3;
 else
