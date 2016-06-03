@@ -40,7 +40,7 @@ type hexagons struct{
    y float64//x,y of hex center
    ue []int //list of ue's
    bs []int // list of bs
-
+   hexid int
 }
 
 var hex []hexagons
@@ -93,9 +93,9 @@ for i:=0;i<len(hex);i++{
      }
     }//j loop over
    adj=append(adj,temp)
-
+ //fmt.Println("\n",temp)
    }
-//fmt.Println(adj)
+//fmt.Println("AAA ",len(adj))
 }//function over
 
 
@@ -111,6 +111,12 @@ if math.Abs(float64(relx*(math.Cos(0)) - rely*math.Sin(0)))<500.00  && math.Abs(
 	
 func adjhex(curr int) []int {
 //first tier
+//fmt.Println("AAA")
+//fmt.Println(curr)
+
+
+
+
 temp:=[]int{}
 for i:=0;i<len(adj);i++{
   if adj[curr][i]==1{
@@ -119,6 +125,8 @@ for i:=0;i<len(adj);i++{
  }
 return temp
 }
+
+
 
 func secondtier(curr int) []int{
 temp:=[]int{}
@@ -563,10 +571,172 @@ return returnobj1
 
 func FR3(r rowdata) returndata3 {
 var returnobj3 returndata3
-fmt.Println(r.Node,"  ",r.Topx)
+fmt.Println("Node id : ",r.Node)
+fmt.Println("No.of interference cancellers : ",r.Topx)
 //bs,ue,hex,adj
 //r.Node is ue no
-//r.Topx
+//r.Topx - no.of interference cancellers
+
+//hexcenter()
+frc:=[] int{}
+//function to find the id of the node selected
+cn:=0
+for i:=0;i<len(hex);i++{
+		g:=hex[i].ue
+	for j:=0;j<len(g);j++{
+		
+		if(r.Node==g[j]) {
+			cn=hex[i].hexid;
+			
+			//to print cell id
+			fmt.Println("Cell id : ",cn)
+
+
+			//to print first tier neighbors
+			fmt.Println("Tier 1: ",adjhex(cn))
+			
+			//to print tier2 neighbours
+			fmt.Println("Tier 2: ",secondtier(cn))
+
+			//calc of fr3 neighbors
+			tempf:=secondtier(cn)
+			
+      //3 arrays containing the cell ids of same freqs.ie all cells in ar1 have the same freq
+			ar1:=[7] int{2,6,9,12,16,19,22}
+			ar2:=[10] int{1,4,5,8,11,14,15,18,21,24}
+			ar3:=[8] int {0,3,7,10,13,17,20,23}
+			
+			//to find if current id is in ar1,ar2 or ar3
+     var  d int
+			switch cn {
+				case 2,6,9,12,16,19,22 : 
+              d=1;
+        
+        case  1,4,5,8,11,14,15,18,21,24: 
+              d=2;
+        
+        case 0,3,7,10,13,17,20,23: 
+              d=3;
+        
+        default : 
+              d=0;
+			}
+		
+//    fmt.Println("d value : ",d )	
+//    fmt.Println("2nd ",tempf )  
+    
+//    fmt.Println(ar1)
+//    fmt.Println(ar2)
+//    fmt.Println(ar3)
+    
+    //fmt.Println("BBB")
+      switch d {
+
+    case 1 : 
+     for k:=0;k<len(ar1);k++ {
+      for l:=0;l<len(tempf);l++{
+        if tempf[l]==ar1[k] {
+          frc=append(frc,ar1[k]);
+          j++;
+        }
+      }
+    }
+        
+    
+    case 2:
+    for k:=0;k<len(ar2);k++ {
+      for l:=0;l<len(tempf);l++{
+        if tempf[l]==ar2[k] {
+          frc=append(frc,ar2[k]);
+        }
+      }
+    }
+  
+      
+      case 3:
+    for k:=0;k<len(ar3);k++ {
+      for l:=0;l<len(tempf);l++{
+        if tempf[l]==ar3[k] {
+          frc=append(frc,ar3[k]);
+        }//case 3 if end
+      }//case 3 for l end
+    }//case 3 for k end
+  }// switch end
+		
+//to print fr3 cells
+      fmt.Println("FR3 cells : ",frc )
+      break
+
+  }//outer if end
+		
+	}//outer for j loop end
+
+}//outer for i loop end
+
+
+frpow:=[] float64 {}
+frbsno:=[]int {}
+//to get the corresponding BS ids
+for i:=0;i<len(frc);i++{
+  g:=hex[frc[i]].bs
+  //fmt.Println("Cell id :",frc[i],g)
+  
+  for p:=0;p<len(g);p++{
+  h:=Pathloss[r.Node][g[p]]
+    frpow=append(frpow,h)
+    frbsno=append(frbsno,g[p])
+//    fmt.Println("\n",h)
+  }
+
+}
+
+//Append the current cell's bsno and power profile at the end of the entire array
+g:=hex[cn].bs
+for p:=0;p<len(g);p++{
+  h:=Pathloss[r.Node][g[p]]
+    frpow=append(frpow,h)
+    frbsno=append(frbsno,g[p])
+    fmt.Println("\n",h)
+}
+fmt.Println("bs no :",frbsno)
+fmt.Println("power array : ",frpow)  
+
+x1:=0
+x2:=0.0
+for i:=0;i<len(frbsno);i++{
+  for j:=1;j<len(frbsno);j++{
+    if frpow[j-1]<frpow[j]{
+      x1=frbsno[j-1]
+      frbsno[j-1]=frbsno[j]
+      frbsno[j]=x1
+
+      x2=frpow[j-1]
+      frpow[j-1]=frpow[j]
+      frpow[j]=x2
+    }
+
+  }
+}
+
+fmt.Println("arranged : \n",frbsno,"\n",frpow)
+
+fmt.Println("UES",ue[0])
+//assign operator number
+openo:=[] int{}
+for i:=0;i<len(frbsno);i++ {
+  j:=frbsno[i]
+  if j>=0 && j<19 {
+    openo=append(openo,1)
+  } else if j>=19 && j<38{
+    openo=append(openo,2)
+  } else if j>=38 && j<57{
+    openo=append(openo,3)
+  } else {
+    openo=append(openo,4)
+  }
+} 
+fmt.Println("\n Op",openo)
+
 returnobj3.PrS=13.13
 returnobj3.PoS=1729.22
 returnobj3.ROI=12.12
