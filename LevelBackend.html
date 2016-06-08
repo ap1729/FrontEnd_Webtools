@@ -609,7 +609,7 @@ vis.append("text")
     .text("Pre SINR: ");
 
 vis.append("text")                  
-  .attr("x", WIDTH*(3/4))
+  .attr("x", WIDTH*(3/4)+30)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text("Post SINR: ");
@@ -634,7 +634,7 @@ vis.append("text")
     .text(prs);
 
 vis.append("text")                  
-  .attr("x", WIDTH*(3/4)+60)
+  .attr("x", WIDTH*(3/4)+100)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text(pos);               
@@ -1032,21 +1032,61 @@ function plotcdf(obj)
  canvas.width = parseInt(2000);
             canvas.height = parseInt(2000);
             
+ctx.moveTo(0,0);
+ctx.font="30px Arial";//font and size of text
+ctx.fillText("CDF CURVES",600,100);//heading
+plotcurve(obj.Combine_sinr_x,obj.Pre_sinr_level0_Y,"#3399ff");//blue
+plotcurve(obj.Combine_sinr_x,obj.Pre_sinr_level1_Y,"#ff0066");//pink
+plotcurve(obj.Combine_sinr_x,obj.Post_sinr_level0_Y,"#ff9933");//orange
+plotcurve(obj.Combine_sinr_x,obj.Post_sinr_level1_Y,"#800000");//brown
+ctx.fillText("SINR value",600,1900);
+//creating legend
+ctx.rect(1200,20,500,150);
+ctx.stroke();
+//
+ctx.fillText("LEGEND",1050,40);
 
-plotcurve(obj.Pre_sinr_level0_X,obj.Pre_sinr_level0_Y,"Pre Processing Level0 CDF curve");
-plotcurve(obj.Pre_sinr_level1_X,obj.Pre_sinr_level1_Y,"Pre Processing Level1 CDF curve");
-plotcurve(obj.Post_sinr_level0_X,obj.Post_sinr_level0_Y,"Post Processing Level0 CDF curve");
-plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"Post Processing Level1 CDF curve");
+ctx.fillStyle="#3399ff";
+ctx.fillRect(1210,30,40,40);
+ctx.stroke();
+ctx.fillStyle="#000000";
+ctx.fillText("PrS:0",1260,50);
+
+ctx.fillStyle="#ff0066";
+ctx.fillRect(1410,30,40,40);
+ctx.stroke();
+ctx.fillStyle="#000000";
+ctx.fillText("PrS:1",1460,50);
+
+ctx.fillStyle="#ff9933";
+ctx.fillRect(1210,90,40,40);
+ctx.stroke();
+ctx.fillStyle="#000000";
+ctx.fillText("PoS:0",1260,110);
+
+ctx.fillStyle="#800000";
+ctx.fillRect(1410,90,40,40);
+ctx.stroke();
+ctx.fillStyle="#000000";
+ctx.fillText("PoS:1 ",1460,110);
+
+
+
+
+
+
+
+
+var dataUrl = canvas.toDataURL('image');
+
+window.open(dataUrl, "toDataURL() image", "width=600, height=200");
 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
 //plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"PoS1");
 }
 var cdfcount=0;
-function plotcurve(xdata,ydata,text)
+function plotcurve(xdata,ydata,color)
 {
-cdfcount++;
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-ctx.font="30px Arial";//font and size of text
+
 
 var xpts=[];
 var ypts=ydata;
@@ -1072,7 +1112,7 @@ for (i=200;i<=1800;i+=50) {
 
 
 
-ctx.strokeStyle="#db1e26";//red
+ctx.strokeStyle=color;//red
 
 //console.log
 for(var i=0;i<ypts.length;i++ )
@@ -1095,8 +1135,7 @@ drawCurvedPath(cps, xpts,ypts);
 //now curve plotted,to put grid,axis and lablels
 
 
-ctx.moveTo(0,0);
-ctx.fillText(text,500,100);//heading
+
 
 
 ctx.moveTo(0, 50);
@@ -1119,14 +1158,6 @@ var count =  0;
     
 
   }
-
-
-//new window
-
-var dataUrl = canvas.toDataURL('image');
-
-window.open(dataUrl, "toDataURL() image"+cdfcount.toString(), "width=600, height=200");
-
 
 }
 

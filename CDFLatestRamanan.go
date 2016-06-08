@@ -178,7 +178,7 @@ type returndata struct{
         PoS float64
         ROI float64
         Bsid []int
-       Operno []int //for bar graph
+        Operno []int //for bar graph
 }// structure for returning data to front end for SIR
 
 type returndata1 struct{
@@ -236,8 +236,9 @@ type pre_post_sinr_roi_ret struct{
     post_processing_sinr_db float64	 
     r_o_i_dbm float64
 }
+//ramanan sinr changes end
 
-//ramanan cdf changes end
+
 type returndata3 struct{
     PrS float64
     PoS float64
@@ -290,6 +291,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 //pass SIR function
   //log.Println("DETECTED")
        updateData =SIR(rxdata)
+//fmt.Println("UPDATE",updateData)
        txbytes, _ := json.Marshal(updateData)
         nbytes, werr := w.Write(txbytes)
 		_ = nbytes
@@ -314,7 +316,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		}                  
 
                 } else if string(data[9])=="C"{
-                 updateData2 = CDF(rxdata)
+                 updateData2 = CDF()
              //CDF plot
                     txbytes2, _ := json.Marshal(updateData2)
                nbytes2, werr2 := w.Write(txbytes2)
@@ -349,22 +351,22 @@ txbytes3, _ := json.Marshal(updateData3)
 
 }
 
+
 func operatorbybs(bsid int) int{
 //which operator by passing bsid
 lb:=0
 ub:=0
 i:=0
 for i=0;i<len(op);i++{
- ub+=op[i].bsno //sectoring
+ ub+=op[i].bsno
  if bsid>=lb && bsid<ub{
    break
   }
- lb+=op[i].bsno//sectoring
+ lb+=op[i].bsno
  }
 
 return i
 }
-
 
 
 
@@ -385,8 +387,8 @@ values:= []float64{}
      keys =append(keys,key)
      values =append(values,value)
   } 
- //fmt.Println("KeYS",len(keys)) 
- //fmt.Println(values)
+// fmt.Println("KeYS",keys) 
+// fmt.Println(values)
 temp1:=0
 temp2:=0.0
   for i:=0;i< len(keys);i++{
@@ -403,8 +405,8 @@ temp2:=0.0
    }
  //  fmt.Println("\n",i)
  } 
-//fmt.Println(keys)
-//fmt.Println(values)
+fmt.Println(keys)
+fmt.Println(values)
 
 
 if r.Level==0{
@@ -475,7 +477,6 @@ if currop1== currop{
 
    //  sort.Float64s(row)//function which sorts data in ascending order
 
-//Ramanan Code here
 //Ramanan code here
 //ramanan sinr changes begin
 //var received_power_db_arr = []float64{} //array variable to store received power from the base station (hardcoded no. of base station)
@@ -522,19 +523,16 @@ var returnobj1 returndata1
           
 max:=0.0
 id:=0
-
-
 //Using 2D array Pathloss[][]
 for i:=0;i<len(Pathloss);i++ {
 //loop for each row
   max=Pathloss[i][0]
   id=0
-  for j:=0;j<len(bs);j++{ 
+  for j:=0;j<len(bs);j++{
 //for all elements in one row
    if max<Pathloss[i][j]{
      id=j       
      max=Pathloss[i][j]
-
    }
 
   }
@@ -547,13 +545,12 @@ for i:=0;i<len(op);i++{
  ub+=op[i].bsno
  if lb<=id && id<ub{
     returnobj1.Changecolor=append(returnobj1.Changecolor,i)      //adding to array to return
- fmt.Println("\n",i," ",operatorbybs(id))
   break
    }
 
  lb+=op[i].bsno
  }
-fmt.Println(i,"  ",id, "   ",i	)
+
 
 }
 //fmt.Println(id,max,"\n")
@@ -562,6 +559,7 @@ fmt.Println(i,"  ",id, "   ",i	)
 
 return returnobj1
 }
+
 
 
 
@@ -579,7 +577,7 @@ return returnobj3
 
 
 
-func CDF(r rowdata) returndata2{
+func CDF() returndata2{
 var returnobj2 returndata2
 //Get pre and post SINR
 var temp rowdata
@@ -588,7 +586,7 @@ var temp rowdata
         temp.Level=0
         temp.TopBsno=10 
 	temp.Noise=-90
-        temp.Topx=r.Topx
+        temp.Topx=3
 //ramanan cdf changes begin
 //ramanan cdfs combine single plot changes begin
 var cal_cdf_l0_l1_obj sinr_x_cdf_y_l0_l1
@@ -605,7 +603,7 @@ var temp_level1 rowdata
         temp_level1.Level=1
         temp_level1.TopBsno=10 
 	temp_level1.Noise=-90
-        temp_level1.Topx=r.Topx
+        temp_level1.Topx=3
 
 var cal_cdf_l0_l1_obj_temp sinr_x_cdf_y_l0_l1
 cal_cdf_l0_l1_obj_temp = cal_cdf_l0_l1(temp_level1)
@@ -779,23 +777,11 @@ pre_post_obj.cdf_values = append(pre_post_obj.cdf_values,float64(1))
 return pre_post_obj.cdf_values
 }
 //ramanan cdfs combine single plot changes end
-
-
-//ramanan cdf changes end
-
-
-
-
-
-
-
-
-
 func main() {
 
 //Nodelocations csv file
 
-csvfile1, err1 := os.Open("Sectorlocations.csv")
+csvfile1, err1 := os.Open("Nodelocations.csv")
 
          if err1 != nil {
                  fmt.Println(err1)
@@ -822,7 +808,7 @@ op =append(op,one)
            uecount:=0
            uecurrop:=1
 for _, each1 := range rawCSVdata1 {
-    //fmt.Println("AAA",each1)
+    
              if count!=0{//to not print first row
 //each is of formatof col1,node,x,y,m1,m2
   var oneRecord TestRecord
@@ -909,7 +895,7 @@ uecurrop+=1
 
 
 //pathloss csv
-csvfile, err := os.Open("sectorloss.csv")
+csvfile, err := os.Open("Converted.csv")
          if err != nil {
                  fmt.Println(err)
                  os.Exit(1)
@@ -929,11 +915,11 @@ csvfile, err := os.Open("sectorloss.csv")
          // now, safe to move raw CSV data to struct
         count=0
          for _, each := range rawCSVdata {
-
              if count!=0{//to not print first row
            //   fmt.Printf("row",each) 
               temp:=[]float64{} 
-                for i := 0; i < len(bs); i++ { 
+                for i := 0; i < len(bs); i++ { //this part is hardcoded ,later will make it indpt
+              
                a, err := strconv.ParseFloat(each[i], 64)            
                  if err==nil{
                      temp= append(temp,a)
@@ -946,7 +932,7 @@ csvfile, err := os.Open("sectorloss.csv")
 
          }//for loop of csv parse is over
 
-fmt.Println(len(Pathloss[0]))
+
 fmt.Println("operator info",op)
 fmt.Println("BS no",len(bs)) // no of basestations
 fmt.Println("UE no",len(ue)) // no of ues

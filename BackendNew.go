@@ -40,7 +40,7 @@ type hexagons struct{
    y float64//x,y of hex center
    ue []int //list of ue's
    bs []int // list of bs
-   hexid int
+
 }
 
 var hex []hexagons
@@ -93,9 +93,9 @@ for i:=0;i<len(hex);i++{
      }
     }//j loop over
    adj=append(adj,temp)
- //fmt.Println("\n",temp)
+
    }
-//fmt.Println("AAA ",len(adj))
+//fmt.Println(adj)
 }//function over
 
 
@@ -111,12 +111,6 @@ if math.Abs(float64(relx*(math.Cos(0)) - rely*math.Sin(0)))<500.00  && math.Abs(
 	
 func adjhex(curr int) []int {
 //first tier
-//fmt.Println("AAA")
-//fmt.Println(curr)
-
-
-
-
 temp:=[]int{}
 for i:=0;i<len(adj);i++{
   if adj[curr][i]==1{
@@ -125,8 +119,6 @@ for i:=0;i<len(adj);i++{
  }
 return temp
 }
-
-
 
 func secondtier(curr int) []int{
 temp:=[]int{}
@@ -180,9 +172,6 @@ type rowdata struct {
         Topx int
 }//data which is coming from user
 
-
-
-
 type returndata struct{
         SIR []float64
         PrS float64
@@ -197,16 +186,24 @@ type returndata1 struct{
 
 }// structure for returning data to front end for level1
 
+//ramanan cdfs combine single plot changes begin
 type returndata2 struct{
-    Pre_sinr_level0_X []float64
+    Combine_sinr_x []float64
+//    Pre_sinr_level0_X []float64
     Pre_sinr_level0_Y []float64
-    Post_sinr_level0_X []float64
+//    Post_sinr_level0_X []float64
     Post_sinr_level0_Y []float64
-    Pre_sinr_level1_X []float64
+//    Pre_sinr_level1_X []float64
     Pre_sinr_level1_Y []float64 
-    Post_sinr_level1_X []float64
+//    Post_sinr_level1_X []float64
     Post_sinr_level1_Y []float64 	
 }//structure for returning data to front end for CDF
+type prefix_postfix struct{
+      cdf_values []float64
+      num_0_prefix float64
+      num_1_postfix float64
+}
+//ramanan cdfs combine single plot changes end
 //ramanan cdf changes end
 
 //ramanan cdf changes begin global variables and structures declaration
@@ -228,6 +225,18 @@ type sinr_x_cdf_y_l0_l1 struct{                                  //structure to 
 }
 
 //ramanan cdf changes end
+
+//ramanan sinr changes begin
+type pre_post_sinr_roi struct{
+    received_power_arr_db []float64
+    num_interfer_cancel int
+}
+type pre_post_sinr_roi_ret struct{
+    pre_processing_sinr_db float64	 
+    post_processing_sinr_db float64	 
+    r_o_i_dbm float64
+}
+//ramanan sinr changes end
 
 
 type returndata3 struct{
@@ -270,11 +279,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-                log.Println("Marshalled Data",rxdata)
-
-
-
-
+                log.Println("Marshalled Data",rxdata)	
 
 //return data types
                 var updateData returndata
@@ -472,49 +477,38 @@ if currop1== currop{
 
    //  sort.Float64s(row)//function which sorts data in ascending order
 
-//Ramanan Code here
-var received_power_db_arr = []float64{} //array variable to store received power from the base station (hardcoded no. of base station)
-var other_received_power_lin_arr = []float64{} //array variable to store received power linear scale from the other base station (hardcoded /no. of base station)
-var pre_processing_sinr_db float64
-var post_processing_sinr_db float64
-var sum_interferers_lin float64 =0
+//Ramanan code here
+//ramanan sinr changes begin
+//var received_power_db_arr = []float64{} //array variable to store received power from the base station (hardcoded no. of base station)
+var sinr_roi pre_post_sinr_roi
+var sinr_roi_ret pre_post_sinr_roi_ret
+//var pre_processing_sinr_db float64
+//var post_processing_sinr_db float64
+
 //fmt.Println(values)
 for i := 0; i < len(bs); i++ {
-	received_power_db_arr =append(received_power_db_arr,values[i]+46.0) //pathloss+hardcoded transmit power (for one UE)
+//	received_power_db_arr =append(received_power_db_arr,values[i]+46.0) //pathloss+hardcoded transmit power (for one UE)
 	values[i] = values[i]+46.0
 	}
-max_received_power_dB := received_power_db_arr[0]
-other_received_power_lin_arr=append(other_received_power_lin_arr,0.0)
-for i := 1; i < len(bs); i++ {
-	other_received_power_lin_arr =append(other_received_power_lin_arr, math.Pow(10,received_power_db_arr[i]/10)) //converting to linear scale	
-	sum_interferers_lin += math.Pow(10,received_power_db_arr[i]/10)
-	}
-//fmt.Println("\n",received_power_db_arr)
-//fmt.Println("\n\n\n\n\n\n",other_received_power_lin_arr)
-//fmt.Println("\n\n\n\n\n\n",sum_interferers_lin)	
-pre_processing_sinr_db = max_received_power_dB-10*math.Log10(sum_interferers_lin + math.Pow(10,r.Noise/10)) 
-//fmt.Println("\n\n\n\n\n\n pre-processing SINR",pre_processing_sinr_db)
-//post processign SINR calculation
-var sum_interferers_cancel_lin float64 =0
-var num_interferers_cancel int = r.Topx 
-for i := num_interferers_cancel+1; i < len(bs); i++ {
-	other_received_power_lin_arr[i] = math.Pow(10,received_power_db_arr[i]/10) //converting to linear scale	
-	sum_interferers_cancel_lin +=  other_received_power_lin_arr[i]
-	}
-post_processing_sinr_db = max_received_power_dB-10*math.Log10(sum_interferers_cancel_lin + math.Pow(10,r.Noise/10)) //noise level -90dBm hardcoded
-//fmt.Println("\n\n\n\n\n\n post-processing SINR",post_processing_sinr_db)
+sinr_roi.received_power_arr_db = append(sinr_roi.received_power_arr_db,values...)
+sinr_roi.num_interfer_cancel = r.Topx  
+
+sinr_roi_ret = pre_post_sinr_roi_cal(sinr_roi)
+
+//pre and post processing SINR calculation
 
 
+//ramanan sinr changes end
   var returnobj returndata
 
 for i:=0;i<r.TopBsno;i++{
 returnobj.Operno=append(returnobj.Operno,operatorbybs(keys[i]))
 }
       returnobj.SIR=values[0:r.TopBsno]
-     returnobj.PrS=pre_processing_sinr_db
-     returnobj.PoS=post_processing_sinr_db
+     returnobj.PrS=sinr_roi_ret.pre_processing_sinr_db
+     returnobj.PoS=sinr_roi_ret.post_processing_sinr_db
      returnobj.Bsid=keys[0:r.TopBsno]
-     returnobj.ROI =10*math.Log10(sum_interferers_cancel_lin)//value here 
+     returnobj.ROI =sinr_roi_ret.r_o_i_dbm////value here 
     fmt.Println(returnobj)
  
        return returnobj
@@ -571,172 +565,10 @@ return returnobj1
 
 func FR3(r rowdata) returndata3 {
 var returnobj3 returndata3
-fmt.Println("Node id : ",r.Node)
-fmt.Println("No.of interference cancellers : ",r.Topx)
+fmt.Println(r.Node,"  ",r.Topx)
 //bs,ue,hex,adj
 //r.Node is ue no
-//r.Topx - no.of interference cancellers
-
-//hexcenter()
-frc:=[] int{}
-//function to find the id of the node selected
-cn:=0
-for i:=0;i<len(hex);i++{
-		g:=hex[i].ue
-	for j:=0;j<len(g);j++{
-		
-		if(r.Node==g[j]) {
-			cn=hex[i].hexid;
-			
-			//to print cell id
-			fmt.Println("Cell id : ",cn)
-
-
-			//to print first tier neighbors
-			fmt.Println("Tier 1: ",adjhex(cn))
-			
-			//to print tier2 neighbours
-			fmt.Println("Tier 2: ",secondtier(cn))
-
-			//calc of fr3 neighbors
-			tempf:=secondtier(cn)
-			
-      //3 arrays containing the cell ids of same freqs.ie all cells in ar1 have the same freq
-			ar1:=[7] int{2,6,9,12,16,19,22}
-			ar2:=[10] int{1,4,5,8,11,14,15,18,21,24}
-			ar3:=[8] int {0,3,7,10,13,17,20,23}
-			
-			//to find if current id is in ar1,ar2 or ar3
-     var  d int
-			switch cn {
-				case 2,6,9,12,16,19,22 : 
-              d=1;
-        
-        case  1,4,5,8,11,14,15,18,21,24: 
-              d=2;
-        
-        case 0,3,7,10,13,17,20,23: 
-              d=3;
-        
-        default : 
-              d=0;
-			}
-		
-//    fmt.Println("d value : ",d )	
-//    fmt.Println("2nd ",tempf )  
-    
-//    fmt.Println(ar1)
-//    fmt.Println(ar2)
-//    fmt.Println(ar3)
-    
-    //fmt.Println("BBB")
-      switch d {
-
-    case 1 : 
-     for k:=0;k<len(ar1);k++ {
-      for l:=0;l<len(tempf);l++{
-        if tempf[l]==ar1[k] {
-          frc=append(frc,ar1[k]);
-          j++;
-        }
-      }
-    }
-        
-    
-    case 2:
-    for k:=0;k<len(ar2);k++ {
-      for l:=0;l<len(tempf);l++{
-        if tempf[l]==ar2[k] {
-          frc=append(frc,ar2[k]);
-        }
-      }
-    }
-  
-      
-      case 3:
-    for k:=0;k<len(ar3);k++ {
-      for l:=0;l<len(tempf);l++{
-        if tempf[l]==ar3[k] {
-          frc=append(frc,ar3[k]);
-        }//case 3 if end
-      }//case 3 for l end
-    }//case 3 for k end
-  }// switch end
-		
-//to print fr3 cells
-      fmt.Println("FR3 cells : ",frc )
-      break
-
-  }//outer if end
-		
-	}//outer for j loop end
-
-}//outer for i loop end
-
-
-frpow:=[] float64 {}
-frbsno:=[]int {}
-//to get the corresponding BS ids
-for i:=0;i<len(frc);i++{
-  g:=hex[frc[i]].bs
-  //fmt.Println("Cell id :",frc[i],g)
-  
-  for p:=0;p<len(g);p++{
-  h:=Pathloss[r.Node][g[p]]
-    frpow=append(frpow,h)
-    frbsno=append(frbsno,g[p])
-//    fmt.Println("\n",h)
-  }
-
-}
-
-//Append the current cell's bsno and power profile at the end of the entire array
-g:=hex[cn].bs
-for p:=0;p<len(g);p++{
-  h:=Pathloss[r.Node][g[p]]
-    frpow=append(frpow,h)
-    frbsno=append(frbsno,g[p])
-    fmt.Println("\n",h)
-}
-fmt.Println("bs no :",frbsno)
-fmt.Println("power array : ",frpow)  
-
-x1:=0
-x2:=0.0
-for i:=0;i<len(frbsno);i++{
-  for j:=1;j<len(frbsno);j++{
-    if frpow[j-1]<frpow[j]{
-      x1=frbsno[j-1]
-      frbsno[j-1]=frbsno[j]
-      frbsno[j]=x1
-
-      x2=frpow[j-1]
-      frpow[j-1]=frpow[j]
-      frpow[j]=x2
-    }
-
-  }
-}
-
-fmt.Println("arranged : \n",frbsno,"\n",frpow)
-
-fmt.Println("UES",ue[0])
-//assign operator number
-openo:=[] int{}
-for i:=0;i<len(frbsno);i++ {
-  j:=frbsno[i]
-  if j>=0 && j<19 {
-    openo=append(openo,1)
-  } else if j>=19 && j<38{
-    openo=append(openo,2)
-  } else if j>=38 && j<57{
-    openo=append(openo,3)
-  } else {
-    openo=append(openo,4)
-  }
-} 
-fmt.Println("\n Op",openo)
-
+//r.Topx
 returnobj3.PrS=13.13
 returnobj3.PoS=1729.22
 returnobj3.ROI=12.12
@@ -756,12 +588,13 @@ var temp rowdata
 	temp.Noise=-90
         temp.Topx=r.Topx
 //ramanan cdf changes begin
+//ramanan cdfs combine single plot changes begin
 var cal_cdf_l0_l1_obj sinr_x_cdf_y_l0_l1
 cal_cdf_l0_l1_obj = cal_cdf_l0_l1(temp)
-returnobj2.Pre_sinr_level0_X = append(returnobj2.Pre_sinr_level0_X,cal_cdf_l0_l1_obj.pre_sinr_dB_x...) 
-returnobj2.Pre_sinr_level0_Y = append(returnobj2.Pre_sinr_level0_Y,cal_cdf_l0_l1_obj.pre_cdf_y...) 
-returnobj2.Post_sinr_level0_X = append(returnobj2.Post_sinr_level0_X,cal_cdf_l0_l1_obj.post_sinr_dB_x...) 
-returnobj2.Post_sinr_level0_Y = append(returnobj2.Post_sinr_level0_Y,cal_cdf_l0_l1_obj.post_cdf_y...) 
+//returnobj2.Pre_sinr_level0_X = append(returnobj2.Pre_sinr_level0_X,cal_cdf_l0_l1_obj.pre_sinr_dB_x...) 
+//returnobj2.Pre_sinr_level0_Y = append(returnobj2.Pre_sinr_level0_Y,cal_cdf_l0_l1_obj.pre_cdf_y...) 
+//returnobj2.Post_sinr_level0_X = append(returnobj2.Post_sinr_level0_X,cal_cdf_l0_l1_obj.post_sinr_dB_x...) 
+//returnobj2.Post_sinr_level0_Y = append(returnobj2.Post_sinr_level0_Y,cal_cdf_l0_l1_obj.post_cdf_y...) 
 
 // CDF for level1
 var temp_level1 rowdata
@@ -774,13 +607,67 @@ var temp_level1 rowdata
 
 var cal_cdf_l0_l1_obj_temp sinr_x_cdf_y_l0_l1
 cal_cdf_l0_l1_obj_temp = cal_cdf_l0_l1(temp_level1)
-returnobj2.Pre_sinr_level1_X = append(returnobj2.Pre_sinr_level1_X,cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x...) 
-returnobj2.Pre_sinr_level1_Y = append(returnobj2.Pre_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.pre_cdf_y...) 
-returnobj2.Post_sinr_level1_X = append(returnobj2.Post_sinr_level1_X,cal_cdf_l0_l1_obj_temp.post_sinr_dB_x...) 
-returnobj2.Post_sinr_level1_Y = append(returnobj2.Post_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.post_cdf_y...) 
+//returnobj2.Pre_sinr_level1_X = append(returnobj2.Pre_sinr_level1_X,cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x...) 
+//returnobj2.Pre_sinr_level1_Y = append(returnobj2.Pre_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.pre_cdf_y...) 
+//returnobj2.Post_sinr_level1_X = append(returnobj2.Post_sinr_level1_X,cal_cdf_l0_l1_obj_temp.post_sinr_dB_x...) 
+//returnobj2.Post_sinr_level1_Y = append(returnobj2.Post_sinr_level1_Y,cal_cdf_l0_l1_obj_temp.post_cdf_y...) 
 
-//fmt.Println("\n pre_sinr_level1 \n",returnobj2.Pre_sinr_level1_X,"\n\n  ",returnobj2.Pre_sinr_level1_Y,"\n")
-//fmt.Println("\n post_sinr_level1 \n",returnobj2.Post_sinr_level1_X,"\n\n  ",returnobj2.Post_sinr_level1_Y,"\n")
+
+var prefix0_postfix1_l0_pre,prefix0_postfix1_l0_post,prefix0_postfix1_l1_pre,prefix0_postfix1_l1_post prefix_postfix //
+var sinr_min_collect_arr = []float64{} //collect all minimum in X
+sinr_min_collect_arr = append(sinr_min_collect_arr,cal_cdf_l0_l1_obj.pre_sinr_dB_x[0])
+sinr_min_collect_arr = append(sinr_min_collect_arr,cal_cdf_l0_l1_obj.post_sinr_dB_x[0])
+sinr_min_collect_arr = append(sinr_min_collect_arr,cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x[0])
+sinr_min_collect_arr = append(sinr_min_collect_arr,cal_cdf_l0_l1_obj_temp.post_sinr_dB_x[0])
+sort.Float64s(sinr_min_collect_arr)//function which sorts data in ascending order
+
+var sinr_max_collect_arr = []float64{} //collect all minimum in X
+sinr_max_collect_arr = append(sinr_max_collect_arr,cal_cdf_l0_l1_obj.pre_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj.pre_sinr_dB_x)-1))
+sinr_max_collect_arr = append(sinr_max_collect_arr,cal_cdf_l0_l1_obj.post_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj.post_sinr_dB_x)-1))
+sinr_max_collect_arr = append(sinr_max_collect_arr,cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x)-1))
+sinr_max_collect_arr = append(sinr_max_collect_arr,cal_cdf_l0_l1_obj_temp.post_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj_temp.post_sinr_dB_x)-1))
+sort.Float64s(sinr_max_collect_arr)//function which sorts data in ascending order
+//fmt.Println("\n min collection array \n",sinr_min_collect_arr,"\nmax collection array\n  ",sinr_max_collect_arr,"\n")
+//combining x array
+//var combine_sinr_x = []float64{}
+temp_x :=sinr_min_collect_arr[0]
+for int(temp_x) <= int(sinr_max_collect_arr[3]){
+returnobj2.Combine_sinr_x = append(returnobj2.Combine_sinr_x,temp_x)
+temp_x=temp_x+float64(1)
+}
+// make y values length equal to X combined values
+prefix0_postfix1_l0_pre.cdf_values = append(prefix0_postfix1_l0_pre.cdf_values,cal_cdf_l0_l1_obj.pre_cdf_y...)
+prefix0_postfix1_l0_pre.num_0_prefix=  cal_cdf_l0_l1_obj.pre_sinr_dB_x[0]-sinr_min_collect_arr[0]
+prefix0_postfix1_l0_pre.num_1_postfix = sinr_max_collect_arr[3]-(cal_cdf_l0_l1_obj.pre_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj.pre_sinr_dB_x)-1))
+returnobj2.Pre_sinr_level0_Y = append(returnobj2.Pre_sinr_level0_Y,pre0_post1(prefix0_postfix1_l0_pre)...) 
+
+prefix0_postfix1_l0_post.cdf_values = append(prefix0_postfix1_l0_post.cdf_values,cal_cdf_l0_l1_obj.post_cdf_y...)
+prefix0_postfix1_l0_post.num_0_prefix=  cal_cdf_l0_l1_obj.post_sinr_dB_x[0]-sinr_min_collect_arr[0]
+prefix0_postfix1_l0_post.num_1_postfix = sinr_max_collect_arr[3]-(cal_cdf_l0_l1_obj.post_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj.post_sinr_dB_x)-1))
+returnobj2.Post_sinr_level0_Y = append(returnobj2.Post_sinr_level0_Y,pre0_post1(prefix0_postfix1_l0_post)...) 
+prefix0_postfix1_l1_pre.cdf_values = append(prefix0_postfix1_l1_pre.cdf_values,cal_cdf_l0_l1_obj_temp.pre_cdf_y...)
+prefix0_postfix1_l1_pre.num_0_prefix=  cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x[0]-sinr_min_collect_arr[0]
+prefix0_postfix1_l1_pre.num_1_postfix = sinr_max_collect_arr[3]-(cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj_temp.pre_sinr_dB_x)-1))
+returnobj2.Pre_sinr_level1_Y = append(returnobj2.Pre_sinr_level1_Y,pre0_post1(prefix0_postfix1_l1_pre)...) 
+
+prefix0_postfix1_l1_post.cdf_values = append(prefix0_postfix1_l1_post.cdf_values,cal_cdf_l0_l1_obj_temp.post_cdf_y...)
+prefix0_postfix1_l1_post.num_0_prefix=  cal_cdf_l0_l1_obj_temp.post_sinr_dB_x[0]-sinr_min_collect_arr[0]
+prefix0_postfix1_l1_post.num_1_postfix = sinr_max_collect_arr[3]-(cal_cdf_l0_l1_obj_temp.post_sinr_dB_x[0]+float64(len(cal_cdf_l0_l1_obj_temp.post_sinr_dB_x)-1))
+returnobj2.Post_sinr_level1_Y = append(returnobj2.Post_sinr_level1_Y,pre0_post1(prefix0_postfix1_l1_post)...) 
+
+//ramanan cdfs combine single plot changes end
+/*
+fmt.Println("\n x length \n",len(returnobj2.Combine_sinr_x),"\n Y L0 pre sinr length  \n  ",len(returnobj2.Pre_sinr_level0_Y),"\n")
+fmt.Println("\n Y L0 post sinr length \n",len(returnobj2.Post_sinr_level0_Y),"\n Y L1 pre sinr length  \n  ",len(returnobj2.Pre_sinr_level1_Y),"\n")
+fmt.Println("\n Y L1 post sinr length  \n  ",len(returnobj2.Post_sinr_level1_Y),"\n")
+*/
+/*
+fmt.Println("\n pre_sinr_level0 \n",returnobj2.Pre_sinr_level0_X,"\n\n  ",returnobj2.Pre_sinr_level0_Y,"\n")
+fmt.Println("\n post_sinr_level0 \n",returnobj2.Post_sinr_level0_X,"\n\n  ",returnobj2.Post_sinr_level0_Y,"\n")
+fmt.Println("\n pre_sinr_level1 \n",returnobj2.Pre_sinr_level1_X,"\n\n  ",returnobj2.Pre_sinr_level1_Y,"\n")
+fmt.Println("\n post_sinr_level1 \n",returnobj2.Post_sinr_level1_X,"\n\n  ",returnobj2.Post_sinr_level1_Y,"\n")
+*/
+
 return returnobj2 
 
 //ramanan cdf changes end
@@ -847,12 +734,49 @@ return cdf_obj
 //ramanan cdf changes end
 
 
+//ramanan sinr changes begin
+func pre_post_sinr_roi_cal(sinr_roi_obj pre_post_sinr_roi) pre_post_sinr_roi_ret{
+var sinr_roi_obj_ret pre_post_sinr_roi_ret
+//var other_received_power_lin_arr = []float64{} //array variable to store received power linear scale from the other base station (hardcoded /no. of base station)
+var sum_interferers_lin float64 =0
+//max_received_power_dB := sinr_roi_obj.received_power_arr_db[0]
+//var pre_processing_sinr_db float64
+//other_received_power_lin_arr=append(other_received_power_lin_arr,0.0)
+for i := 1; i < len(sinr_roi_obj.received_power_arr_db); i++ {
+//	other_received_power_lin_arr =append(other_received_power_lin_arr, math.Pow(10,rx_power_db_arr[i]/10)) //converting to linear scale	
+	sum_interferers_lin += math.Pow(10,sinr_roi_obj.received_power_arr_db[i]/10)
+	}
+//fmt.Println("\n",received_power_db_arr)
+//fmt.Println("\n\n\n\n\n\n",other_received_power_lin_arr)
+//fmt.Println("\n\n\n\n\n\n",sum_interferers_lin)	
+sinr_roi_obj_ret.pre_processing_sinr_db = sinr_roi_obj.received_power_arr_db[0]-10*math.Log10(sum_interferers_lin + math.Pow(10,-90/10)) 
+//fmt.Println("\n\n\n\n\n\n pre-processing SINR",pre_processing_sinr_db)
+var sum_interferers_cancel_lin float64 =0
+for i := sinr_roi_obj.num_interfer_cancel+1; i < len(sinr_roi_obj.received_power_arr_db); i++ {
+	sum_interferers_cancel_lin += math.Pow(10,sinr_roi_obj.received_power_arr_db[i]/10) //converting to linear scale	
+	//sum_interferers_cancel_lin +=  other_received_power_lin_arr[i]
+	}
+sinr_roi_obj_ret.post_processing_sinr_db = sinr_roi_obj.received_power_arr_db[0]-10*math.Log10(sum_interferers_cancel_lin + math.Pow(10,-90/10)) //noise level -90dBm
+sinr_roi_obj_ret.r_o_i_dbm = 10*math.Log10(sum_interferers_cancel_lin)
+return sinr_roi_obj_ret
+}
 
+//ramanan sinr changes end
 
-
-
-
-
+//ramanan cdfs combine single plot changes begin
+func pre0_post1(pre_post_obj prefix_postfix) []float64{
+ zero_slice := []float64{0}
+for i:=0;i<int(pre_post_obj.num_0_prefix);i++{
+pre_post_obj.cdf_values = append(zero_slice,pre_post_obj.cdf_values...)
+}
+for j:=0;j<int(pre_post_obj.num_1_postfix);j++{
+pre_post_obj.cdf_values = append(pre_post_obj.cdf_values,float64(1))
+}
+//fmt.Println("\n pre_post_obj.num_0_prefix \n",pre_post_obj.num_0_prefix)
+//fmt.Println("\n pre_post_obj.num_1_postfix \n",pre_post_obj.num_1_postfix)
+return pre_post_obj.cdf_values
+}
+//ramanan cdfs combine single plot changes end
 func main() {
 
 //Nodelocations csv file
