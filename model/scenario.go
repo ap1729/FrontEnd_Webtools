@@ -50,6 +50,7 @@ func (sc *Scenario) AddOperator(op *Operator) bool {
 	return true
 }
 
+// "Constructor" for a new Scenario
 func NewScenario() *Scenario {
 	sc := new(Scenario)
 	sc.baseStationMap = make(map[uint]BaseStation)

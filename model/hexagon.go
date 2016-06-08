@@ -21,11 +21,11 @@ func (hex *Hexagon) ID() uint {
 	return hex.id
 }
 
-// Function to check if a point lies inside the Hexagon
+// Function to check if a point lies inside or on the boundary of the Hexagon
 func (hex *Hexagon) Contains(x, y float64) bool {
 	relx := x - hex.centerX
 	rely := y - hex.centerY
-	if math.Abs(relx*math.Cos(0)-rely*math.Sin(0)) < 500.00 && math.Abs(relx*math.Cos(math.Pi/3)-rely*math.Sin(math.Pi/3)) < 500.00 && math.Abs(relx*math.Cos(-math.Pi/3)-rely*math.Sin(-math.Pi/3)) < 500.00 {
+	if math.Abs(relx*math.Cos(0)-rely*math.Sin(0)) <= 500.00 && math.Abs(relx*math.Cos(math.Pi/3)-rely*math.Sin(math.Pi/3)) <= 500.00 && math.Abs(relx*math.Cos(-math.Pi/3)-rely*math.Sin(-math.Pi/3)) <= 500.00 {
 		return true
 	} else {
 		return false

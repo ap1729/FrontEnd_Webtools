@@ -1,11 +1,10 @@
 package service
 
 import (
+	"FrontEnd_WebTools/model"
 	"encoding/csv"
 	"os"
 	"strconv"
-
-	"../model"
 )
 
 // Generate a scenario object with all nodes and operators
@@ -50,6 +49,7 @@ func ReadNodes(filePath string) (*model.Scenario, error) {
 	return sc, nil
 }
 
+// Load the loss values into the LossTable of the scenario reference
 func ReadLossTable(filePath string, destSc *model.Scenario) error {
 	file, err := os.Open(filePath)
 	if err != nil {
