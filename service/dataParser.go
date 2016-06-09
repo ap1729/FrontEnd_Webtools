@@ -23,7 +23,7 @@ func ReadNodes(filePath string) (*model.Scenario, error) {
 	var bsId, ueId uint = 0, 0
 	var sc = model.NewScenario()
 	for _, row := range records {
-		nodeType := row[0][0:1]
+		nodeType := row[0][0:2]
 		opId, err := strconv.ParseUint(string(row[0][2]), 10, 64)
 		if err != nil {
 			return nil, err
@@ -41,16 +41,18 @@ func ReadNodes(filePath string) (*model.Scenario, error) {
 		if nodeType == "BS" {
 			sc.AddBaseStation(model.NewBaseStation(bsId, x, y, 0, op))
 			bsId++
-		} else {
+		} else if nodeType == "UE" {
 			sc.AddUser(model.NewUser(ueId, x, y, 0, op))
 			ueId++
+		} else {
+			return sc, nil
 		}
 	}
 	return sc, nil
 }
 
 // Load the loss values into the LossTable of the scenario reference
-func ReadLossTable(filePath string, destSc *model.Scenario) error {
+func ImportLossTable(filePath string, destSc *model.Scenario) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -62,7 +64,7 @@ func ReadLossTable(filePath string, destSc *model.Scenario) error {
 		return err
 	}
 	destSc.LossTable = make([][]float64, len(destSc.Users))
-	for i := range records {
+	for i, _ := range records {
 		destSc.LossTable[i] = make([]float64, len(destSc.BaseStations))
 		for j, val := range records[i] {
 			loss, err := strconv.ParseFloat(val, 64)
