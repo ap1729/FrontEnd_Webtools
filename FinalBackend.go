@@ -98,6 +98,10 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// Define and pass data to the /perf functions as required - keep them general!
 		if rxData["type"] == "A" {
 			// TODO: SIR (or whatever)
+			// Example:
+			// returnData := perf.SINR(<arguments>)
+			// serializedData := json.Marshal(returnData)
+			// w.Write(...)
 
 		} else if rxData["type"] == "B" {
 			// TODO: level 1 (or whatever)
