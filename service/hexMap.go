@@ -2,7 +2,7 @@ package service
 
 import (
 	"math"
-	"test/model"
+	"FrontEnd_WebTools/model"
 )
 
 type HexMap struct {
