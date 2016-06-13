@@ -27,9 +27,10 @@ func initialize() bool {
 	lap1 := time.Now()
 
 	// Read all nodes (BS and UE)
-	sc, err := service.ReadNodes("data/OmniLocations.csv")
-	if err != nil {
-		fmt.Printf("Error: %v", err)
+	sb := model.NewScenarioBuilder()
+	suc := service.ReadNodes(sb, "data/OmniLocations.csv")
+	if suc == false {
+		// fmt.Printf("Error: %v", err)
 		return false
 	}
 
@@ -37,9 +38,9 @@ func initialize() bool {
 	lap2 := time.Now()
 
 	// Import loss values into Scenario object
-	err = service.ImportLossTable("data/OmniLosses.csv", sc)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
+	suc = service.ReadLossTable(sb, "data/OmniLosses.csv")
+	if suc == false {
+		// fmt.Printf("Error: %v", err)
 		return false
 	}
 
@@ -56,7 +57,8 @@ func initialize() bool {
 	fmt.Printf("\nPreliminary initialization time estimate:\n")
 	fmt.Printf("Location read time: %v\nLosses read time: %v\nCell map init time: %v\n", lap2.Sub(lap1), lap3.Sub(lap2), lap4.Sub(lap3))
 
-	scenario = sc
+	scenario = sb.Finalize()
+	sb = nil
 	hexMap = hm
 	return true
 }
@@ -130,9 +132,10 @@ func main() {
 		fmt.Println("Fatal error! Failed to load data.")
 	} else {
 		fmt.Println("\nSuccessfully loaded data.")
-		fmt.Printf("There are %d BS's and %d UE's.\n", len(scenario.BaseStations), len(scenario.Users))
-		fmt.Printf("The loss table is a %d x %d matrix.\n\n", len(scenario.LossTable), len(scenario.LossTable[0]))
+		fmt.Printf("There are %d BS's and %d UE's.\n", len(scenario.BaseStations()), len(scenario.Users()))
 	}
+	// jobj, err := json.Marshal(hexMap)
+	// fmt.Printf("Marshalled Object: (Error: %v)\n%v\n\n", err, jobj)
 
 	log.Println("\nStarted Server at :8080")
 	http.HandleFunc("/update", handlerroute)
