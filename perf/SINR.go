@@ -1,32 +1,31 @@
 package perf
 
 import (
-  //"fmt"
-  "math"
-  )
-//has functions for pre,post SINR and ROI 
+	//"fmt"
+	"math"
+)
 
-func SINR_ROI(values []float64, intrCancelCount uint) []float64{
+//has functions for pre,post SINR and ROI
+
+func SINR_ROI(values []float64, intrCancelCount uint) []float64 {
 	//values is recieved power
-	var calc=[]float64{}
-//PreProcessing SINR calcuation
+	var calc = []float64{}
+	//PreProcessing SINR calcuation
 	//fmt.Println("got values",intrCancelCount)
 
+	//Pre Processing SINR
+	var sum float64 = 0.0
+	for i := 1; i < len(values); i++ {
+		sum += math.Pow(10, (values[i] / 10))
+	}
+	calc = append(calc, values[0]-10*math.Log10(sum)) //PreProcessing Term
 
-//Pre Processing SINR
-var sum float64 =0.0
-for i:=1;i<len(values);i++{
- sum +=math.Pow(10,(values[i]/10))
+	//Post Processing SINR
+	sum = 0.0
+	for i := int(intrCancelCount) + 1; i < len(values); i++ {
+		sum += math.Pow(10, (values[i] / 10))
+	}
+	calc = append(calc, values[0]-10*math.Log10(sum)) //Post SINR
+	calc = append(calc, 10*math.Log10(sum))           //ROI
+	return calc
 }
-calc=append(calc,values[0]-10*math.Log10(sum))//PreProcessing Term
-
-//Post Processing SINR
-sum=0.0
-for i:=int(intrCancelCount)+1;i<len(values);i++{
-sum+=math.Pow(10,(values[i]/10))
-}
-calc=append(calc,values[0]-10*math.Log10(sum))//Post SINR
-calc=append(calc,10*math.Log10(sum))	//ROI
-return calc
-} 
-

@@ -1,8 +1,8 @@
 package service
 
 import (
-	"math"
 	"FrontEnd_WebTools/model"
+	"math"
 )
 
 type HexMap struct {
