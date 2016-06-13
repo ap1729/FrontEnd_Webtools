@@ -3,6 +3,7 @@ package main
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
+	"FrontEnd_WebTools/perf"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -97,16 +98,32 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// Each function in perf returns data is a generic string dictionary.
 		// Define and pass data to the /perf functions as required - keep them general!
 		if rxData["type"] == "A" {
-			// TODO: SIR (or whatever)
-			// Example:
-			// returnData := perf.SINR(<arguments>)
-			// serializedData := json.Marshal(returnData)
-			// w.Write(...)
-
+	//FR1 calculation done
+    			returnData:=perf.FR1(scenario,uint(rxData["node"].(float64)),uint(rxData["level"].(float64)),uint(rxData["topx"].(float64)),uint(rxData["TopBSno"].(float64)))
+				fmt.Println("FR1 calculation done")
+				
+				serializedData,_ := json.Marshal(returnData)
+				txbytes,werr:= w.Write(serializedData)
+				if werr != nil {
+					log.Println("I got some error while writing back", werr)
+						} else {
+			 		log.Println("Sent this  ", string(txbytes))
+                		}
 		} else if rxData["type"] == "B" {
-			// TODO: level 1 (or whatever)
+			returnData:=perf.Level1(scenario)
+			fmt.Println("Level1 done")
+			serializedData,_ := json.Marshal(returnData)
+			txbytes,werr:= w.Write(serializedData)
+				if werr != nil {
+				log.Println("I got some error while writing back", werr)
+			} else {
+				 log.Println("Sent this  ", string(txbytes))
+	                }
+				
 
 		} else if rxData["type"] == "C" {
+			returnData:=perf.CDF(scenario,uint(rxData["topx"].(float64)))
+			fmt.Println("CDF calc done",returnData)
 			// TODO: CDF plot (or whatever)
 
 		} else if rxData["type"] == "D" {

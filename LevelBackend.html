@@ -85,19 +85,14 @@ div.visible {
    </style>
   </head>
   <body>
-  <div class="navbar">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">MOSSSAIC</a>
-      <ul class="nav navbar-nav">
-        <li class="active">
-          <a href="#">Reload</a>
-        </li>
-        <li>
-          <a href="#">Help</a>
-        </li>
-      </ul>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar navbar-fixed-top">
+    <div class="container-fluid" id="NavBar">
     </div>
-  </div>
+  </div><!--- navigationbar-->
+</nav>
+<script src="NavBar.js"></script>
+
 
    <h1 class="text-center">Hexagonal Grid</h1>
     <div class="panel panel-default">
@@ -402,16 +397,14 @@ function onsuccess(obj){
 
 console.log(obj); 
 //obj.SIR is SIR
-//obj.ROI is ROI
-//obj.PrS is pre SINR
-//obj.PoS is post SINR
-//obj.Bsid is top x basestation id's
-obj.PoS=Math.round(obj.PoS * 100) / 100;
-obj.PrS=Math.round(obj.PrS * 100) / 100;
-obj.ROI=Math.round(obj.ROI * 100) / 100;
-document.getElementById("LastSIR").value=obj.ROI;
-document.getElementById("PostSINR").value=obj.PoS;
-document.getElementById("PreSINR").value=obj.PrS;
+//obj.SINR has PreSINr,PostSINR and ROI in a array
+//obj.BSid is top x basestation id's
+obj.SINR[0]=Math.round(obj.SINR[0] * 100) / 100;
+obj.SINR[1]=Math.round(obj.SINR[1] * 100) / 100;
+obj.SINR[2]=Math.round(obj.SINR[2] * 100) / 100;
+document.getElementById("LastSIR").value=obj.SINR[0];
+document.getElementById("PostSINR").value=obj.SINR[1];
+document.getElementById("PreSINR").value=obj.SINR[2];
 
 
 if(document.getElementById("TopBS").checked == true)
@@ -426,19 +419,19 @@ if(document.getElementById("TopBS").checked == true)
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
-   Bsid="#BS"+obj.Bsid[i].toString();
+   Bsid="#BS"+obj.BSid[i].toString();
    console.log(Bsid);
     d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);// to change attributes of max basestations
   }
 }//top rect being enlarged
  
  var barData=[];
-  for(i=0;i<obj.Bsid.length;i++)
+  for(i=0;i<obj.BSid.length;i++)
   {
-    barData.push({'x':obj.Bsid[i],'y':obj.SIR[i],'co':obj.Operno[i]});
+    barData.push({'x':obj.BSid[i],'y':obj.SIR[i],'co':obj.operno[i]-1});
   }
 
-PlotBarGraph(barData,obj.Oprno,obj.PrS,obj.PoS);
+PlotBarGraph(barData,obj.Oprno,obj.SINR[0],obj.SINR[1]);
 
 }
 
@@ -664,16 +657,13 @@ function zoomed() {
 function onsuccess1(obj)
 {
  console.log(obj);
- /*
- var circles=svgContainer.selectAll("circle").data(obj.Changecolor)
-      .style("fill",function(d){return opercolor[d].color; });//works but data shouldn't be changed
-*/
+
 //UE id starts from UE76
 str1="#UE";
- for(i=0;i<obj.Changecolor.length;i++)
+ for(i=0;i<obj.changeColor.length;i++)
    {
     str2=str1+(i+76).toString();//UE id starts from UE76
-    d3.select(str2).style("fill",opercolor[obj.Changecolor[i]].color);
+    d3.select(str2).style("fill",opercolor[obj.changeColor[i]-1].color);
    }
 
 }
@@ -688,7 +678,8 @@ if(topBSno=="")
  topBSno=10;
 else
   topBSno=parseInt(topBSno);
-BackObj={type:"B",node:13,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
+
+BackObj={type:"B",level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 
@@ -700,7 +691,7 @@ if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
-
+ 
 
 BackObj1={type:"A",node:currselected,level:level,TopBSno:topBsno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
