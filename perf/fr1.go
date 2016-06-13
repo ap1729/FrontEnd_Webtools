@@ -13,14 +13,17 @@ func FR1(sc *model.Scenario, userID uint, level uint, intrCancelCount uint, prof
 	values := make([]float64, len(row))
 	keys := make([]int, len(row))
 	for i := 0; i < len(row); i++ {
-		keys = append(keys, i)
+		keys[i] = i
 		values[i] = row[i] + 46.0
 	}
+
+	
 
 	temp1 := 0
 	temp2 := 0.0
 	for i := 0; i < len(keys); i++ {
 		for j := 1; j < len(keys); j++ {
+		
 			if values[j-1] < values[j] {
 				temp1 = keys[j-1]
 				keys[j-1] = keys[j]
