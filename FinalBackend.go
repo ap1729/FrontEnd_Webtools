@@ -2,8 +2,8 @@ package main
 
 import (
 	"FrontEnd_WebTools/model"
-	"FrontEnd_WebTools/service"
 	"FrontEnd_WebTools/perf"
+	"FrontEnd_WebTools/service"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// Global variables that encapsulate all required data
+// Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
 var scenario *model.Scenario
 var hexMap *service.HexMap
@@ -44,12 +44,15 @@ func initialize() bool {
 		// fmt.Printf("Error: %v", err)
 		return false
 	}
+	scenario = sb.Finalize()
+	sb = nil
 
 	// Time stamp 3
 	lap3 := time.Now()
 
 	// Generate hexagonal cell map of ISD 1000 and upto 3 tiers
 	hm := service.NewHexMap(500*2/math.Sqrt(3), 3)
+	hexMap = hm
 
 	// Time stamp 4
 	lap4 := time.Now()
@@ -58,9 +61,6 @@ func initialize() bool {
 	fmt.Printf("\nPreliminary initialization time estimate:\n")
 	fmt.Printf("Location read time: %v\nLosses read time: %v\nCell map init time: %v\n", lap2.Sub(lap1), lap3.Sub(lap2), lap4.Sub(lap3))
 
-	scenario = sb.Finalize()
-	sb = nil
-	hexMap = hm
 	return true
 }
 
@@ -100,38 +100,37 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// Each function in perf returns data is a generic string dictionary.
 		// Define and pass data to the /perf functions as required - keep them general!
 		if rxData["type"] == "A" {
-	//FR1 calculation done
-			lap1 := time.Now()	
-    			returnData:=perf.FR1(scenario,uint(rxData["node"].(float64)),uint(rxData["level"].(float64)),uint(rxData["topx"].(float64)),uint(rxData["TopBSno"].(float64)))
-				fmt.Println("FR1 calculation done")
-				lap2 := time.Now()	
-				fmt.Println("Time Taken: ",lap2.Sub(lap1))
-				serializedData,_ := json.Marshal(returnData)
-				txbytes,werr:= w.Write(serializedData)
-				if werr != nil {
-					log.Println("I got some error while writing back", werr)
-						} else {
-			 		log.Println("Sent this  ", string(txbytes))
-                		}
-		} else if rxData["type"] == "B" {
-
-			lap1 := time.Now()		
-			returnData:=perf.Level1(scenario)
+			//FR1 calculation done
+			lap1 := time.Now()
+			returnData := perf.FR1(scenario, uint(rxData["node"].(float64)), uint(rxData["level"].(float64)), uint(rxData["topx"].(float64)), uint(rxData["TopBSno"].(float64)))
+			fmt.Println("FR1 calculation done")
 			lap2 := time.Now()
-			fmt.Println("Level1 done")
-			fmt.Println("Time Taken: ",lap2.Sub(lap1))
-			serializedData,_ := json.Marshal(returnData)
-			txbytes,werr:= w.Write(serializedData)
-				if werr != nil {
+			fmt.Println("Time Taken: ", lap2.Sub(lap1))
+			serializedData, _ := json.Marshal(returnData)
+			txbytes, werr := w.Write(serializedData)
+			if werr != nil {
 				log.Println("I got some error while writing back", werr)
 			} else {
-				 log.Println("Sent this  ", string(txbytes))
-	                }
-				
+				log.Println("Sent this  ", string(txbytes))
+			}
+		} else if rxData["type"] == "B" {
+
+			lap1 := time.Now()
+			returnData := perf.Level1(scenario)
+			lap2 := time.Now()
+			fmt.Println("Level1 done")
+			fmt.Println("Time Taken: ", lap2.Sub(lap1))
+			serializedData, _ := json.Marshal(returnData)
+			txbytes, werr := w.Write(serializedData)
+			if werr != nil {
+				log.Println("I got some error while writing back", werr)
+			} else {
+				log.Println("Sent this  ", string(txbytes))
+			}
 
 		} else if rxData["type"] == "C" {
-			returnData:=perf.CDF(scenario,uint(rxData["topx"].(float64)))
-			fmt.Println("CDF calc done",returnData)
+			returnData := perf.CDF(scenario, uint(rxData["topx"].(float64)))
+			fmt.Println("CDF calc done", returnData)
 			// TODO: CDF plot (or whatever)
 
 		} else if rxData["type"] == "D" {
