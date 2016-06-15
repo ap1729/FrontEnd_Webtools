@@ -101,9 +101,11 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// Define and pass data to the /perf functions as required - keep them general!
 		if rxData["type"] == "A" {
 	//FR1 calculation done
+			lap1 := time.Now()	
     			returnData:=perf.FR1(scenario,uint(rxData["node"].(float64)),uint(rxData["level"].(float64)),uint(rxData["topx"].(float64)),uint(rxData["TopBSno"].(float64)))
 				fmt.Println("FR1 calculation done")
-				
+				lap2 := time.Now()	
+				fmt.Println("Time Taken: ",lap2.Sub(lap1))
 				serializedData,_ := json.Marshal(returnData)
 				txbytes,werr:= w.Write(serializedData)
 				if werr != nil {
@@ -112,8 +114,12 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			 		log.Println("Sent this  ", string(txbytes))
                 		}
 		} else if rxData["type"] == "B" {
+
+			lap1 := time.Now()		
 			returnData:=perf.Level1(scenario)
+			lap2 := time.Now()
 			fmt.Println("Level1 done")
+			fmt.Println("Time Taken: ",lap2.Sub(lap1))
 			serializedData,_ := json.Marshal(returnData)
 			txbytes,werr:= w.Write(serializedData)
 				if werr != nil {

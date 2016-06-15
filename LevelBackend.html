@@ -85,8 +85,8 @@ div.visible {
    </style>
   </head>
   <body>
-<nav class="navbar navbar-default" role="navigation">
-  <div class="navbar navbar-fixed-top">
+<nav class="navbar navbar-default " role="navigation">
+  <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid" id="NavBar">
     </div>
   </div><!--- navigationbar-->
@@ -108,8 +108,22 @@ div.visible {
             No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3">
             POPUP ACTIVE: <input type="checkbox" id="popup"> 
              <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
-             <button type="button" class="btn btn-default" onclick="FR3()">FR3</button>
-          </div>
+             <select id="FR">
+              <option value="FR1">FR1</option>
+              <option value="FR3">FR3</option>
+              <option value="FFR">FFR</option>
+              <option value="AFFR">AFFR</option>
+            </select>
+
+            
+               <br>
+                VALID OPERATORS  
+                <input type="checkbox" id="Oper1" checked> Operator 1
+                <input type="checkbox" id="Oper2" checked> Operator 2
+                 <input type="checkbox" id="Oper3" checked> Operator 3
+                  <input type="checkbox" id="Oper4" checked> Operator 4
+              </div>
+
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
@@ -136,6 +150,7 @@ div.visible {
            </div>
 <canvas id="canvas"></canvas>
         </div>
+
 
 
   <!-- jQuery -->
@@ -402,9 +417,9 @@ console.log(obj);
 obj.SINR[0]=Math.round(obj.SINR[0] * 100) / 100;
 obj.SINR[1]=Math.round(obj.SINR[1] * 100) / 100;
 obj.SINR[2]=Math.round(obj.SINR[2] * 100) / 100;
-document.getElementById("LastSIR").value=obj.SINR[0];
+document.getElementById("LastSIR").value=obj.SINR[2];
 document.getElementById("PostSINR").value=obj.SINR[1];
-document.getElementById("PreSINR").value=obj.SINR[2];
+document.getElementById("PreSINR").value=obj.SINR[0];
 
 
 if(document.getElementById("TopBS").checked == true)
@@ -454,9 +469,11 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-
-
-BackObj={type:"A",node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno,noise:-90,topx:topx };//as d.col1 starts from no after basestation
+var validoper=validoperator();
+console.log(validoper);
+  
+//Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
+BackObj={type:"A",opFlags:validoper,node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno,noise:-90,topx:topx };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
@@ -668,6 +685,33 @@ str1="#UE";
 
 }
 
+function validoperator(){
+  //function to return a array of 0 and 1's to indicate which operators are valid
+  a=[1,1,1,1];
+ 
+  if(document.getElementById("Oper1").checked)
+     a[0]=1;
+  else 
+    a[0]=0;
+
+if(document.getElementById("Oper2").checked)
+     a[1]=1;
+  else 
+    a[1]=0;
+
+  if(document.getElementById("Oper3").checked)
+     a[2]=1;
+  else 
+    a[2]=0;
+
+  if(document.getElementById("Oper4").checked)
+     a[3]=1;
+  else 
+    a[3]=0;
+
+
+  return a;
+}
 
 function level1()
 {
@@ -679,7 +723,9 @@ if(topBSno=="")
 else
   topBSno=parseInt(topBSno);
 
-BackObj={type:"B",level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
+var validoper=validoperator();
+
+BackObj={type:"B",opflags:validoper,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 
@@ -693,7 +739,7 @@ else
   topx=parseInt(topx);
  
 
-BackObj1={type:"A",node:currselected,level:level,TopBSno:topBsno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
+BackObj1={type:"A",opflags:validoper,node:currselected,level:level,TopBSno:topBsno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 
@@ -706,7 +752,10 @@ function level0()
   level=0;
  var circles = svgContainer.selectAll("circle").data(rows1)
  .style("fill",function(d,i) { return opercolor[parseInt(d.node[2])-1].color;} ) ; 
- BackObj1={type:"A",node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
+
+ var validoper=validoperator();
+
+ BackObj1={type:"A",opflags:validoper,node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 
@@ -721,7 +770,7 @@ else
   topx=parseInt(topx);
 
 
-BackObj2={type:"A",node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
+BackObj2={type:"A",opflags:vallidoper,node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj2));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj2),onsuccess,"json");//getting from server
 
@@ -996,7 +1045,9 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
- BackObj={type:"C",topx:topx};
+var validoper=validoperator();
+
+ BackObj={type:"C",opflags:validoper,topx:topx};
 
 
  console.log(BackObj);
