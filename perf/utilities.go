@@ -1,6 +1,6 @@
 package perf
 
-func Filter(values []float64, filtIndices []uint) []float64 {
+func filter(values []float64, filtIndices []uint) []float64 {
 	val := make([]float64, len(filtIndices))
 	for i := 0; i < len(filtIndices); i++ {
 		val[i] = values[filtIndices[i]]
@@ -8,7 +8,7 @@ func Filter(values []float64, filtIndices []uint) []float64 {
 	return val
 }
 
-func Sort(values []float64) ([]float64, []uint) {
+func sort(values []float64) ([]float64, []uint) {
 	ind := make([]uint, len(values))
 	val := make([]float64, len(values))
 	for i := 0; i < len(values); i++ {

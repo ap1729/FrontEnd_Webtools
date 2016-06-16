@@ -5,10 +5,9 @@ import (
 	"math"
 )
 
-//has functions for pre,post SINR and ROI
-
-func SINR_ROI(values []float64, intrCancelCount uint) []float64 {
-	//values is recieved power
+// Function for pre,post SINR and ROI
+func sinr(values []float64, intrCancelCount uint) []float64 {
+	// Values is recieved power
 	var calc = []float64{}
 	//PreProcessing SINR calcuation
 	//fmt.Println("got values",intrCancelCount)

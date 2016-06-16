@@ -5,8 +5,8 @@ import (
 )
 
 func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationIds []uint) ([]float64, []uint) {
-	losses := Filter(sc.LossProfile(userID), intrStationIds)
-	losses, ind := Sort(losses)
+	losses := filter(sc.LossProfile(userID), intrStationIds)
+	losses, ind := sort(losses)
 
 	if level == 0 {
 		actualOper := sc.GetUserByID(userID).DefaultOp().ID()

@@ -2,10 +2,10 @@ package perf
 
 import "FrontEnd_WebTools/model"
 
-func FR1(sc *model.Scenario, userID uint, level uint, intrCancelCount uint, profileTopN uint) map[string]interface{} {
+func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
-	intStatIds := intrStations("FR1", sc, userID, nil)
+	intStatIds := intrStations(frMode, sc, userID, nil)
 	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
 
 	op := make([]uint, len(bsId))
@@ -16,7 +16,7 @@ func FR1(sc *model.Scenario, userID uint, level uint, intrCancelCount uint, prof
 
 	// Calculate SINR and ROI
 	returnData["operno"] = op
-	returnData["SINR"] = SINR_ROI(losses, intrCancelCount)
+	returnData["SINR"] = sinr(losses, intrCancelCount)
 	returnData["BSid"] = bsId[0:profileTopN]
 	returnData["SIR"] = losses[0:profileTopN]
 

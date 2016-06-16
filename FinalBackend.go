@@ -99,50 +99,51 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// Each of these types must call calculations defined under package /perf.
 		// Each function in perf returns data is a generic string dictionary.
 		// Define and pass data to the /perf functions as required - keep them general!
-		if rxData["type"] == "A" {
-			//FR1 calculation done
-			lap1 := time.Now()
-			returnData := perf.FR1(scenario, uint(rxData["node"].(float64)), uint(rxData["level"].(float64)), uint(rxData["topx"].(float64)), uint(rxData["TopBSno"].(float64)))
-			fmt.Println("FR1 calculation done")
-			lap2 := time.Now()
-			fmt.Println("Time Taken: ", lap2.Sub(lap1))
-			serializedData, _ := json.Marshal(returnData)
-			txbytes, werr := w.Write(serializedData)
-			if werr != nil {
-				log.Println("I got some error while writing back", werr)
-			} else {
-				log.Println("Sent this  ", string(txbytes))
-			}
-		} else if rxData["type"] == "B" {
 
-			lap1 := time.Now()
-			returnData := perf.Level1(scenario)
-			lap2 := time.Now()
-			fmt.Println("Level1 done")
-			fmt.Println("Time Taken: ", lap2.Sub(lap1))
-			serializedData, _ := json.Marshal(returnData)
-			txbytes, werr := w.Write(serializedData)
-			if werr != nil {
-				log.Println("I got some error while writing back", werr)
-			} else {
-				log.Println("Sent this  ", string(txbytes))
-			}
+		// JSON structure:
+		// frmode: Frequency-Reuse mode (Ex. "FR1", "FR3")
+		// node: User ID (uint)
+		// level: Cooperation Level (uint)
+		// intcnc: Interference canceller count (uint)
+		// topbsno: The top N stations who's profile is shown (uint)
+		// perf: The performance metric to evaluate (Ex. "cdf", "sir", "lvlx")
+		// opflags: The flags that
 
-		} else if rxData["type"] == "C" {
-			returnData := perf.CDF(scenario, uint(rxData["topx"].(float64)))
-			fmt.Println("CDF calc done", returnData)
-			// TODO: CDF plot (or whatever)
+		var returnData map[string]interface{}
 
-		} else if rxData["type"] == "D" {
-			// TODO: FR3 (or whatever)
+		frMode := rxData["frmode"].(string)
+		if frMode[0:3] == "lvl" {
+			returnData = perf.Level1(scenario)
+		}
 
-		} else {
+		ueID := uint(rxData["node"].(float64))
+		level := uint(rxData["level"].(float64))
+		intCancelCount := uint(rxData["intcnc"].(float64))
+		topN := uint(rxData["topbsno"].(float64))
+
+		switch rxData["perf"] {
+		case "sir":
+			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
+			fmt.Println("SIR calculation done")
+		case "cdf":
+			fmt.Println("Pending changes. Sorry!")
+			return
+		default:
 			fmt.Println("Unknown command")
 			return
 		}
 
+		// Returning data to front-end
+		serializedData, _ := json.Marshal(returnData)
+		txbytes, werr := w.Write(serializedData)
+		if werr != nil {
+			log.Println("I got some error while writing back", werr)
+		} else {
+			log.Println("Sent this  ", string(txbytes))
+		}
+
 		// Console feedback
-		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["type"])
+		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["perf"])
 
 	}
 }
