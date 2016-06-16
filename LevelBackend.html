@@ -55,20 +55,53 @@ svg {
     fill-opacity: 0.8 !important;
   }
 
+.inactive{
+  fill: black!important;
+  fill-opacity: 0.15;
+}  
 
 
 div.visible {
     visibility: visible !important;
 }
 
+.loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    position:absolute;
+    top:400px;
+    left:600px;
+    width: 120px;
+    height: 120px;
+    display: none;
+    animation: spin 2s linear infinite;
+}
 
-    </style>
-    <script type="text/javascript">
-      var col1,node,x1,y1,m1,m2,table;    
-      /// Global variables
-      </script>
-        <style>
- 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+           dt {
+          width: 20px;
+          height: 20px;
+          display: inline-block;
+          overflow: hidden;
+          border: 1px solid #000;
+          }
+          .lime {background-color: lime; color: lime; }
+          .orange {background-color: orange; color: orange; }
+          .red {background-color: red; color: red; }
+          .brown {background-color: brown; color: brown; }
+          .circle{border-radius: 50%;}
+          .rect1{}
+          dd {
+          display: inline-block;
+          width: 7em;
+          margin: 0 0 0 1em;
+          }/* above is for legend*/
+
    svgContainer {
   font: 10px sans-serif;
   shape-rendering: crispEdges;
@@ -96,9 +129,27 @@ div.visible {
 
    <h1 class="text-center">Hexagonal Grid</h1>
     <div class="panel panel-default">
+      
       <div class="panel-body">
         <div class="well">
            <div id="drawbox"> 
+
+           <dl>
+<dt class="lime"></dt>
+<dd>Operator 1</dd>
+<dt class="orange"></dt>
+<dd>Operator 2</dd>
+<dt class="red"></dt>
+<dd>Operator 3</dd>
+<dt class="brown"></dt>
+<dd>Operator 4</dd>
+<dt class="circle"></dt>
+<dd> UE(user) </dd>
+<dt class="rect1"></dt>
+<dd> eNodeB(Basestation) </dd>
+
+</dl>
+<div class="loader" id="loader"></div>
           </div>
            <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
            <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
@@ -123,7 +174,7 @@ div.visible {
                  <input type="checkbox" id="Oper3" checked> Operator 3
                   <input type="checkbox" id="Oper4" checked> Operator 4
               </div>
-
+<button type="button" class="btn btn-default" onclick="Validate()">Validate</button>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
@@ -133,6 +184,7 @@ div.visible {
      <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
       <button type="button" class="btn btn-default" >Plot Initial</button>  onclick="doPlot()"--> 
         </div>
+
       </div>
         <div>
            <div class="panel panel-default">
@@ -147,11 +199,15 @@ div.visible {
                
                </p>
              </div>
+
            </div>
 <canvas id="canvas"></canvas>
         </div>
 
-
+<script type="text/javascript">
+      var col1,node,x1,y1,m1,m2,table;    
+      /// Global variables
+      </script>
 
   <!-- jQuery -->
   <script src="js/jquery.js"></script>
@@ -177,7 +233,7 @@ div.visible {
   var topBsno=10;//no of Bs to show on click and in bar graph
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
-  var currselected; //latest selected circle
+  var currselected=-1; //latest selected circle
   var wcount=0;//window number
 
  // var BScord=[];//basestation coords 
@@ -230,7 +286,6 @@ zoom = d3.behavior.zoom()
     .on("drag", dragged1)
     .on("dragend", dragended1);  */  
 svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom).attr("pointer-events",'all').call(zoom);;
-
 svgContainer=svg.append("g").attr("id","svgContainer").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 xaxisobject=svgContainer.append("g")
@@ -448,6 +503,7 @@ if(document.getElementById("TopBS").checked == true)
 
 PlotBarGraph(barData,obj.Oprno,obj.SINR[0],obj.SINR[1]);
 
+document.getElementById("loader").style.display = "none";
 }
 
 
@@ -469,14 +525,16 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
+//var validoper=[2,2,2,2]
 var validoper=validoperator();
 console.log(validoper);
   
 //Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
 BackObj={type:"A",opFlags:validoper,node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno,noise:-90,topx:topx };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
+document.getElementById("loader").style.display = "block";
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-
+//document.getElementById("loader").style.display = "none";
 //above change the backend code and do parsing
 
 if(document.getElementById("popup").checked == true)
@@ -682,39 +740,60 @@ str1="#UE";
     str2=str1+(i+76).toString();//UE id starts from UE76
     d3.select(str2).style("fill",opercolor[obj.changeColor[i]-1].color);
    }
-
+  
 }
 
 function validoperator(){
   //function to return a array of 0 and 1's to indicate which operators are valid
   a=[1,1,1,1];
+//doing inactive visual
+
+
+var j=0;
+var i=0;
+var lb=0;
+var ub=0;
+ var Bsid="";
+ for(j=0;j<4;j++)
+ { //for each operator
+  ub+=bsno[j].bsno;
+  if(document.getElementById("Oper"+(j+1).toString()).checked)//check if operator is checked or not 
+  {
  
-  if(document.getElementById("Oper1").checked)
-     a[0]=1;
-  else 
-    a[0]=0;
+a[j]=1;    
 
-if(document.getElementById("Oper2").checked)
-     a[1]=1;
-  else 
-    a[1]=0;
-
-  if(document.getElementById("Oper3").checked)
-     a[2]=1;
-  else 
-    a[2]=0;
-
-  if(document.getElementById("Oper4").checked)
-     a[3]=1;
-  else 
-    a[3]=0;
-
-
+  for(i=lb;i<ub;i++)
+  {//active
+    
+    Bsid='#BS'+i.toString();
+    d3.select(Bsid).classed('inactive',false);
+  }
+ }
+ else
+ {
+a[j]=0;
+console.log("BBBB");
+  for(i=lb;i<ub;i++)
+  {// inactive bs 
+    Bsid='#BS'+i.toString();
+    d3.select(Bsid).classed('inactive',true);
+ }
+}
+  lb+=bsno[j].bsno;
+  
+ } 
   return a;
 }
 
 function level1()
 {
+
+
+  if(document.getElementById("loader").style.display =="none")
+  {
+    console.log("changed")
+    document.getElementById("loader").style.display = "block";
+  }
 level=1
 //console.log("BBBBBB",currselected);//row no 
 topBSno=document.getElementById("TopBSno").value;
@@ -727,8 +806,10 @@ var validoper=validoperator();
 
 BackObj={type:"B",opflags:validoper,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
+//document.getElementById("loader").style.display = "none";
+console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
 
@@ -1259,6 +1340,9 @@ document.getElementById("PostSINR").value=obj.PoS;
 document.getElementById("LastSIR").value=obj.ROI;
 }
 
+function Validate(){
+//to send to backend,the array of active operators
+}
     </script>
 
   </body>
