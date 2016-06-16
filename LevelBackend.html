@@ -530,7 +530,7 @@ var validoper=validoperator();
 console.log(validoper);
   
 //Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
-BackObj={type:"A",opFlags:validoper,node:parseInt(d.col1-bs.length),level:level,TopBSno:topBSno,noise:-90,topx:topx };//as d.col1 starts from no after basestation
+BackObj={perf:"sir",opflags:validoper,node:parseInt(d.col1-bs.length),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
@@ -794,7 +794,7 @@ function level1()
     console.log("changed")
     document.getElementById("loader").style.display = "block";
   }
-level=1
+
 //console.log("BBBBBB",currselected);//row no 
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
@@ -804,12 +804,16 @@ else
 
 var validoper=validoperator();
 
-BackObj={type:"B",opflags:validoper,level:level,TopBSno:topBsno};//as d.col1 starts from no after basestation
-console.log(JSON.stringify(BackObj));
+if(level!=1)
+{
 
+BackObj={perf:"lvlchng",params:1,opflags:validoper,level:level,topbsno:topBSno,frmode:document.getElementById("FR").value };//params is to which level
+ console.log(JSON.stringify(BackObj));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
-console.log(document.getElementById("loader").style.display);
+}
+
+//console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
 
@@ -818,13 +822,15 @@ if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
- 
 
-BackObj1={type:"A",opflags:validoper,node:currselected,level:level,TopBSno:topBsno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
+if(currselected!=-1) 
+{
+
+BackObj1={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
-
-
+}
+level=1;//updating level 
 }
 
 
@@ -836,24 +842,15 @@ function level0()
 
  var validoper=validoperator();
 
- BackObj1={type:"A",opflags:validoper,node:currselected,level:level,TopBSno:topBSno};//as d.col1 starts from no after basestation
-console.log(JSON.stringify(BackObj1));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
-
-
 topx=document.getElementById("topx").value;
-
-
-
 if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
 
-
-BackObj2={type:"A",opflags:vallidoper,node:currselected,level:level,TopBSno:topBSno,noise:-90,topx:topx};//as d.col1 starts from no after basestation
-console.log(JSON.stringify(BackObj2));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj2),onsuccess,"json");//getting from server
+BackObj={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+console.log(JSON.stringify(BackObj));
+$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
 
 
@@ -1128,10 +1125,8 @@ else
 
 var validoper=validoperator();
 
- BackObj={type:"C",opflags:validoper,topx:topx};
-
-
- console.log(BackObj);
+BackObj={perf:"cdf",opflags:validoper,intcnc:topx,frmode:document.getElementById("FR").value };
+console.log(BackObj);
  $.post("http://localhost:8080/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
 }
 
@@ -1319,7 +1314,7 @@ function drawCurvedPath(cps, xpts,ypts){
           }
 
 
-
+//FR3 and fr3front are not needed
 function FR3()
 {
   topx=document.getElementById("topx").value;
