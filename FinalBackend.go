@@ -106,13 +106,15 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		// level: Cooperation Level (uint)
 		// intcnc: Interference canceller count (uint)
 		// topbsno: The top N stations who's profile is shown (uint)
-		// perf: The performance metric to evaluate (Ex. "cdf", "sir", "lvlx")
-		// opflags: The flags that
+		// perf: The performance metric to evaluate (Ex. "cdf", "sir", "lvlchng")
+		// opflags: The flags that specify which operators are active (array of binary)
+		// params: Any additional details that the perf function may need
 
 		var returnData map[string]interface{}
-
 		frMode := rxData["frmode"].(string)
-		if frMode[0:3] == "lvl" {
+
+		if frMode == "lvlchng" {
+			// lvlTarget := uint(rxData["params"].(float64))
 			returnData = perf.Level1(scenario)
 		}
 
