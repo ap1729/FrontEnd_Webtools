@@ -116,23 +116,23 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		if frMode == "lvlchng" {
 			// lvlTarget := uint(rxData["params"].(float64))
 			returnData = perf.Level1(scenario)
-		}
+		} else {
+			ueID := uint(rxData["node"].(float64))
+			level := uint(rxData["level"].(float64))
+			intCancelCount := uint(rxData["intcnc"].(float64))
+			topN := uint(rxData["topbsno"].(float64))
 
-		ueID := uint(rxData["node"].(float64))
-		level := uint(rxData["level"].(float64))
-		intCancelCount := uint(rxData["intcnc"].(float64))
-		topN := uint(rxData["topbsno"].(float64))
-
-		switch rxData["perf"] {
-		case "sir":
-			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
-			fmt.Println("SIR calculation done")
-		case "cdf":
-			fmt.Println("Pending changes. Sorry!")
-			return
-		default:
-			fmt.Println("Unknown command")
-			return
+			switch rxData["perf"] {
+			case "sir":
+				returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
+				fmt.Println("SIR calculation done")
+			case "cdf":
+				fmt.Println("Pending changes. Sorry!")
+				return
+			default:
+				fmt.Println("Unknown command")
+				return
+			}
 		}
 
 		// Returning data to front-end
