@@ -113,7 +113,7 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		var returnData map[string]interface{}
 		frMode := rxData["frmode"].(string)
 
-		if frMode == "lvlchng" {
+		if rxData["perf"] == "lvlchng" {
 			// lvlTarget := uint(rxData["params"].(float64))
 			returnData = perf.Level1(scenario)
 		} else {
