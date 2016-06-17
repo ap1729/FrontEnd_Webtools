@@ -7,6 +7,13 @@ import (
 	"strconv"
 )
 
+// Reads a CSV file containing locations of nodes, and populates the ScenarioBuilder.
+// The CSV file is expected to have a format as follows:
+//
+//     type, x, y
+//
+// where type is a string who's first two letters specify the type of node ("BS", "UE")
+// and remaining characters specify the operator ID. (Ex. "BS1", "UE3")
 func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 	file, err := os.Open(locFilePath)
 	if err != nil {
@@ -44,6 +51,11 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 	return true
 }
 
+// Takes an unsealed ScenarioBuilder and imports loss data from a CSV file into the builder.
+// This function seals the ScenarioBuilder on completion.
+//
+// The CSV file is to have M rows and N columns, where M is the number of Users and N is the number of BaseStations.
+// Each row is an array of N values separated by comma.
 func ReadLossTable(sb *model.ScenarioBuilder, lossFilePath string) bool {
 	if sb.IsSealed() == true {
 		return false

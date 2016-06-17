@@ -2,6 +2,7 @@ package service
 
 import "math"
 
+// Hexagon models a single cell site and provides useful functionality.
 type Hexagon struct {
 	CenterX, CenterY, Side float64
 	ID                     uint
@@ -23,7 +24,7 @@ func (hex *Hexagon) ID() uint {
 }
 */
 
-// Function to check if a point lies inside or on the boundary of the Hexagon
+// Function to check if a point (x, y) lies inside or on the boundary of the Hexagon.
 func (hex *Hexagon) Contains(x, y float64) bool {
 	relx := x - hex.CenterX
 	rely := y - hex.CenterY

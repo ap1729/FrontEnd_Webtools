@@ -5,12 +5,19 @@ import (
 	"math"
 )
 
+// TODO: This struct requires improvements in its API, especially FindContainedStations().
+// HexMap models a cell map, that contains a map of Hexagonal cells.
 type HexMap struct {
 	hexagons       []Hexagon
 	adjMat         [][]int
 	memberStations map[Hexagon]([]*model.BaseStation)
 }
 
+// Constructor to generate a cell map, with suitable ID's assigned to each hexagon.
+// This is the recommended way to generate multi-tier maps as found in practice.
+//
+// Params: 'sideLength' is the length of the side of the regular hexagonal cell,
+// while the 'radius' is a natural number specifying the number of tiers to generate.
 func NewHexMap(sideLength float64, radius uint) *HexMap {
 	N := 2*radius - 1
 	normLength := sideLength * math.Sqrt(3) / 2
@@ -50,6 +57,10 @@ func NewHexMap(sideLength float64, radius uint) *HexMap {
 	return &HexMap{hexagons: hexagons, adjMat: adjMat, memberStations: memberMap}
 }
 
+// Parses a list of BaseStations and creates internal references to which BaseStation lies in which Hexagon.
+//
+// BUG: Each call appends the existing knowledge of BaseStation locations with the passed array of stations.
+// If care is not exercised, this may lead to duplicate references.
 func (hm *HexMap) AssociateStations(stations []model.BaseStation) int {
 	missCount := 0
 	flag := false
@@ -68,6 +79,7 @@ func (hm *HexMap) AssociateStations(stations []model.BaseStation) int {
 	return missCount
 }
 
+// Returns a list of hexagons that are first neighbours to the root hexagon specified by its ID.
 func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 	var neighs []Hexagon
 	for i := 0; i < len(hm.hexagons); i++ {
@@ -78,6 +90,9 @@ func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 	return neighs
 }
 
+// Returns a list of second-tier neighbours to the root hexagon specified by its ID.
+//
+// Simply put, these are the neighbours of neighbours of the root hexagon.
 func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
 	sum := make([]int, len(hm.adjMat))
 	N := len(hm.hexagons)
@@ -100,6 +115,7 @@ func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
 	return neighs
 }
 
+// Finds the hexagon in the map that contains the point (x, y). If not found, the function returns nil.
 func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 	for i := 0; i < len(hm.hexagons); i++ {
 		if hm.hexagons[i].Contains(x, y) == true {
@@ -109,11 +125,14 @@ func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 	return nil
 }
 
+// Retreive all BaseStations that are contained in the specified hexagon.
+//
+// This function essentially retreives the stations as parsed by AssociateStations().
 func (hm *HexMap) FindContainedStations(hex *Hexagon) []*model.BaseStation {
 	return hm.memberStations[*hex]
 }
 
-// Helper function for internal usage
+// Private helper function: Euclidean distance between two points (x1, y1) and (x2, y2).
 func euclideanDist(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
 }
