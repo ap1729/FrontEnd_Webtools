@@ -1153,10 +1153,10 @@ function plotcdf(obj)
 ctx.moveTo(0,0);
 ctx.font="30px Arial";//font and size of text
 ctx.fillText("CDF CURVES",600,100);//heading
-plotcurve(obj.Combine_sinr_x,obj.Pre_sinr_level0_Y,"#3399ff");//blue
-plotcurve(obj.Combine_sinr_x,obj.Pre_sinr_level1_Y,"#ff0066");//pink
-plotcurve(obj.Combine_sinr_x,obj.Post_sinr_level0_Y,"#ff9933");//orange
-plotcurve(obj.Combine_sinr_x,obj.Post_sinr_level1_Y,"#800000");//brown
+plotcurve(obj.X,obj.prs0Y,"#3399ff");//blue
+plotcurve(obj.X,obj.pos0Y,"#ff0066");//pink
+plotcurve(obj.X,obj.prs1Y,"#ff9933");//orange
+plotcurve(obj.X,obj.pos1Y,"#800000");//brown
 ctx.fillText("SINR value",600,1900);
 //creating legend
 ctx.rect(1200,20,500,150);

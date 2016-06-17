@@ -116,7 +116,12 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		if rxData["perf"] == "lvlchng" {
 			// lvlTarget := uint(rxData["params"].(float64))
 			returnData = perf.Level1(scenario)
-		} else {
+		} else if rxData["perf"]=="cdf"{
+
+         returnData=perf.CDF(scenario,uint(rxData["intcnc"].(float64)))
+         fmt.Println("CDF calc done")
+
+		}else{
 			ueID := uint(rxData["node"].(float64))
 			level := uint(rxData["level"].(float64))
 			intCancelCount := uint(rxData["intcnc"].(float64))
