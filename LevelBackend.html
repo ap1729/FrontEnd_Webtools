@@ -464,7 +464,6 @@ function mouseOut(d, i) {
 }
 
 function onsuccess(obj){
-
 console.log(obj); 
 //obj.SIR is SIR
 //obj.SINR has PreSINr,PostSINR and ROI in a array
@@ -558,7 +557,7 @@ newwindow(d.col1);//plot on graph
 
 function PlotBarGraph(barData,operno1,prs,pos){
   //function which plots bar graph
-  //also increases top contributing basestations sizes 
+  //also increases top contributing basestations sizes  
 InitChart(barData);
 
 function InitChart(barData) {
@@ -812,7 +811,7 @@ BackObj={perf:"lvlchng",params:1,opflags:validoper,level:level,topbsno:topBSno,f
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 }
-
+level=1;//updating level 
 //console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
@@ -830,7 +829,7 @@ BackObj1={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:top
 console.log(JSON.stringify(BackObj1));
 $.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
-level=1;//updating level 
+
 }
 
 
