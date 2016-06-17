@@ -113,31 +113,25 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		var returnData map[string]interface{}
 		frMode := rxData["frmode"].(string)
 
-		if rxData["perf"] == "lvlchng" {
-			// lvlTarget := uint(rxData["params"].(float64))
-			returnData = perf.Level1(scenario)
-		} else if rxData["perf"]=="cdf"{
-
-         returnData=perf.CDF(scenario,uint(rxData["intcnc"].(float64)))
-         fmt.Println("CDF calc done")
-
-		}else{
+		switch rxData["perf"] {
+		case "lvlchng":
+			targetLvl := uint(rxData["params"].(float64))
+			returnData = perf.ChangeLevel(scenario, targetLvl)
+			fmt.Println("Level Change complete.")
+		case "sir":
 			ueID := uint(rxData["node"].(float64))
 			level := uint(rxData["level"].(float64))
 			intCancelCount := uint(rxData["intcnc"].(float64))
 			topN := uint(rxData["topbsno"].(float64))
-
-			switch rxData["perf"] {
-			case "sir":
-				returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
-				fmt.Println("SIR calculation done")
-			case "cdf":
-				fmt.Println("Pending changes. Sorry!")
-				return
-			default:
-				fmt.Println("Unknown command")
-				return
-			}
+			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
+			fmt.Println("SIR calculation complete.")
+		case "cdf":
+			intCancelCount := uint(rxData["intcnc"].(float64))
+			returnData = perf.CDF(scenario, frMode, intCancelCount)
+			fmt.Println("CDF calc done")
+		default:
+			fmt.Println("Unknown command")
+			return
 		}
 
 		// Returning data to front-end

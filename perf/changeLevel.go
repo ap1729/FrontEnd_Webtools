@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func Level1(sc *model.Scenario) map[string]interface{} {
+func ChangeLevel(sc *model.Scenario, targetLvl uint) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
 	fmt.Println("Level 1 reached")
