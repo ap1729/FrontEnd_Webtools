@@ -173,8 +173,9 @@ div.visible {
                 <input type="checkbox" id="Oper2" checked> Operator 2
                  <input type="checkbox" id="Oper3" checked> Operator 3
                   <input type="checkbox" id="Oper4" checked> Operator 4
-              </div>
-<button type="button" class="btn btn-default" onclick="Validate()">Validate</button>
+              
+<button type="button" class="btn btn-default" onclick="validoperator()">Validate</button>
+                  </div>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
@@ -890,10 +891,7 @@ var translate = [0, 0];
  
 
 function initialize() {
-  
-
-
-    fillMap();
+      fillMap();
     position();
     render();
 }
@@ -1080,19 +1078,6 @@ function getVisibleData() {
 var node;
 function newwindow(idno){
   //function to open a new window and put graph
-   //var myWindow = window.open("", "", "width=500,height=500");
-
-
- // node = document.createTextNode(str);
-
-//var element = document.getElementById("text");
-//console.log(d3.select("#text")[0][0].firstChild.data); //when using <h1 id =text>
-//d3.select("#text")[0][0].firstChild.data=str;
-
-
-//console.log(element);
-//element.appendChild(node);
-
   var embedded_svg = document.getElementById("Output");//visual
   console.log(embedded_svg);
  
@@ -1103,9 +1088,6 @@ function newwindow(idno){
   var blank_root = svg_win.document.documentElement;
         svg_win.document.removeChild(blank_root);
         svg_win.document.appendChild(transplanted_svg);
- 
-   
-    //    svg_win.document.title("window"+wcount);
          wcount++;     
 
 

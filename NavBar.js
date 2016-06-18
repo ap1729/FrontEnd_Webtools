@@ -1,6 +1,6 @@
  document.getElementById("NavBar").innerHTML =
  '<a class="navbar-brand" href="LevelBackend.html">Omni</a>'+
-'<a class="navbar-brand" href="Sectoring.html">Sectoring</a>'+
+'<a class="navbar-brand" href="sectoring.html">Sectoring</a>'+
 '<a class="navbar-brand" href="#">Emergency</a>'+
  
       '<ul class="nav navbar-nav navbar-right">'+

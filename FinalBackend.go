@@ -29,7 +29,7 @@ func initialize() bool {
 
 	// Read all nodes (BS and UE)
 	sb := model.NewScenarioBuilder()
-	suc := service.ReadNodes(sb, "data/OmniLocations.csv")
+	suc := service.ReadNodes(sb, "data/SectorLocations.csv")
 	if suc == false {
 		// fmt.Printf("Error: %v", err)
 		return false
@@ -39,7 +39,7 @@ func initialize() bool {
 	lap2 := time.Now()
 
 	// Import loss values into Scenario object
-	suc = service.ReadLossTable(sb, "data/OmniLosses.csv")
+	suc = service.ReadLossTable(sb, "data/SectorLosses.csv")
 	if suc == false {
 		// fmt.Printf("Error: %v", err)
 		return false
@@ -67,16 +67,16 @@ func initialize() bool {
 // Temporary quick fix, changes pending
 func handlerroute(w http.ResponseWriter, r *http.Request) {
 
-	// w.Header().Add("Access-Control-Allow-Origin", "*")
+	 w.Header().Add("Access-Control-Allow-Origin", "*") //Allows Cross-Origin Requests
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Only POST method is supported."))
 		return
 	}
 	log.Println("Request Method is:", r.Method)
-	// log.Println("Request is originated from  ", r.RemoteAddr)
-	// log.Println("Request is originated URL  ", r.RequestURI)
-	// log.Println("Request Headers", r.Header)
+	log.Println("Request is originated from  ", r.RemoteAddr)
+	log.Println("Request is originated URL  ", r.RequestURI)
+	log.Println("Request Headers", r.Header) //Request info
 
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
