@@ -2,6 +2,17 @@ package perf
 
 import "FrontEnd_WebTools/model"
 
+// TODO: Truncating the profile values as per end-user request is wrongly handled
+// here. The job of this function is to solely compute results independent of
+// front-end display options.
+
+// Computes the SINR values and the received power profile for a user.
+//
+// Parameter description:
+//
+// frMode - frequency-reuse mode
+// intrCancelCount - the number of interferers to cancel
+// profileTopN - for how many top stations the power profile must be returned
 func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
