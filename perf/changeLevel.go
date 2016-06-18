@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// Returns the operators that users connect to, if the cooperation level was set
+// to targetLvl.
 func ChangeLevel(sc *model.Scenario, targetLvl uint) map[string]interface{} {
 	returnData := map[string]interface{}{}
 

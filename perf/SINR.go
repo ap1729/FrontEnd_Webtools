@@ -1,11 +1,21 @@
 package perf
 
 import (
-	//"fmt"
+	// "fmt"
 	"math"
 )
 
-// Function for pre,post SINR and ROI
+// TODO: Cleanup function, fix bug of dBm -> linear conversion
+
+// Computes the pre- and post- processing SINR values, and additionally returns
+// remaining interference power (ROI) for the given array of signal powers (dBm).
+//
+// The function returns an array of three elements, as follows:
+//
+// [pre SINR, post SINR, ROI]
+//
+// Note: This function does not order the signal profile and computes results
+// directly on the array in the same order of elements it is passed.
 func sinr(values []float64, intrCancelCount uint) []float64 {
 	// Values is recieved power
 	var calc = []float64{}

@@ -4,6 +4,13 @@ import (
 	"FrontEnd_WebTools/model"
 )
 
+// Retreives the signal loss profile for a user and its interfering stations
+// for a given scenario and level of cooperation.
+//
+// The function arranges the signal values from the strongest to the weakest,
+// additionally incorporating any order constraints specified by the level of
+// cooperation. The second return value specifies the BaseStation indices
+// corresponding to the source of the loss value.
 func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationIds []uint) ([]float64, []uint) {
 	losses := filter(sc.LossProfile(userID), intrStationIds)
 	losses, ind := sort(losses)
