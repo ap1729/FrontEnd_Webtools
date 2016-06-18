@@ -67,16 +67,18 @@ func initialize() bool {
 // Temporary quick fix, changes pending
 func handlerroute(w http.ResponseWriter, r *http.Request) {
 
-	 w.Header().Add("Access-Control-Allow-Origin", "*") //Allows Cross-Origin Requests
+	// Allow Cross-Origin Requests
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Only POST method is supported."))
 		return
 	}
+	// Request info
 	log.Println("Request Method is:", r.Method)
 	log.Println("Request is originated from  ", r.RemoteAddr)
 	log.Println("Request is originated URL  ", r.RequestURI)
-	log.Println("Request Headers", r.Header) //Request info
+	log.Println("Request Headers", r.Header)
 
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
