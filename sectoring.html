@@ -303,7 +303,7 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('Nodelocations.csv',//Sectorlocations.csv'
+d3.csv('Sectorlocations.csv',//Sectorlocations.csv'
         // accessor function
         function(d) {
             return {
@@ -389,12 +389,25 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .on('click', click)
             .attr("data-toggle","tooltip");
 
-           
             var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
-            rect.attr("x",function(d,i){ return x(d.x)+3.5;})
-            .attr("y",function(d,i){return y(d.y)+3.5;})  //this 3.5 is to make the point as center of rectangle
-            .attr("width",7)
-            .attr("height",7)
+            rect.attr("x",function(d,i){
+                        if(d.col1%3==0) 
+                            return x(d.x);
+                   else if(d.col1%3==1)
+                            return x(d.x)+3.1;
+                        else 
+                           return x(d.x)-3;
+                              })
+            .attr("y",function(d,i){
+                     if(d.col1%3==0) 
+                            return y(d.y)-5;
+                   else if(d.col1%3==1)
+                            return y(d.y)+1;
+                        else 
+                           return y(d.y)+1;
+                           })  //this 3.5 is to make the point as center of rectangle
+            .attr("width",6)
+            .attr("height",6)
             .style("fill",function(d,i) { 
                                         return bscolor[parseInt(d.node[2])-1].color;
                                         } ) 
@@ -402,12 +415,6 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .on('mouseover', mouseOver1)
             .attr("data-toggle","tooltip") ;
             // .call(drag1);*/
-  
-            //Origin , 0,0 ,temporary
-            /*
-            var rect1=svgContainer.append("rect");
-             rect1.attr("x",x(0)+3.5).attr("y",y(0)+3.5).style("fill","blue").attr("width",7).attr("height",7) .attr("data-toggle","tooltip");
-            // .attr("data-toggle","tooltip").attr("title","AP");*/
             }
               
               );
@@ -479,19 +486,34 @@ document.getElementById("PreSINR").value=obj.SINR[0];
 
 if(document.getElementById("TopBS").checked == true)
 {//button is also clicked, to enhance size of those basestations
-  //console.log(barData[0].y);
+
   var Bsid="";
   for(i=0;i<bs.length;i++)
   {// to make all rect same size
     Bsid='#BS'+i.toString();
-    d3.select(Bsid).attr("width",7).attr("height",7);
+    d3.select(Bsid).attr("width",6).attr("height",6);
   }
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
-   Bsid="#BS"+obj.BSid[i].toString();
+   Bsid="#BS"+obj.Bsid[i].toString();
    console.log(Bsid);
-    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);// to change attributes of max basestations
+   if(Bsid[i]%3==0)
+   {
+    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);// to change attributes of max basestations
+   }
+   else if(Bsid[i]%3==1)
+   {
+  d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);    
+
+   }
+else
+{
+
+  d3.select(Bsid).attr("width",6 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);
+}
+
+
   }
 }//top rect being enlarged
  
@@ -737,7 +759,7 @@ function onsuccess1(obj)
 str1="#UE";
  for(i=0;i<obj.changeColor.length;i++)
    {
-    str2=str1+(i+76).toString();//UE id starts from UE76
+    str2=str1+(i+228).toString();//UE id starts from UE228 for sectoring
     d3.select(str2).style("fill",opercolor[obj.changeColor[i]-1].color);
    }
   
