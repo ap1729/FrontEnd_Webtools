@@ -14,15 +14,15 @@ import (
 // needed, pass nil.
 func intrStations(mode string, sc *model.Scenario, userID uint, params map[string]interface{}) []uint {
 	var bsIds []uint
-
 	switch mode {
+
 	case "FR1":
 		bsIds = make([]uint, len(sc.BaseStations()))
 		for i := 0; i < len(sc.BaseStations()); i++ {
 			bsIds[i] = uint(i)
 		}
-	case "FR3":
 
+	case "FR3":
 		hexMap := params["hexmap"].(*service.HexMap)
 		//get x,y locations of UE
 		uex := sc.GetUserByID(uint(userID)).X()
@@ -57,7 +57,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 
 		//2nd tier neighbors
 		//2nd tier cells are in the array snids
-		sneigh := hexMap.SecondNeighbours(int(cn))
+		sneigh := hexMap.SecondNeighbours(cn)
 		snids := []uint{}
 		for i := 0; i < len(sneigh); i++ {
 			snids = append(snids, sneigh[i].ID)
@@ -106,7 +106,6 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 		frc = append(frc, cn)
 		//fmt.Println("FR3 cells :",frc)
 		//array fr3bsno stores the BS IDS in fr3 cells
-		//array fr3pow stores the SIR values of corresponding UEs in fr3 cells
 		fr3bsno := []uint{}
 		for k := 0; k < len(frc); k++ {
 			//append each cell's bsid to fr3bsno

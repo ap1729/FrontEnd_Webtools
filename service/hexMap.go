@@ -93,7 +93,7 @@ func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 // Returns a list of second-tier neighbours to the root hexagon specified by its ID.
 //
 // Simply put, these are the neighbours of neighbours of the root hexagon.
-func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
+func (hm *HexMap) SecondNeighbours(root uint) []Hexagon {
 	sum := make([]int, len(hm.adjMat))
 	N := len(hm.hexagons)
 	for i := 0; i < N; i++ {
@@ -107,7 +107,7 @@ func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
 	}
 	var neighs []Hexagon
 	// A non-zero element in sum is a second tier neighbour if it is not connected to root
-	for i := 0; i < N; i++ {
+	for i := uint(0); i < uint(N); i++ {
 		if hm.adjMat[root][i] == 0 && sum[i] > 0 && root != i {
 			neighs = append(neighs, hm.hexagons[i])
 		}
