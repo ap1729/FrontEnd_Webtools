@@ -16,8 +16,33 @@
 
 
 <style type="text/css">
- #ul{
-  text-align: center;
+   .impt{
+    stroke: black;
+    stroke-width: 2px;
+   background: red;
+   }
+
+ .heading{
+  stroke: orange;
+    stroke-width: 1px;
+   background:steelblue ;
+ }
+   dt {
+          width: 200px;
+          height: 25px;
+          font-family:serif;
+          font-size: :30px;
+          display: inline-block;
+          overflow: hidden;
+          
+          }
+
+           dd {
+          font-family: sans-serif;
+          font-size: 18px;
+          width: 100em;
+          margin: 0 0 0 1em;
+          }
  }
 }
 </style>
@@ -40,26 +65,34 @@
 
 
 <div class="text-center" >
-  <h1>MOSSSAIC VISUAL TOOL INSTRUCTIONS</h1>    
-<h2>FOR BEST RESULTS USE MOZILLA FIREFOX</h2
-  <dl class="text-primary">
+  <h1 >MOSSSAIC VISUAL TOOL INSTRUCTIONS</h1>    
+<h2 class="impt">FOR BEST RESULTS USE MOZILLA FIREFOX</h2>
+  <dl class="text-left">
+  <!--
     <dt>Omni</dt>
-    <dd>-Shows the grid with omni basestations</dd>
+    <dd>-Shows the grid with omni basestations(testing purposes)</dd>
     <dd>-More info</dd>
-    <dd>-----</dd>
-    <dt>Sectoring</dt>
+    <dd>-----</dd>-->
+    <dt class="heading">Sectoring</dt>
     <dd>-Shows the grid with sectored basestations</dd>
+    <dd>-Panning and zoom is enabled</dd>
+    <dd>-User can control which freq mode is used (i.e) FR1,FR3,FFR etc</dd>
+    <dd>-user can control number of basestations that can be seen in SIR profile and number of interference cancellers</dd>
+    <dd>-On Checking Popup Active ,the SIR profile is shown on a new window</dd>
+    <dd>-CDF curves can be viewed</dd>
+    <dd>-One can control the valid operators and hence can make the multioperator system into a single operator system </dd>
+    <dd>-Drag enabled checkbox will allow ue's to be dragged(testing currently)</dd>
     <dd>-More info</dd>
     <dd>------ </dd>
-    <dt>Emergency</dt>
+    <dt class="heading">Emergency</dt>
     <dd>-Shows Emergency aspect of MOSSSAIC</dd>
     <dd>-More info</dd>
     <dd>-------- </dd>
-    <dt>MOSSSAIC</dt>
+    <dt class="heading">MOSSSAIC</dt>
     <dd>-Details about the Project</dd>
     <dd>-More info</dd>
     <dd>------ </dd>
-    <dt>Home</dt>
+    <dt class="heading">Home</dt>
     <dd>-Comes Back to this Page</dd>
 
     
