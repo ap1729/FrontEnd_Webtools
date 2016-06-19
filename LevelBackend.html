@@ -361,7 +361,7 @@ d3.csv('/data/OmniLocations.csv',//Sectorlocations.csv'
               }
               //above function for seperating basestations and nodes,bs has basestations and rows1 has normal nodes
             
-}       
+            }       
 oper.push({'operno':operno,'ueno':ueno});//for last operator
 bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
 //console.log(oper);
@@ -512,7 +512,7 @@ document.getElementById("loader").style.display = "none";
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
    //to send node info to backend and do appropriate calculations
    
-if (d3.event.defaultPrevented) console.log("click suppressed") return; // click suppressed
+if (d3.event.defaultPrevented) {console.log("click suppressed"); return; }// click suppressed
  console.log("clicked!");
 
 topBSno=document.getElementById("TopBSno").value;
@@ -895,6 +895,7 @@ var translate = [0, 0];
  
 
 function initialize() {
+  console.log("ZDGZB");
       fillMap();
     position();
     render();
