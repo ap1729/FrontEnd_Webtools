@@ -17,11 +17,13 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	returnData := map[string]interface{}{}
 
 	intStatIds := intrStations(frMode, sc, userID, params)
-	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
+	losses, sortInd := signalLossProfile(userID, sc, level, intStatIds)
 
-	op := make([]uint, len(bsId))
-	for i := 0; i < len(bsId); i++ {
+	op := make([]uint, len(sortInd))
+	bsId := make([]uint, len(sortInd))
+	for i := 0; i < len(sortInd); i++ {
 		losses[i] += 46
+		bsId[i] = intStatIds[sortInd[i]]
 		op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
 	}
 
