@@ -175,6 +175,7 @@ div.visible {
                   <input type="checkbox" id="Oper4" checked> Operator 4
               
 <button type="button" class="btn btn-default" onclick="validoperator()">Validate</button>
+
                   </div>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
@@ -382,7 +383,7 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .style("fill",function(d,i) { 
                                           return opercolor[parseInt(d.node[2])-1].color;
                                           } ) // to change colour of each basestation user 
-            .call(drag)
+           // .call(drag)
             .on('mouseover', mouseOver) 
             .on('mousemove', mouseMove)
             .on('mouseout', mouseOut)
@@ -511,6 +512,9 @@ document.getElementById("loader").style.display = "none";
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
    //to send node info to backend and do appropriate calculations
    
+if (d3.event.defaultPrevented) console.log("click suppressed") return; // click suppressed
+ console.log("clicked!");
+
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
  topBSno=10;

@@ -13,7 +13,7 @@ var y = d3.scale.linear()
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Level 1  + Backend</title>
+    <title>Sectoring</title>
     <!-- Bootstrap CSS -->
 
   <script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
@@ -49,6 +49,17 @@ svg {
     fill-opacity: 0.05;
 }
 
+
+.ue {
+  
+  stroke: steelblue;
+  stroke-width: 0.6px;
+}
+
+,bs{
+  stroke: pink ;
+  stroke-width: 0.6px;
+}
 
 .over {
     fill: black!important;  /* to show selected on hover*/    
@@ -175,6 +186,8 @@ div.visible {
                   <input type="checkbox" id="Oper4" checked> Operator 4
               
 <button type="button" class="btn btn-default" onclick="validoperator()">Validate</button>
+
+<input type="checkbox" id="dragcheck" checked> Drag Enabled
                   </div>
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
@@ -225,6 +238,7 @@ div.visible {
 
   var xAxis,yAxis;
   var xaxisobject,zoom;
+  var dragcheck;//to know if drag is enabled
  // var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
 
   var rows1=[],bs=[];//stores rows and bs data
@@ -235,7 +249,7 @@ div.visible {
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var currselected=-1; //latest selected circle
-  var wcount=0;//window number
+  var wcount=0;//window number for cdf plot
 
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
@@ -377,6 +391,7 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
               return "UE"+d.col1//original "UE"+d.node[2].toString()+"-"+d.col1
 
              })
+            .attr("class", "ue")
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
             .style("fill",function(d,i) { 
@@ -406,6 +421,7 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
                         else 
                            return y(d.y)+1;
                            })  //this 3.5 is to make the point as center of rectangle
+            .attr("class", "bs")
             .attr("width",6)
             .attr("height",6)
             .style("fill",function(d,i) { 
@@ -496,8 +512,8 @@ if(document.getElementById("TopBS").checked == true)
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
-   Bsid="#BS"+obj.Bsid[i].toString();
-   console.log(Bsid);
+   Bsid="#BS"+obj.BSid[i].toString();
+  // console.log(Bsid);
    if(Bsid[i]%3==0)
    {
     d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);// to change attributes of max basestations
@@ -532,7 +548,14 @@ document.getElementById("loader").style.display = "none";
 
 function click(d, i) { // on mouse click ,to be used for circles to show SINR profile ,modify it 
    //to send node info to backend and do appropriate calculations
-   
+   if(document.getElementById("dragcheck").checked==true)
+   {
+   if (d3.event.defaultPrevented) {console.log("click suppressed"); return;} // click suppressed
+ }
+ else
+ {
+ console.log("clicked!");
+// d3.event.sourceEvent.stopPropagation();//silence other listeners
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
  topBSno=10;
@@ -576,7 +599,8 @@ newwindow(d.col1);//plot on graph
           d3.select(this).attr("r",10);
         else
           d3.select(this).attr("r",3.5);
-      }
+  }
+}
 
 function PlotBarGraph(barData,operno1,prs,pos){
   //function which plots bar graph
@@ -1223,7 +1247,7 @@ for(i=0;i<ypts.length/2;i++)
   ctx.lineTo(90+2*i*xscale,1800);
   ctx.stroke();
 }
-for (i=200;i<=1800;i+=50) {
+for (i=200;i<=1800;i+=80) {
   //horizontal lines for grid
   ctx.moveTo(90,i);
     ctx.lineTo(canvas.width-100,i);
@@ -1272,7 +1296,7 @@ for(i=0;i<xpts.length/2;i++)
 
 var count =  0;
 
-  for (i=200;i<=1800;i+=50) {
+  for (i=200;i<=1800;i+=80) {
    
   //  console.log(1.25-(ypts[count]/800));
     ctx.fillText(Math.round((1800-i)/16)/100,20,i)  ;
@@ -1319,6 +1343,12 @@ function drawCurvedPath(cps, xpts,ypts){
 
 
 function dragstarted(d) {
+  if(document.getElementById("dragcheck").checked==false)
+  {
+    if (d3.event.defaultPrevented){ console.log("Drag suprresed");return;} // drag suppressed
+  }
+else{
+  console.log("Drag started");
   d3.event.sourceEvent.stopPropagation();
   d3.select(this).classed("dragging", true);
   console.log(d,d3.event);
@@ -1332,18 +1362,34 @@ d.x=x.invert(d3.event.sourceEvent.offsetX);
 d.y=y.invert(d3.event.sourceEvent.offsetY);
 console.log(d3.event);
  d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
+ }
 }
+
 function dragged(d) {
+ if(document.getElementById("dragcheck").checked==false)
+  {
+    if (d3.event.defaultPrevented){ console.log("Drag suprresed");return;} // drag suppressed
+  }
+else{
+  if(d3.event.sourceEvent.offsetX>15 && d3.event.sourceEvent.offsetY>15)
+  {
 
 d.x=x.invert(d3.event.sourceEvent.offsetX);
 d.y=y.invert(d3.event.sourceEvent.offsetY);
 //d.x=d3.event.sourceEvent.clientX;//try putting -35 here
 //d.y=d3.event.sourceEvent.clientY;
- console.log(d3.event.sourceEvent.offsetX);
+ console.log(d3.event);
+ console.log(d3.event.sourceEvent.offsetX,d3.event.sourceEvent.offsetY);
  d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
-
+  } 
+ }
 }
 function dragended(d) {
+   if(document.getElementById("dragcheck").checked==false)
+  {
+    if (d3.event.defaultPrevented){ console.log("Drag suprresed");return;} // drag suppressed
+  }
+else{
      console.log(d,"ended ",d3.event,this);
  d3.select(this).classed("dragging", false);
   var x = d3.scale.linear()
@@ -1352,6 +1398,11 @@ function dragended(d) {
 var y = d3.scale.linear()
     .domain([-5, 30 ]) // changes range of values for y axis
     .range([height, 0]);
+
+
+//    d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
+
+
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
@@ -1367,6 +1418,7 @@ BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Colu
 
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 */
+ }
 }
     </script>
 
