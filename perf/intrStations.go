@@ -112,7 +112,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			for j := 0; j < len(sneigh); j++ {
 				if sneigh[j].ID == frc[k] {
 					//fmt.Println(&sneigh[j])
-					bs1 := hexMap.FindContainedStations(&sneigh[j])
+					bs1 := hexMap.FindContainedStations(sneigh[j].ID)
 					for m := 0; m < len(bs1); m++ {
 						id := bs1[m].ID()
 						fr3bsno = append(fr3bsno, id)
@@ -121,7 +121,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			}
 		}
 		//appending the current cell's bs and pow
-		bs2 := hexMap.FindContainedStations(currenthex)
+		bs2 := hexMap.FindContainedStations(currenthex.ID)
 		for m := 0; m < len(bs2); m++ {
 			id := bs2[m].ID()
 			fr3bsno = append(fr3bsno, id)

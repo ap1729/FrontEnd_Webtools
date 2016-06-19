@@ -5,7 +5,13 @@ import (
 	"math"
 )
 
-// TODO: This struct requires improvements in its API, especially FindContainedStations().
+// TODO: Convert all functions to accept and return Hexagon objects. Make
+// Hexagon class read-only (immutable). (Alternatively create duplicates for each fn call)
+//
+// Currently, all functions accept an ID and return a list of hexagon objects.
+// For providing access to Hexagon list, use a copy of pointer array, that is
+// []*Hexagon. (Ref: See how it is done in model/Scenario class.)
+
 // HexMap models a cell map, that contains a map of Hexagonal cells.
 type HexMap struct {
 	hexagons       []Hexagon
@@ -128,8 +134,8 @@ func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 // Retreive all BaseStations that are contained in the specified hexagon.
 //
 // This function essentially retreives the stations as parsed by AssociateStations().
-func (hm *HexMap) FindContainedStations(hex *Hexagon) []*model.BaseStation {
-	return hm.memberStations[*hex]
+func (hm *HexMap) FindContainedStations(root uint) []*model.BaseStation {
+	return hm.memberStations[hm.hexagons[root]]
 }
 
 // Private helper function: Euclidean distance between two points (x1, y1) and (x2, y2).
