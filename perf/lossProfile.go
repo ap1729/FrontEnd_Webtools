@@ -14,6 +14,11 @@ import (
 func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationIds []uint) ([]float64, []uint) {
 	losses := filter(sc.LossProfile(userID), intrStationIds)
 	losses, ind := sort(losses)
+	// The sort indices were created for the loss array, and are sequential from
+	// 0 to len(losses). Hence, map the index to the actual BaseStation ID:
+	for i := 0; i < len(ind); i++ {
+		ind[i] = intrStationIds[ind[i]]
+	}
 
 	if level == 0 {
 		actualOper := sc.GetUserByID(userID).DefaultOp().ID()

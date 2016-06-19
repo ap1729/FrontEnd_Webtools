@@ -53,6 +53,7 @@ func initialize() bool {
 	// Generate hexagonal cell map of ISD 1000 and upto 3 tiers
 	hm := service.NewHexMap(500*2/math.Sqrt(3), 3)
 	hexMap = hm
+	hexMap.AssociateStations(scenario.BaseStations())
 
 	// Time stamp 4
 	lap4 := time.Now()
@@ -125,7 +126,14 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			level := uint(rxData["level"].(float64))
 			intCancelCount := uint(rxData["intcnc"].(float64))
 			topN := uint(rxData["topbsno"].(float64))
-			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN)
+
+			var params map[string]interface{}
+			if frMode == "FR3" || frMode == "FFR" {
+				params = map[string]interface{}{}
+				params["hexmap"] = hexMap
+			}
+
+			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, params)
 			fmt.Println("SIR calculation complete.")
 		case "cdf":
 			intCancelCount := uint(rxData["intcnc"].(float64))
