@@ -1,6 +1,9 @@
 package perf
 
-import "FrontEnd_WebTools/model"
+import (
+	"FrontEnd_WebTools/model"
+	"fmt"
+)
 
 // TODO: Truncating the profile values as per end-user request is wrongly handled
 // here. The job of this function is to solely compute results independent of
@@ -17,13 +20,13 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	returnData := map[string]interface{}{}
 
 	intStatIds := intrStations(frMode, sc, userID, params)
-	losses, sortInd := signalLossProfile(userID, sc, level, intStatIds)
+	fmt.Printf("Interfering station ID's:\n%v\n", intStatIds)
 
-	op := make([]uint, len(sortInd))
-	bsId := make([]uint, len(sortInd))
-	for i := 0; i < len(sortInd); i++ {
+	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
+
+	op := make([]uint, len(bsId))
+	for i := 0; i < len(bsId); i++ {
 		losses[i] += 46
-		bsId[i] = intStatIds[sortInd[i]]
 		op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
 	}
 
