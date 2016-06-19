@@ -61,14 +61,14 @@ func NewHexMap(sideLength float64, radius uint) *HexMap {
 //
 // BUG: Each call appends the existing knowledge of BaseStation locations with the passed array of stations.
 // If care is not exercised, this may lead to duplicate references.
-func (hm *HexMap) AssociateStations(stations []model.BaseStation) int {
+func (hm *HexMap) AssociateStations(stations []*model.BaseStation) int {
 	missCount := 0
 	flag := false
 	for i := 0; i < len(stations); i++ {
 		flag = false
 		for j := 0; j < len(hm.hexagons); j++ {
 			if hm.hexagons[j].Contains(stations[i].X(), stations[i].Y()) == true {
-				hm.memberStations[hm.hexagons[j]] = append(hm.memberStations[hm.hexagons[j]], &stations[i])
+				hm.memberStations[hm.hexagons[j]] = append(hm.memberStations[hm.hexagons[j]], stations[i])
 				flag = true
 			}
 		}
