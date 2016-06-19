@@ -2,7 +2,6 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
-	"fmt"
 )
 
 // Retreives the signal loss profile for a user and its interfering stations
@@ -14,16 +13,12 @@ import (
 // corresponding to the source of the loss value.
 func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationIds []uint) ([]float64, []uint) {
 	losses := filter(sc.LossProfile(userID), intrStationIds)
-
-	fmt.Printf("Loss values:\n%v\n", losses)
-
 	losses, ind := sort(losses)
+	// The sort indices were created for the loss array, and are sequential from
+	// 0 to len(losses). Hence, map the index to the actual BaseStation ID:
 	for i := 0; i < len(ind); i++ {
 		ind[i] = intrStationIds[ind[i]]
 	}
-
-	fmt.Printf("After sort: Interfering station ID's:\n%v\n", ind)
-	fmt.Printf("After sort :Loss values:\n%v\n", losses)
 
 	if level == 0 {
 		actualOper := sc.GetUserByID(userID).DefaultOp().ID()
