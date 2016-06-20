@@ -605,7 +605,7 @@ else{
 //obj.BSid is top x basestation id's
 obj.data.post=Math.round(obj.data.post * 100) / 100;
 obj.data.pre=Math.round(obj.data.pre * 100) / 100;
-obj.data.roi=Math.round(obj.roi * 100) / 100;
+obj.data.roi=Math.round(obj.data.roi * 100) / 100;
 document.getElementById("LastSIR").value=obj.data.roi;
 document.getElementById("PostSINR").value=obj.data.post;
 document.getElementById("PreSINR").value=obj.data.pre;
@@ -648,7 +648,7 @@ if(document.getElementById("TopBS").checked == true)
     barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':obj.data.opno[i]-1});
   }
 
-PlotBarGraph(barData,obj.data.pre,obj.data.Post);
+PlotBarGraph(barData,obj.data.pre,obj.data.post);
 
 document.getElementById("loader").style.display = "none";
  }
@@ -916,7 +916,7 @@ str1="#UE";
  for(i=0;i<obj.data.opconn.length;i++)
    {
     str2=str1+(i+228).toString();//UE id starts from UE228 for sectoring
-    d3.select(str2).style("fill",opercolor[obj.changeColor[i]-1].color);
+    d3.select(str2).style("fill",opercolor[obj.data.opconn[i]-1].color);
    }
   
 }
