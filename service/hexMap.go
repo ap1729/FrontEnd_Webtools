@@ -17,6 +17,7 @@ type HexMap struct {
 	hexagons       []Hexagon
 	adjMat         [][]int
 	memberStations map[Hexagon]([]*model.BaseStation)
+	userIds 			 map[Hexagon]([]*model.User)
 }
 
 // Constructor to generate a cell map, with suitable ID's assigned to each hexagon.
@@ -35,6 +36,7 @@ func NewHexMap(sideLength float64, radius uint) *HexMap {
 	var index uint = 0
 	var hexagons []Hexagon = *new([]Hexagon)
 	memberMap := map[Hexagon]([]*model.BaseStation){} // Initializing map
+	usermap:= map[Hexagon]([]*model.User){}
 	for i := uint(0); i < N; i++ {
 		for j := uint(0); j < N; j++ {
 			cx = cxi + float64(j)*normLength*2 - float64(i%2)*normLength
@@ -42,6 +44,7 @@ func NewHexMap(sideLength float64, radius uint) *HexMap {
 			if euclideanDist(cx, cy, 0, 0) <= float64(radius-1)*2*normLength+0.001 {
 				hexagons = append(hexagons, Hexagon{CenterX: cx, CenterY: cy, Side: sideLength, ID: index})
 				memberMap[hexagons[index]] = []*model.BaseStation{} // Initializing map
+				usermap[hexagons[index]] = []*model.User{}
 				index++
 			}
 		}
@@ -60,6 +63,7 @@ func NewHexMap(sideLength float64, radius uint) *HexMap {
 			}
 		}
 	}
+	return &HexMap{hexagons: hexagons, adjMat: adjMat, memberStations: memberMap,userIds:usermap}
 	return &HexMap{hexagons: hexagons, adjMat: adjMat, memberStations: memberMap}
 }
 
@@ -85,6 +89,23 @@ func (hm *HexMap) AssociateStations(stations []*model.BaseStation) int {
 	return missCount
 }
 
+func (hm *HexMap) AssociateUsers(users []*model.User) int {
+	missCount := 0
+	flag := false
+	for i := 0; i < len(users); i++ {
+		flag = false
+		for j := 0; j < len(hm.hexagons); j++ {
+			if hm.hexagons[j].Contains(users[i].X(), users[i].Y()) == true {
+				hm.userIds[hm.hexagons[j]] = append(hm.userIds[hm.hexagons[j]], users[i])
+				flag = true
+			}
+		}
+		if flag == false {
+			missCount++
+		}
+	}
+	return missCount
+}
 // Returns a list of hexagons that are first neighbours to the root hexagon specified by its ID.
 func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 	var neighs []Hexagon
@@ -136,6 +157,9 @@ func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 // This function essentially retreives the stations as parsed by AssociateStations().
 func (hm *HexMap) FindContainedStations(root uint) []*model.BaseStation {
 	return hm.memberStations[hm.hexagons[root]]
+}
+func (hm *HexMap) FindContainedUsers(hex *Hexagon) []*model.User {
+	return hm.userIds[*hex]
 }
 
 // Private helper function: Euclidean distance between two points (x1, y1) and (x2, y2).

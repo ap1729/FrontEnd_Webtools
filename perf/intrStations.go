@@ -14,8 +14,8 @@ import (
 // needed, pass nil.
 func intrStations(mode string, sc *model.Scenario, userID uint, params map[string]interface{}) []uint {
 	var bsIds []uint
-	switch mode {
 
+	switch mode {
 	case "FR1":
 		bsIds = make([]uint, len(sc.BaseStations()))
 		for i := 0; i < len(sc.BaseStations()); i++ {
@@ -82,8 +82,103 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 		return bsIds
 
 	case "FFR":
-		fmt.Println("UE : ", userID)
-		return nil
+		hexMap := params["hexmap"].(*service.HexMap)
+		intrCancelCount := (params["intcnc"].(uint))
+		//get x,y locations of UE
+		uex := sc.GetUserByID(uint(userID)).X()
+		uey := sc.GetUserByID(uint(userID)).Y()
+
+		//func to find the hex containing the UE
+		currenthex := hexMap.FindContainingHex(uex, uey)
+
+		//cn is the current cell id
+		cn := currenthex.ID
+		fmt.Println("UE : ", userID, " Hexagon id :", cn)
+
+		//finding the UEs in a cell
+		usid := []uint{}
+		us := hexMap.FindContainedUsers(currenthex)
+		for j := 0; j < len(us); j++ {
+			id := us[j].ID()
+			usid = append(usid, id)
+		}
+
+		//fmt.Println("Users :",usid)
+		//fmt.Println("len :",len(usid))
+
+		//finding FR1 Post SINR for all UEs in the current cell, and store it in an array called posarr
+		posarr := []float64{}
+		for k := 0; k < len(usid); k++ {
+			// bsIds1 := intrStations("FR1", sc, uint(k), nil)
+			// losses, bsId := signalLossProfile(uint(k), sc, 1, bsIds1)
+			//fmt.Println("losses: ",losses)
+			//fmt.Println("bsid:",bsId)
+			// op := make([]uint, len(bsId))
+			// for i := 0; i < len(bsId); i++ {
+			// 	losses[i] += 46.0
+			// 	op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
+			// }
+			// arr := []float64{}
+			// arr = sinr(losses, intrCancelCount) //The func sinr() returns an array of three values..arr[0] gives Pre SINR, arr[1] gives Post SINR and arr[2] gives the ROI values.
+			//Since only the Post SINR is needed, arr[1] is considered.
+			// posarr = append(posarr, arr[1])
+			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, nil)
+			posarr = append(posarr, values["SINR"].([]float64)[1])
+		}
+		//fmt.Println("POST SINR :",posarr)
+		//fmt.Println("len(sinr): ",len(posarr))
+
+		posarr, ind := sort(posarr)
+
+		/*l1:=filter(posarr,usid)
+		los,in:=sort(l1)
+		usid1:=make([]uint,len(in))
+		var x uint
+		for j:=0;j<len(in);j++{
+			x=usid[in[j]]
+			usid1[j]=sc.GetUserByID(x).ID()
+		}*/
+		//fmt.Println("--After sort :--")
+		//fmt.Println("PoSarr: ",posarr)
+		//fmt.Println(usid)
+		//
+		// var perc float64
+		// var percval float64
+		// //give the values as %..i.e.if 60%, give as 60
+		perc := 50
+		// //fmt.Println("Length of ue1 :",lenue1)
+		// percval = (perc / 100.0) * float64(len(usid))
+		// top1 := int(math.Floor(percval))
+		// rem1 := len(usid) - int(top1)
+		//fmt.Println("Perc:",perc," percval :",percval)
+		//fmt.Println(" Top1:",top1," Rem1 :",rem1)
+		// fmt.Println("Out of ", len(usid), " UEs in the cell ", cn, " ,")
+		// fmt.Println("the no.of cells that follow FR1 :", top1)
+		// fmt.Println("the no.of cells that follow FR3 :", rem1)
+		// fr1ues := []uint{}
+		// fr3ues := []uint{}
+		// for i := 0; i < len(usid); i++ {
+		// 	if i < top1 {
+		// 		fr1ues = append(fr1ues, usid[ind[i]])
+		// 	} else {
+		// 		fr3ues = append(fr3ues, usid[ind[i]])
+		// 	}
+		// }
+		//fmt.Println("FR1 : ",fr1ues,"len :",len(fr1ues))
+		//fmt.Println("FR3 : ",fr3ues,"len :",len(fr3ues))
+		t := 0
+		for j := 0; j < len(ind)*perc/100; j++ {
+			if userID == usid[ind[j]] {
+				t = 1
+				fmt.Println(" The selected UE ", userID, " follows FR1")
+				bsIds = intrStations("FR1", sc, userID, params)
+			}
+		}
+		if t == 0 {
+			fmt.Println(" The selected UE ", userID, " follows FR3")
+			bsIds = intrStations("FR3", sc, userID, params)
+			break
+		}
 
 	case "AFFR":
 	default:
