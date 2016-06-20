@@ -27,6 +27,6 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint) map[string]interface{} {
 		newOper[i] = sc.GetStationByID(uint(id)).OwnerOp().ID()
 	}
 
-	returnData["changeColor"] = newOper
+	returnData["opconn"] = newOper
 	return returnData
 }

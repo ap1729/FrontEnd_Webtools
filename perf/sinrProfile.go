@@ -26,10 +26,14 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	}
 
 	// Calculate SINR and ROI
-	returnData["operno"] = op[0:profileTopN]
-	returnData["SINR"] = sinr(losses, intrCancelCount)
-	returnData["BSid"] = bsId[0:profileTopN]
-	returnData["SIR"] = losses[0:profileTopN]
+
+	sinrVals := sinr(losses, intrCancelCount)
+	returnData["pre"] = sinrVals[0]
+	returnData["post"] = sinrVals[1]
+	returnData["roi"] = sinrVals[2]
+	returnData["bsid"] = bsId[0:profileTopN]
+	returnData["opno"] = op[0:profileTopN]
+	returnData["sir"] = losses[0:profileTopN]
 
 	return returnData
 }

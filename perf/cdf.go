@@ -63,11 +63,11 @@ func CDF(sc *model.Scenario, frMode string, intrCancelCount uint) map[string]int
 		tempX = tempX + float64(1)
 	}
 
-	returnData["X"] = combineSinrX
-	returnData["prs0Y"] = pre0Post1(cdfL0Obj.prsCdfYArr, cdfL0Obj.prsDbXArr[0], float64(len(cdfL0Obj.prsDbXArr)-1))
-	returnData["pos0Y"] = pre0Post1(cdfL0Obj.posCdfYArr, cdfL0Obj.posDbXArr[0], float64(len(cdfL0Obj.posDbXArr)-1))
-	returnData["prs1Y"] = pre0Post1(cdfL1Obj.prsCdfYArr, cdfL1Obj.prsDbXArr[0], float64(len(cdfL1Obj.prsDbXArr)-1))
-	returnData["pos1Y"] = pre0Post1(cdfL1Obj.posCdfYArr, cdfL1Obj.posDbXArr[0], float64(len(cdfL1Obj.posDbXArr)-1))
+	returnData["sinr"] = combineSinrX
+	returnData["pre0"] = pre0Post1(cdfL0Obj.prsCdfYArr, cdfL0Obj.prsDbXArr[0], float64(len(cdfL0Obj.prsDbXArr)-1))
+	returnData["post0"] = pre0Post1(cdfL0Obj.posCdfYArr, cdfL0Obj.posDbXArr[0], float64(len(cdfL0Obj.posDbXArr)-1))
+	returnData["pre1"] = pre0Post1(cdfL1Obj.prsCdfYArr, cdfL1Obj.prsDbXArr[0], float64(len(cdfL1Obj.prsDbXArr)-1))
+	returnData["post1"] = pre0Post1(cdfL1Obj.posCdfYArr, cdfL1Obj.posDbXArr[0], float64(len(cdfL1Obj.posDbXArr)-1))
 	return returnData
 }
 

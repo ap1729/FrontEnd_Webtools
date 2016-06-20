@@ -18,6 +18,9 @@ import (
 var scenario *model.Scenario
 var hexMap *service.HexMap
 
+// A package level object to store return data
+var responseData map[string]interface{}
+
 // E.g for sending from browser
 // Obj={id:"32",Column1:30,Column2:-45,Column3:-34,Column4:-40}
 // $.post("http://localhost:8080/update",JSON.stringify(Obj),"json")
@@ -65,9 +68,27 @@ func initialize() bool {
 	return true
 }
 
-// Temporary quick fix, changes pending
-func handlerroute(w http.ResponseWriter, r *http.Request) {
+func main() {
 
+	initSuccess := initialize()
+	if initSuccess == false {
+		fmt.Println("Fatal error! Failed to load data.")
+	} else {
+		fmt.Println("\nSuccessfully loaded data.")
+		fmt.Printf("There are %d BS's and %d UE's.\n", len(scenario.BaseStations()), len(scenario.Users()))
+	}
+
+	log.Println("\nStarted Server at :8080")
+	http.HandleFunc("/update", updateHandler)
+	http.Handle("/", http.FileServer(http.Dir(".")))
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Println("Error: ", err)
+	}
+}
+
+// Temporary quick fix, changes pending
+func updateHandler(w http.ResponseWriter, r *http.Request) {
 	// Allow Cross-Origin Requests
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if r.Method != "POST" {
@@ -75,11 +96,14 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Only POST method is supported."))
 		return
 	}
-	// Request info
+	// Request info display
 	log.Println("Request Method is:", r.Method)
 	log.Println("Request is originated from  ", r.RemoteAddr)
 	log.Println("Request is originated URL  ", r.RequestURI)
 	log.Println("Request Headers", r.Header)
+
+	// A safety net for handling panics
+	defer sendResponse(&w)
 
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -101,7 +125,6 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 
 		// Each of these types must call calculations defined under package /perf.
 		// Each function in perf returns data is a generic string dictionary.
-		// Define and pass data to the /perf functions as required - keep them general!
 
 		// JSON structure:
 		// frmode: Frequency-Reuse mode (Ex. "FR1", "FR3")
@@ -144,38 +167,34 @@ func handlerroute(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Returning data to front-end
-		serializedData, _ := json.Marshal(returnData)
-		txbytes, werr := w.Write(serializedData)
-		if werr != nil {
-			log.Println("I got some error while writing back", werr)
-		} else {
-			log.Println("Sent this  ", string(txbytes))
-		}
-
 		// Console feedback
 		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["perf"])
+		responseData = returnData
 
 	}
 }
 
-func main() {
+func sendResponse(w *http.ResponseWriter) {
+	rStat := recover()
+	response := map[string]interface{}{}
 
-	initSuccess := initialize()
-	if initSuccess == false {
-		fmt.Println("Fatal error! Failed to load data.")
+	if rStat == nil {
+		fmt.Printf("\nSuccesful execution.\n")
+		response["status"] = 0
+		response["data"] = responseData
+
 	} else {
-		fmt.Println("\nSuccessfully loaded data.")
-		fmt.Printf("There are %d BS's and %d UE's.\n", len(scenario.BaseStations()), len(scenario.Users()))
+		fmt.Printf("Recovered :)\nError encountered: %v", rStat)
+		response["status"] = 0
+		response["data"] = ""
 	}
-	// jobj, err := json.Marshal(hexMap)
-	// fmt.Printf("Marshalled Object: (Error: %v)\n%v\n\n", err, jobj)
 
-	log.Println("\nStarted Server at :8080")
-	http.HandleFunc("/update", handlerroute)
-	http.Handle("/", http.FileServer(http.Dir(".")))
-	err2 := http.ListenAndServe(":8080", nil)
-	if err2 != nil {
-		log.Println("Error ", err2)
+	serializedData, _ := json.Marshal(response)
+	txbytes, err := (*w).Write(serializedData)
+	if err != nil {
+		log.Println("Failed to send response to user.\nError: ", err)
+	} else {
+		log.Println("Response sent:\n", string(txbytes))
 	}
+
 }
