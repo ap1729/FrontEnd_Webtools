@@ -57,6 +57,7 @@ func initialize() bool {
 	hm := service.NewHexMap(500*2/math.Sqrt(3), 3)
 	hexMap = hm
 	hexMap.AssociateStations(scenario.BaseStations())
+	hexMap.AssociateUsers(scenario.Users())
 
 	// Time stamp 4
 	lap4 := time.Now()
@@ -155,6 +156,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				params = map[string]interface{}{}
 				params["hexmap"] = hexMap
 			}
+			if frMode == "FFR" {
+				params["intcnc"] = intCancelCount
+			}
 
 			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, params)
 			fmt.Println("SIR calculation complete.")
@@ -164,6 +168,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			if frMode == "FR3" || frMode == "FFR" {
 				params = map[string]interface{}{}
 				params["hexmap"] = hexMap
+			}
+			if frMode == "FFR" {
+				params["intcnc"] = intCancelCount
 			}
 			returnData = perf.CDF(scenario, frMode, intCancelCount, params)
 			fmt.Println("CDF calc done")

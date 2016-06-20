@@ -48,37 +48,37 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 
 		//array frc stores the fr3 cellids
 		frc := []uint{}
-		code:=[19] uint{2,1,3,1,3,2,1,3,2,1,3,2,1,3,2,1,2,1,3}
-		f:=code[cn]
+		code := [19]uint{2, 1, 3, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 2, 1, 3}
+		f := code[cn]
 		//fmt.Println("f: ",f)
-		for k:=0;k<len(code);k++{
-			for j:=0;j<len(snids);j++{
-				if f==code[snids[j]] {
-					frc=append(frc,snids[j])
-					}
+		for k := 0; k < len(code); k++ {
+			for j := 0; j < len(snids); j++ {
+				if f == code[snids[j]] {
+					frc = append(frc, snids[j])
+				}
 			}
 			break
 		}
 		//fmt.Println("FR3 cells :",frc)
 		//append the current cell also to the list of fr3 cells
 		frc = append(frc, cn)
-		fmt.Println("FR3 cells :",frc)
+		fmt.Println("FR3 cells :", frc)
 		//array fr3bsno stores the BS IDS in fr3 cells
 		fr3bsno := []uint{}
 		for k := 0; k < len(frc); k++ {
 			//append each cell's bsid to fr3bsno
 			bs1 := hexMap.FindContainedStations(frc[k])
-					for m := 0; m < len(bs1); m++ {
-						id := bs1[m].ID()
-						fr3bsno = append(fr3bsno, id)
-					}
-				}
+			for m := 0; m < len(bs1); m++ {
+				id := bs1[m].ID()
+				fr3bsno = append(fr3bsno, id)
+			}
+		}
 
 		bsIds = make([]uint, len(fr3bsno))
 		for p := 0; p < len(fr3bsno); p++ {
 			bsIds[p] = fr3bsno[p]
 		}
-		fmt.Println("Bsids :",bsIds, "\n len:",len(bsIds) )
+		fmt.Println("Bsids :", bsIds, "\n len:", len(bsIds))
 		return bsIds
 
 	case "FFR":
@@ -97,7 +97,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 
 		//finding the UEs in a cell
 		usid := []uint{}
-		us := hexMap.FindContainedUsers(currenthex)
+		us := hexMap.FindContainedUsers(cn)
 		for j := 0; j < len(us); j++ {
 			id := us[j].ID()
 			usid = append(usid, id)
@@ -119,11 +119,8 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			// 	op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
 			// }
 			// arr := []float64{}
-			// arr = sinr(losses, intrCancelCount) //The func sinr() returns an array of three values..arr[0] gives Pre SINR, arr[1] gives Post SINR and arr[2] gives the ROI values.
-			//Since only the Post SINR is needed, arr[1] is considered.
-			// posarr = append(posarr, arr[1])
 			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, nil)
-			posarr = append(posarr, values["SINR"].([]float64)[1])
+			posarr = append(posarr, values["post"].(float64))
 		}
 		//fmt.Println("POST SINR :",posarr)
 		//fmt.Println("len(sinr): ",len(posarr))
