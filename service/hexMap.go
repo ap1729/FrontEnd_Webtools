@@ -5,7 +5,13 @@ import (
 	"math"
 )
 
-// TODO: This struct requires improvements in its API, especially FindContainedStations().
+// TODO: Convert all functions to accept and return Hexagon objects. Make
+// Hexagon class read-only (immutable). (Alternatively create duplicates for each fn call)
+//
+// Currently, all functions accept an ID and return a list of hexagon objects.
+// For providing access to Hexagon list, use a copy of pointer array, that is
+// []*Hexagon. (Ref: See how it is done in model/Scenario class.)
+
 // HexMap models a cell map, that contains a map of Hexagonal cells.
 type HexMap struct {
 	hexagons       []Hexagon
@@ -93,7 +99,7 @@ func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 // Returns a list of second-tier neighbours to the root hexagon specified by its ID.
 //
 // Simply put, these are the neighbours of neighbours of the root hexagon.
-func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
+func (hm *HexMap) SecondNeighbours(root uint) []Hexagon {
 	sum := make([]int, len(hm.adjMat))
 	N := len(hm.hexagons)
 	for i := 0; i < N; i++ {
@@ -107,7 +113,7 @@ func (hm *HexMap) SecondNeighbours(root int) []Hexagon {
 	}
 	var neighs []Hexagon
 	// A non-zero element in sum is a second tier neighbour if it is not connected to root
-	for i := 0; i < N; i++ {
+	for i := uint(0); i < uint(N); i++ {
 		if hm.adjMat[root][i] == 0 && sum[i] > 0 && root != i {
 			neighs = append(neighs, hm.hexagons[i])
 		}
@@ -128,8 +134,8 @@ func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 // Retreive all BaseStations that are contained in the specified hexagon.
 //
 // This function essentially retreives the stations as parsed by AssociateStations().
-func (hm *HexMap) FindContainedStations(hex *Hexagon) []*model.BaseStation {
-	return hm.memberStations[*hex]
+func (hm *HexMap) FindContainedStations(root uint) []*model.BaseStation {
+	return hm.memberStations[hm.hexagons[root]]
 }
 
 // Private helper function: Euclidean distance between two points (x1, y1) and (x2, y2).
