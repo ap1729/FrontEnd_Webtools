@@ -205,29 +205,33 @@ div.visible {
     <form>
   <fieldset>
     <legend>Control Parameters</legend>
-      No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10">  
+      No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10" title="No of BS seen in SIR profile" data-toggle="tooltip">  
+     
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-      No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3">
+      No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3" title="No of Interference cancellers" data-toggle="tooltip">
       <br>
-      POPUP ACTIVE: <input type="checkbox" id="popup">
-      View Top BS: <input type="checkbox" id="TopBS" >
-      <br>
-     FR Mode <select id="FR">
+      POPUP ACTIVE: <input type="checkbox" id="popup" title="Shows SIR profile in new window" data-toggle="tooltip">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      View Top BS: <input type="checkbox" id="TopBS" title="See Top interfering basestations enlarged" data-toggle="tooltip">
+      ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     FR Mode <select id="FR" title="Choose Frequency reuse mode" data-toggle="tooltip">
               <option value="FR1">FR1</option>
               <option value="FR3">FR3</option>
               <option value="FFR">FFR</option>
               <option value="AFFR">AFFR</option>
      </select>
-
+     <br>
+     
     Drag Enabled<input type="checkbox" id="dragcheck" > 
      <br>
- VALID OPERATORS  
+ VALID OPERATORS  &nbsp; : &nbsp;
                 <input type="checkbox" id="Oper1" checked> Operator 1
                 <input type="checkbox" id="Oper2" checked> Operator 2
                 <input type="checkbox" id="Oper3" checked> Operator 3
                 <input type="checkbox" id="Oper4" checked> Operator 4
               
-<button type="button" class="btn btn-default" onclick="validoperator()">Validate</button>
+<button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button>
 </fieldset>
 </form>
     </div>
@@ -235,9 +239,9 @@ div.visible {
     <form>
   <fieldset>
     <legend>Viewing Options</legend>
-           <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
-           <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
-           <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
+           <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
+           <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
+           <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
          <br>  <br>Click UE to view SIR profile
          <br>(graph is plotted below,else check POPUP ACTIVE on the left side)
 </fieldset>
@@ -810,14 +814,20 @@ vis.append("text")
     .attr("text-anchor","middle")
     .text("Level: ");
 
+    vis.append("text")                  
+  .attr("x", (WIDTH/4)+150)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text("FR Mode: ");
+
 vis.append("text")                  
-  .attr("x", WIDTH/2+30)
+  .attr("x", WIDTH/2+110)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text("Pre SINR: ");
 
 vis.append("text")                  
-  .attr("x", WIDTH*(3/4)+30)
+  .attr("x", WIDTH*(3/4)+90)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text("Post SINR: ");
@@ -836,13 +846,18 @@ vis.append("text")
     .text(level);
 
 vis.append("text")                  
-  .attr("x", (WIDTH/2)+100)
+  .attr("x", (WIDTH/4)+205)
+    .attr("y",MARGINS.top-3)
+    .attr("text-anchor","middle")
+    .text(document.getElementById("FR").value);
+vis.append("text")                  
+  .attr("x", (WIDTH/2)+180)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text(prs);
 
 vis.append("text")                  
-  .attr("x", WIDTH*(3/4)+100)
+  .attr("x", WIDTH*(3/4)+160)
     .attr("y",MARGINS.top-3)
     .attr("text-anchor","middle")
     .text(pos);               
@@ -1224,7 +1239,7 @@ var node;
 function newwindow(idno){
   //function to open a new window and put graph
   var embedded_svg = document.getElementById("Output");//visual
-  console.log(embedded_svg);
+  //console.log(embedded_svg);
  
   var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
   //var title=svg_win.document.createElement("title")
