@@ -31,13 +31,13 @@ type prefxPosfx struct{			// pre and post fix 0s and 1s to CDF
 }
 */
 
-func CDF(sc *model.Scenario, frMode string, intrCancelCount uint) map[string]interface{} {
+func CDF(sc *model.Scenario, frMode string, intrCancelCount uint, params map[string]interface{}) map[string]interface{} {
 	var cdfL0Obj, cdfL1Obj cdfL0L1Ret
 	returnData := map[string]interface{}{}
 	fmt.Println("CDF func reached")
 
-	cdfL0Obj = cdfL0L1(sc, uint(0), intrCancelCount, frMode)
-	cdfL1Obj = cdfL0L1(sc, uint(1), intrCancelCount, frMode)
+	cdfL0Obj = cdfL0L1(sc, uint(0), intrCancelCount, frMode, params)
+	cdfL1Obj = cdfL0L1(sc, uint(1), intrCancelCount, frMode, params)
 
 	var sinrMinCollectArr = []float64{} //collect all minimum in X
 	sinrMinCollectArr = append(sinrMinCollectArr, cdfL0Obj.prsDbXArr[0])
@@ -84,14 +84,14 @@ func pre0Post1(cdfArr []float64, firstEleXArr float64, lenMinus1 float64) []floa
 	return cdfArr
 }
 
-func cdfL0L1(temp *model.Scenario, levelValue uint, intfCancelCount uint, frMode string) cdfL0L1Ret {
+func cdfL0L1(temp *model.Scenario, levelValue uint, intfCancelCount uint, frMode string, params map[string]interface{}) cdfL0L1Ret {
 	var cdfL0L1RetObj cdfL0L1Ret
 	var calCdfObj calCdfRet
 	var prsPosRoiArr = []float64{} //array containing pre , post processing SINR and ROI values
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
 	for userId := 0; userId < numUeCdf; userId++ {
-		intStatIds := intrStations(frMode, temp, uint(userId), nil)
+		intStatIds := intrStations(frMode, temp, uint(userId), params)
 		losses, bsId := signalLossProfile(uint(userId), temp, levelValue, intStatIds)
 
 		for i := 0; i < len(bsId); i++ {

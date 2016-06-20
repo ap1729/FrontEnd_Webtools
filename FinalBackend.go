@@ -160,7 +160,12 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("SIR calculation complete.")
 		case "cdf":
 			intCancelCount := uint(rxData["intcnc"].(float64))
-			returnData = perf.CDF(scenario, frMode, intCancelCount)
+			var params map[string]interface{}
+			if frMode == "FR3" || frMode == "FFR" {
+				params = map[string]interface{}{}
+				params["hexmap"] = hexMap
+			}
+			returnData = perf.CDF(scenario, frMode, intCancelCount, params)
 			fmt.Println("CDF calc done")
 		default:
 			fmt.Println("Unknown command")
@@ -184,7 +189,7 @@ func sendResponse(w *http.ResponseWriter) {
 		response["data"] = responseData
 
 	} else {
-		fmt.Printf("Recovered :)\nError encountered: %v", rStat)
+		fmt.Printf("\nRecovered :)\nError encountered: %v\n", rStat)
 		response["status"] = 1
 		response["data"] = ""
 	}
