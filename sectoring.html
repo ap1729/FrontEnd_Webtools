@@ -8,7 +8,9 @@ var y = d3.scale.linear()
     .range([900, 0]);//900 is height value defined in SetSize()
 -->
 <!DOCTYPE html>
+
 <html>
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -333,6 +335,10 @@ div.visible {
  
 
   <script type="text/javascript">
+
+
+
+
   var canvas=document.getElementById("canvas");
   var ctx=canvas.getContext("2d"); //for plotting curve
 
@@ -676,7 +682,7 @@ console.log(validoper);
 BackObj={perf:"sir",opflags:validoper,node:parseInt(d.col1-bs.length),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+$.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 //above change the backend code and do parsing
 
@@ -969,7 +975,7 @@ if(level!=1)
 
 BackObj={perf:"lvlchng",params:1,opflags:validoper,level:level,topbsno:topBSno,frmode:document.getElementById("FR").value };//params is to which level
  console.log(JSON.stringify(BackObj));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
+$.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 }
 level=1;//updating level 
@@ -988,7 +994,7 @@ if(currselected!=-1)
 
 BackObj1={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj1));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
+$.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
 
 }
@@ -1010,7 +1016,7 @@ else
 
 BackObj={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
-$.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+$.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
 
 
@@ -1268,7 +1274,7 @@ var validoper=validoperator();
 
 BackObj={perf:"cdf",opflags:validoper,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(BackObj);
- $.post("http://localhost:8080/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
+ $.post("/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
 }
 
   function va(arr, i, j){
