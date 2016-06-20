@@ -594,16 +594,21 @@ function mouseOut(d, i) {
 }
 
 function onsuccess(obj){
-console.log(obj); 
+console.log(obj);
+if(checkerr(obj.status)<0)
+{
+   console.log("backend error");
+} 
+else{
 //obj.SIR is SIR
 //obj.SINR has PreSINr,PostSINR and ROI in a array
 //obj.BSid is top x basestation id's
-obj.SINR[0]=Math.round(obj.SINR[0] * 100) / 100;
-obj.SINR[1]=Math.round(obj.SINR[1] * 100) / 100;
-obj.SINR[2]=Math.round(obj.SINR[2] * 100) / 100;
-document.getElementById("LastSIR").value=obj.SINR[2];
-document.getElementById("PostSINR").value=obj.SINR[1];
-document.getElementById("PreSINR").value=obj.SINR[0];
+obj.data.post=Math.round(obj.data.post * 100) / 100;
+obj.data.pre=Math.round(obj.data.pre * 100) / 100;
+obj.data.roi=Math.round(obj.roi * 100) / 100;
+document.getElementById("LastSIR").value=obj.data.roi;
+document.getElementById("PostSINR").value=obj.data.post;
+document.getElementById("PreSINR").value=obj.data.pre;
 
 var Bsid="";
   for(i=0;i<bs.length;i++)
@@ -619,33 +624,34 @@ if(document.getElementById("TopBS").checked == true)
 
   for(i=0;i<topBSno;i++) //top 10 ,hence this loop 
   {
-   Bsid="#BS"+obj.BSid[i].toString();
+   Bsid="#BS"+obj.data.bsid[i].toString();
   // console.log(Bsid);
    if(Bsid[i]%3==0)
    {
-    d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);// to change attributes of max basestations
+    d3.select(Bsid).attr("width",obj.data.sir[i]-obj.data.sir[topBSno-1]+8 ).attr("height",6);// to change attributes of max basestations
    }
    else if(Bsid[i]%3==1)
    {
-  d3.select(Bsid).attr("width",obj.SIR[i]-obj.SIR[topBSno-1]+8 ).attr("height",6);    
+  d3.select(Bsid).attr("width",obj.data.sir[i]-obj.data.sir[topBSno-1]+8 ).attr("height",6);    
 
    }
    else
    {
-   d3.select(Bsid).attr("width",6 ).attr("height",obj.SIR[i]-obj.SIR[topBSno-1]+8);
+   d3.select(Bsid).attr("width",6 ).attr("height",obj.data.sir[i]-obj.data.sir[topBSno-1]+8);
    }
   }
 }//top rect being enlarged
  
  var barData=[];
-  for(i=0;i<obj.BSid.length;i++)
+  for(i=0;i<obj.data.bsid.length;i++)
   {
-    barData.push({'x':obj.BSid[i],'y':obj.SIR[i],'co':obj.operno[i]-1});
+    barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':obj.data.opno[i]-1});
   }
 
-PlotBarGraph(barData,obj.Oprno,obj.SINR[0],obj.SINR[1]);
+PlotBarGraph(barData,obj.data.pre,obj.data.Post);
 
 document.getElementById("loader").style.display = "none";
+ }
 }
 
 
@@ -706,7 +712,7 @@ newwindow(d.col1);//plot on graph
   }
 }
 
-function PlotBarGraph(barData,operno1,prs,pos){
+function PlotBarGraph(barData,prs,pos){
   //function which plots bar graph
   //also increases top contributing basestations sizes  
 InitChart(barData);
@@ -898,17 +904,23 @@ function zoomed() {
 function onsuccess1(obj)
 {
  console.log(obj);
+if(checkerr(obj.status)<0)
+{
+ console.log(error);
+}
+else{
+
 
 //UE id starts from UE228
 str1="#UE";
- for(i=0;i<obj.changeColor.length;i++)
+ for(i=0;i<obj.data.opconn.length;i++)
    {
     str2=str1+(i+228).toString();//UE id starts from UE228 for sectoring
     d3.select(str2).style("fill",opercolor[obj.changeColor[i]-1].color);
    }
   
 }
-
+}
 function validoperator(){
   //function to return a array of 0 and 1's to indicate which operators are valid
   a=[1,1,1,1];
@@ -1294,16 +1306,21 @@ console.log(BackObj);
 function plotcdf(obj)
 {//cdf to be plotted here
  console.log(obj,"is recieved");
+ if(checkerr(obj.status)<0)
+{
+ console.log(error);
+}
+else{
  canvas.width = parseInt(2000);
             canvas.height = parseInt(2000);
             
 ctx.moveTo(0,0);
 ctx.font="30px Arial";//font and size of text
 ctx.fillText("CDF CURVES",600,100);//heading
-plotcurve(obj.X,obj.prs0Y,"#3399ff");//blue
-plotcurve(obj.X,obj.pos0Y,"#ff0066");//pink
-plotcurve(obj.X,obj.prs1Y,"#ff9933");//orange
-plotcurve(obj.X,obj.pos1Y,"#800000");//brown
+plotcurve(obj.data.sinr,obj.data.pre0,"#3399ff");//blue
+plotcurve(obj.data.sinr,obj.data.post0,"#ff0066");//pink
+plotcurve(obj.data.sinr,obj.data.pre1,"#ff9933");//orange
+plotcurve(obj.data.sinr,obj.data.post1,"#800000");//brown
 ctx.fillText("SINR value",600,1900);
 //creating legend
 ctx.rect(1200,20,500,150);
@@ -1347,6 +1364,7 @@ var dataUrl = canvas.toDataURL('image');
 window.open(dataUrl, "toDataURL() image", "width=600, height=200");
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 //plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"PoS1");
+ }
 }
 var cdfcount=0;
 function plotcurve(xdata,ydata,color)
@@ -1485,6 +1503,17 @@ console.log(d3.event);
  }
 }
 
+function checkerr(stat){
+  if(stat==0)
+    
+     return 1;
+  else
+  { 
+    document.getElementById("loader").style.display = "none";
+    window.alert("Some Error in Backend ");
+    return -1; 
+  }
+}
 function dragged(d) {
  if(document.getElementById("dragcheck").checked==false)
   {

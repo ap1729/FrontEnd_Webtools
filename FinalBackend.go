@@ -185,7 +185,7 @@ func sendResponse(w *http.ResponseWriter) {
 
 	} else {
 		fmt.Printf("Recovered :)\nError encountered: %v", rStat)
-		response["status"] = 0
+		response["status"] = 1
 		response["data"] = ""
 	}
 
