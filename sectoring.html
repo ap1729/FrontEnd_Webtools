@@ -630,12 +630,9 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-//var validoper=[2,2,2,2]
-var validoper=validoperator();
-console.log(validoper);
   
 //Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
-BackObj={perf:"sir",opflags:validoper,node:parseInt(d.col1-bs.length),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };//as d.col1 starts from no after basestation
+BackObj={perf:"sir",node:parseInt(d.col1-bs.length),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };//as d.col1 starts from no after basestation
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
@@ -856,7 +853,7 @@ function onsuccess1(obj)
  console.log(obj);
 if(checkerr(obj.status)<0)
 {
- console.log(error);
+ console.log(obj.error);
 }
 else{
 
@@ -910,8 +907,12 @@ console.log("BBBB");
   lb+=bsno[j].bsno;
   
  } 
-  return a;
+  //return a;
+BackObj={perf:"oper",opflags:a};//params is to which level
+ console.log(JSON.stringify(BackObj));
 
+document.getElementById("loader").style.display = "block";
+$.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 document.getElementById("loader").style.display = "none";
 }
 
@@ -932,12 +933,11 @@ if(topBSno=="")
 else
   topBSno=parseInt(topBSno);
 
-var validoper=validoperator();
 
 if(level!=1)
 {
 
-BackObj={perf:"lvlchng",params:1,opflags:validoper,level:level,topbsno:topBSno,frmode:document.getElementById("FR").value };//params is to which level
+BackObj={perf:"lvlchng",params:1,level:level,topbsno:topBSno,frmode:document.getElementById("FR").value };//params is to which level
  console.log(JSON.stringify(BackObj));
 
 document.getElementById("loader").style.display = "block";
@@ -959,7 +959,7 @@ else
 if(currselected!=-1) 
 {
 
-BackObj1={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj1={perf:"sir",node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj1));
 $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
@@ -973,7 +973,7 @@ function level0()
  var circles = svgContainer.selectAll("circle").data(rows1)
  .style("fill",function(d,i) { return opercolor[parseInt(d.node[2])-1].color;} ) ; 
 
- var validoper=validoperator();
+
 
 topx=document.getElementById("topx").value;
 if(topx=="")
@@ -981,7 +981,7 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-BackObj={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"sir",node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
@@ -1235,9 +1235,7 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-var validoper=validoperator();
-
-BackObj={perf:"cdf",opflags:validoper,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"cdf",intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(BackObj);
 
 document.getElementById("loader").style.display = "block";
