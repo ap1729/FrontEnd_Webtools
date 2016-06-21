@@ -10,6 +10,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"runtime/debug"
 	"time"
 )
 
@@ -199,7 +200,8 @@ func sendResponse(w *http.ResponseWriter) {
 		response["data"] = responseData
 
 	} else {
-		fmt.Printf("\nRecovered :)\nError encountered: %v\n", rStat)
+		debug.PrintStack()
+		fmt.Printf("\n\nRecovered :)\nError encountered: %v\n\n", rStat)
 		response["status"] = 1
 		response["data"] = ""
 	}
