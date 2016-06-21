@@ -141,6 +141,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		frMode := rxData["frmode"].(string)
 
 		switch rxData["perf"] {
+		case "scmeta":
+			returnData = service.PackageScenario(scenario)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			returnData = perf.ChangeLevel(scenario, targetLvl)
