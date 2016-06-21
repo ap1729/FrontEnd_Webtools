@@ -265,6 +265,7 @@ field{
 
            </div>
 <canvas id="canvas"></canvas>
+<img id="CDFImage"/>
         </div>
 
 <script type="text/javascript">
@@ -303,7 +304,7 @@ field{
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var currselected=-1; //latest selected circle
   var wcount=0;//window number for cdf plot
-
+  var wcount1=0;
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
   console.log(opercolor);
@@ -1266,16 +1267,17 @@ function plotcdf(obj)
 }
 else{
  canvas.width = parseInt(2000);
-            canvas.height = parseInt(2000);
+ canvas.height = parseInt(2000);
             
 ctx.moveTo(0,0);
 ctx.font="30px Arial";//font and size of text
-ctx.fillText("CDF CURVES",600,100);//heading
+ctx.fillText("CDF CURVES:",600,100);//heading
+ctx.fillText(document.getElementById("FR").value,820,100);
 plotcurve(obj.data.sinr,obj.data.pre0,"#3399ff");//blue
 plotcurve(obj.data.sinr,obj.data.post0,"#ff0066");//pink
 plotcurve(obj.data.sinr,obj.data.pre1,"#ff9933");//orange
 plotcurve(obj.data.sinr,obj.data.post1,"#800000");//brown
-ctx.fillText("SINR value",600,1900);
+ctx.fillText("SINR value in dBm",600,2500);
 //creating legend
 ctx.rect(1200,20,500,150);
 ctx.stroke();
@@ -1306,10 +1308,14 @@ ctx.stroke();
 ctx.fillStyle="#000000";
 ctx.fillText("PoS:1 ",1460,110);
 
-
+/*
 var dataUrl = canvas.toDataURL('image');
 
-window.open(dataUrl, "toDataURL() image", "width=600, height=200");
+window.open(dataUrl, "toDataURL() image", "width=600, height=200");*/
+var image = document.getElementById("CDFImage");
+ image.src = canvas.toDataURL("image/png");
+ window.open(canvas.toDataURL("image/png"), '_blank');
+wcount1+=1;
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 //plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"PoS1");
 
