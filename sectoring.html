@@ -268,10 +268,7 @@ field{
 <img id="CDFImage"/>
         </div>
 
-<script type="text/javascript">
-      var col1,node,x1,y1,m1,m2,table;    
-      /// Global variables
-      </script>
+
 
   <!-- jQuery -->
   <script src="js/jquery.js"></script>
@@ -295,9 +292,7 @@ field{
   var dragcheck;//to know if drag is enabled
  // var mycolormap = d3.scale.linear().domain([0 ,300]).range(["red", "green"]);
 
-  var rows1=[],bs=[];//stores rows and bs data
-  var oper=[];//array to store how many operators are there and how many Ue's in each,oper index starts from 0
-  var bsno=[];//array to store how many bs for each operator
+  var ue=[],bs=[];//stores ue and bs data
   var level=0;//which level it is currently in
   var topBsno=10;//no of Bs to show on click and in bar graph
   var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
@@ -307,7 +302,6 @@ field{
   var wcount1=0;
  // var BScord=[];//basestation coords 
   //var idtochange=""; // for dragging , unnecessary
-  console.log(opercolor);
   
 
 var x = d3.scale.linear()
@@ -340,11 +334,7 @@ zoom = d3.behavior.zoom()
     .center([x(1000), y(100)])
     .size([3000, 3000])
     .on("zoom", zoomed);
-var drag = d3.behavior.drag()
-    .origin(function(d) { return d; })
-    .on("dragstart", dragstarted)
-    .on("drag", dragged)
-    .on("dragend", dragended);
+
 
 
 
@@ -373,85 +363,38 @@ svgContainer.append("g")
     .attr("class", "y axis")
     .call(yAxis);
  //window.alert()
-d3.csv('/data/SectorLocations.csv',//Sectorlocations.csv'
-        // accessor function
-        function(d) {
-            return {
-                col1:d.col1,
-                node:d.node,
-                x:d.x,
-                y:d.y,
-                m1:d.m1,  
-                m2:d.m2
-                 };        } ,
-       
-        function (err, rows) {
-          //console.log(rows);  
-          var operno=1,ueno=0;//operator no and no of ue's for each operator 
-          var operbsno=1,bsno1=0;//operator no and no of bs for each operator       
-            var svg = d3.select("svg");
-            var i=0;
-            for(i=0;i<rows.length;i++) 
-            {
-              if(rows[i].node[0]=='B' && rows[i].node[1]=='S')
-               {
-                bs.push(rows[i]);//basestation
-                
-                 if(operbsno==rows[i].node[2])
-                 {
-                  bsno1++;
-                 }
-              else
-               {
-                   bsno.push({'operno':operbsno,'bsno':bsno1});
-                   operbsno++;
-                   bsno1=1;
-                 }
+ BackObj={perf:"scmeta" };
+console.log(JSON.stringify(BackObj));
+document.getElementById("loader").style.display = "block";
+$.post("/update",JSON.stringify(BackObj),doPlot,"json");
+document.getElementById("loader").style.display = "none";
 
+}
+// d3 mouse events
 
-               // BScord.push({x:rows[i].x,y:rows[i].y});
-               }
-              else
-              {
-                rows1.push(rows[i]);//operators
-                //assuming UE's are in order
-               if(operno==rows[i].node[2])
-                 {
-                  ueno++;
-                 }
-            else
-               {
-             oper.push({'operno':operno,'ueno':ueno});
-              operno++;
-               ueno=1;
-               }
-
-               // console.log(rows[i].col1);
-              }
-              //above function for seperating basestations and nodes,bs has basestations and rows1 has normal nodes
-            
-}       
-oper.push({'operno':operno,'ueno':ueno});//for last operator
-bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
-//console.log(oper);
-//console.log(bsno);
-            console.log("UE",rows1);
-            console.log("BS",bs);
-
-          
-
-            var circles = svgContainer.selectAll("circle").data(rows1).enter().append("circle");
-            circles.attr("r", function(d,i) { return (3.5);}) 
+ 
+function doPlot(obj) {
+  //function to plot ue and bs
+  var drag = d3.behavior.drag()
+    .origin(function(d) { return d; })
+    .on("dragstart", dragstarted)
+    .on("drag", dragged)
+    .on("dragend", dragended);
+  console.log(obj);
+  ue=obj.data.users;
+  bs=obj.data.basestats;
+ var uecircles = svgContainer.selectAll("ue").data(ue).enter().append("circle");
+            uecircles.attr("r", function(d,i) { return (3.5);}) 
             .attr("id",function(d,i){ 
-           
-              return "UE"+d.col1//original "UE"+d.node[2].toString()+"-"+d.col1
+              //window.alert(i);
+              return "UE"+d.id;
 
              })
             .attr("class", "ue")
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })  
             .style("fill",function(d,i) { 
-                                          return opercolor[parseInt(d.node[2])-1].color;
+                                          return opercolor[d.opid].color;
                                           } ) // to change colour of each basestation user 
             .call(drag)
             .on('mouseover', mouseOver) 
@@ -460,19 +403,19 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .on('click', click)
             .attr("data-toggle","tooltip");
 
-            var rect= svgContainer.selectAll("rect").data(bs).enter().append("rect");
-            rect.attr("x",function(d,i){
-                        if(d.col1%3==0) 
+ var bsrect= svgContainer.selectAll("bs").data(bs).enter().append("rect");
+            bsrect.attr("x",function(d,i){
+                        if(d.id%3==0) 
                             return x(d.x);
-                   else if(d.col1%3==1)
+                   else if(d.id%3==1)
                             return x(d.x)+3.1;
                         else 
                            return x(d.x)-3;
                               })
             .attr("y",function(d,i){
-                     if(d.col1%3==0) 
+                     if(d.id%3==0) 
                             return y(d.y)-5;
-                   else if(d.col1%3==1)
+                   else if(d.id%3==1)
                             return y(d.y)+1;
                         else 
                            return y(d.y)+1;
@@ -481,21 +424,19 @@ bsno.push({'operno':operbsno,'bsno':bsno1});//for last operator
             .attr("width",6)
             .attr("height",6)
             .style("fill",function(d,i) { 
-                                        return bscolor[parseInt(d.node[2])-1].color;
+                                        return bscolor[d.opid].color;
                                         } ) 
-            .attr("id",function(d,i){return "BS"+d.col1;})
+            .attr("id",function(d,i){return "BS"+d.id;})
             .on('mouseover', mouseOver1)
             .attr("data-toggle","tooltip") ;
-            // .call(drag1);*/
-            }
-              
-              );
+            // .call(drag1);
 }
-// d3 mouse events
+
+
 function mouseOver1(d,i){
   //function for basestation , mouse hover
   //window.alert(0);
-   d3.select(this).attr("title","BS" +(d.col1));
+   d3.select(this).attr("title","BS" +(d.id));
 }
 function mouseOver(d, i) {  
   //function for circle,tooltip on mouse hover
@@ -503,7 +444,7 @@ function mouseOver(d, i) {
     d3.select(this).classed('over', true);
     if(level==0)
     { 
-       d3.select(this).attr("title","UE"+d.col1);
+       d3.select(this).attr("title","UE"+d.id);
       }
       else if(level==1)
       {
@@ -528,7 +469,7 @@ function mouseOver(d, i) {
         {
          currop=5;
         }
-        d3.select(this).attr("title","UE" +(d.col1)+" Def:"+d.node[2]+" Curr:"+currop);
+        d3.select(this).attr("title","UE" +(d.id)+" Def:"+d.opid+" Curr:"+currop);
 
       }
       else
@@ -595,7 +536,7 @@ if(document.getElementById("TopBS").checked == true)
  var barData=[];
   for(i=0;i<obj.data.bsid.length;i++)
   {
-    barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':obj.data.opno[i]-1});
+    barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':obj.data.opno[i]});
   }
 
 PlotBarGraph(barData,obj.data.pre,obj.data.post);
@@ -621,7 +562,7 @@ if(topBSno=="")
  topBSno=10;
 else
   topBSno=parseInt(topBSno);
-currselected=d.col1.toString()-bs.length;
+currselected=d.id.toString();
 
 topx=document.getElementById("topx").value;
 
@@ -632,7 +573,7 @@ else
 
   
 //Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
-BackObj={perf:"sir",node:parseInt(d.col1-bs.length),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };//as d.col1 starts from no after basestation
+BackObj={perf:"sir",node:parseInt(d.id),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
@@ -642,7 +583,7 @@ $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 if(document.getElementById("popup").checked == true)
 {
 wcount++;
-newwindow(d.col1);//plot on graph
+newwindow(d.id);//plot on graph
 
 }
 
@@ -853,7 +794,7 @@ function onsuccess1(obj)
  console.log(obj);
 if(checkerr(obj.status)<0)
 {
- console.log(obj.error);
+ console.log("error");
 }
 else{
 
@@ -863,7 +804,7 @@ str1="#UE";
  for(i=0;i<obj.data.opconn.length;i++)
    {
     str2=str1+(i+228).toString();//UE id starts from UE228 for sectoring
-    d3.select(str2).style("fill",opercolor[obj.data.opconn[i]-1].color);
+    d3.select(str2).style("fill",opercolor[obj.data.opconn[i]].color);
    }
   
 }
@@ -970,10 +911,14 @@ $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from serve
 function level0()
 { //level 0 reset
   level=0;
- var circles = svgContainer.selectAll("circle").data(rows1)
- .style("fill",function(d,i) { return opercolor[parseInt(d.node[2])-1].color;} ) ; 
+ var uecircles = svgContainer.selectAll("ue").data(ue)
+ .style("fill",function(d,i) { console.log(d);return opercolor[d.opid].color;} ) ; 
 
-
+topBSno=document.getElementById("TopBSno").value;
+if(topBSno=="")
+ topBSno=10;
+else
+  topBSno=parseInt(topBSno);
 
 topx=document.getElementById("topx").value;
 if(topx=="")
@@ -1094,7 +1039,7 @@ var y = d3.scale.linear()
   grid.enter()
   .sort(function(a, b) { return a.id - b.id; })
   .append("circle")
-   .attr("cx",function(d){ return x(d.centroid[0]); })
+  .attr("cx",function(d){ return x(d.centroid[0]); })
   .attr("cy",function(d){ return y(d.centroid[1]);})
   .attr("r", (40)) //radius of 200=40*5 m //linear scale of 5
   .style("fill","none")
@@ -1503,22 +1448,12 @@ var y = d3.scale.linear()
     .range([height, 0]);
 
 
-//    d3.select(this).attr("cx", x(d.x)).attr("cy", y(d.y));
 
 
 console.log('Am I at ', x.invert(d.x),y.invert(d.y)) ;
 //console.log('But actually at',d.x,d.y,x(d.x),y(d.y));
 //Backend Part here
-/*
-BackObj={node:parseInt(d.node),Col:parseInt(d.col1),Column1:parseFloat(d.x),Column2:parseFloat(d.y),Column3:parseFloat(d.m1),Column4:parseFloat(d.m2)};//,x1:parseFloat(BScord[0].x),y1:parseFloat(BScord[0].y),x2:parseFloat(BScord[1].x),y2:parseFloat(BScord[1].y)};//Creating object to send to backend
-                if(d.node==1) 
-                 idtochange = "node1  "+d.col1;
-               else if(d.node==2)
-                  idtochange = "node2  "+d.col1;
-              else
-                  idtochange = "ERROR";
-//window.alert(idtochange);
-
+/*  
 $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 */
  }
