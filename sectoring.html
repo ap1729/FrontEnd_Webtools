@@ -129,7 +129,9 @@ div.visible {
           }/* above is for legend*/
           .legend{font: 20px sans-serif;color:steelblue;};
 
-
+field{
+  text-align:left;
+}
    svgContainer {
   font: 10px sans-serif;
   shape-rendering: crispEdges;
@@ -153,152 +155,97 @@ div.visible {
   </div><!--- navigationbar-->
 </nav>
 <script src="NavBar.js"></script>
-
+<!--<div class="panel-heading">Master Control</div>-->
 
    <h1 class="text-center">Hexagonal Grid</h1>
     <div class="panel panel-default">
+       <div class="panel-body">
+       
+          <div class="well">
+                <div class="row vdivide">
+           <div id="drawbox" class="col-sm-10 text-center"> 
+
+              <dl>
+                <dd class="legend">LEGEND</dd>       
+                <dt class="lime"></dt>
+                <dd>Operator 1</dd>
+                <dt class="orange"></dt>
+                <dd>Operator 2</dd>
+                <dt class="red"></dt>
+                <dd>Operator 3</dd>
+                <dt class="brown"></dt>
+                <dd>Operator 4</dd>
+                <dt class="circle"></dt>
+                <dd> UE(user) </dd>
+                <dt class="rect1"></dt>
+                <dd> eNodeB(Basestation) </dd>
+            </dl>
+          <div class="loader" id="loader"></div>
+          </div>
+         
+         
       
-      <div class="panel-body">
-        <div class="well">
-           <div id="drawbox"> 
-
-           <dl>
-
- <dd class="legend">LEGEND</dd>       
-<dt class="lime"></dt>
-<dd>Operator 1</dd>
-<dt class="orange"></dt>
-<dd>Operator 2</dd>
-<dt class="red"></dt>
-<dd>Operator 3</dd>
-<dt class="brown"></dt>
-<dd>Operator 4</dd>
-<dt class="circle"></dt>
-<dd> UE(user) </dd>
-<dt class="rect1"></dt>
-<dd> eNodeB(Basestation) </dd>
-
-</dl>
-<div class="loader" id="loader"></div>
- </div>
-<!--
- <div class="panel panel-default">
-     <div class="panel-heading">User Controls</div>
-     <div class="panel-body">
-
-        <div class="row">
-            <div class="col-md-6">col1</div><div class="col-md-6">col2</div>
-        </div> 
-        <div class="row">
-            <div class="col-md-6">col1 </div><div class="col-md-6">col2</div>
-        </div> 
-        <div class="row">
-            <div class="col-md-6">col1</div><div class="col-md-6">col2</div>
-        </div> 
-     </div>
-</div>
--->
-<div class="panel panel-default">
-     <div class="panel-heading">Master Control</div>
-     <div class="panel-body">
-<div class="container">
-  <div class="row vdivide">
-    <div class="col-sm-6 text-center">
-    <form>
-  <fieldset>
-    <legend>Control Parameters</legend>
-      No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10" title="No of BS seen in SIR profile" data-toggle="tooltip">  
-     
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-      No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3" title="No of Interference cancellers" data-toggle="tooltip">
-      <br>
-      POPUP ACTIVE: <input type="checkbox" id="popup" title="Shows SIR profile in new window" data-toggle="tooltip">
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      View Top BS: <input type="checkbox" id="TopBS" title="See Top interfering basestations enlarged" data-toggle="tooltip">
-      ;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-     FR Mode <select id="FR" title="Choose Frequency reuse mode" data-toggle="tooltip">
-              <option value="FR1">FR1</option>
-              <option value="FR3">FR3</option>
-              <option value="FFR">FFR</option>
-              <option value="AFFR">AFFR</option>
-     </select>
-     <br>
-     
-    Drag Enabled<input type="checkbox" id="dragcheck" > 
-     <br>
- VALID OPERATORS  &nbsp; : &nbsp;
-                <input type="checkbox" id="Oper1" checked> Operator 1
-                <input type="checkbox" id="Oper2" checked> Operator 2
-                <input type="checkbox" id="Oper3" checked> Operator 3
-                <input type="checkbox" id="Oper4" checked> Operator 4
               
-<button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button>
-</fieldset>
-</form>
-    </div>
-    <div class="col-sm-6 text-center">
-    <form>
-  <fieldset>
-    <legend>Viewing Options</legend>
-           <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
-           <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
-           <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
-         <br>  <br>Click UE to view SIR profile
-         <br>(graph is plotted below,else check POPUP ACTIVE on the left side)
-</fieldset>
-</form>
-    </div>
-  </div>
-</div>
-</div>
-</div>
-</div>
-<!--
-           <button type="button" class="btn btn-default" onclick="level0()">Level0</button>
-           <button type="button" class="btn btn-default" onclick="level1()">Level1</button>
-           View Top BS: <input type="checkbox" id="TopBS" >
-          <button type="button" class="btn btn-default" onclick="Reset()">Reset</button>
-            No of BS <input id="TopBSno" type="number" style="width: 40px;" step="1" value="10">  
-            No.IC<input id="topx" type="number" style="width: 40px;" step="1" value="3">
-            POPUP ACTIVE: <input type="checkbox" id="popup"> 
-             
-             <button type="button" class="btn btn-default" onclick="CDF()">CDF</button>
-             <select id="FR">
-              <option value="FR1">FR1</option>
-              <option value="FR3">FR3</option>
-              <option value="FFR">FFR</option>
-              <option value="AFFR">AFFR</option>
-            </select>
-           
-            
-               <br>
-                VALID OPERATORS  
-                <input type="checkbox" id="Oper1" checked> Operator 1
-                <input type="checkbox" id="Oper2" checked> Operator 2
-                 <input type="checkbox" id="Oper3" checked> Operator 3
-                  <input type="checkbox" id="Oper4" checked> Operator 4
-              
-<button type="button" class="btn btn-default" onclick="validoperator()">Validate</button>
+                  <div class="col-sm-2 text-center">
+                  <form>
+                   <fieldset class="field">
+                      <legend >Control Parameters</legend>
 
-<input type="checkbox" id="dragcheck" > Drag Enabled
+                     
+                        No of BS <input id="TopBSno" type="number" style="width: 20%;" step="1" value="10" title="No of BS seen in SIR profile" data-toggle="tooltip">  
+                       
+                        <br>
+                        No.IC<input id="topx" type="number" style="width: 20%;" step="1" value="3" title="No of Interference cancellers" data-toggle="tooltip">
+                        <br>
+                        POPUP ACTIVE: <input type="checkbox" id="popup" title="Shows SIR profile in new window" data-toggle="tooltip">
+                        <br>
+                        View Top BS: <input type="checkbox" id="TopBS" title="See Top interfering basestations enlarged" data-toggle="tooltip">
+                        <br>
+                       FR Mode <select id="FR" title="Choose Frequency reuse mode" data-toggle="tooltip">
+                                <option value="FR1">FR1</option>
+                                <option value="FR3">FR3</option>
+                                <option value="FFR">FFR</option>
+                                <option value="AFFR">AFFR</option>
+                       </select>
+                       <br>
+                       
+                      Drag Enabled<input type="checkbox" id="dragcheck" > 
+                       <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                       VALID OPERATORS  &nbsp; : &nbsp;
+                               Operator 1<input type="checkbox" id="Oper1" checked> 
+                               Operator 2 <input type="checkbox" id="Oper2" checked> 
+                               Operator 3<input type="checkbox" id="Oper3" checked> 
+                               Operator 4<input type="checkbox" id="Oper4" checked> 
+                                
+                       <button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button>
+                    <br><br>
+                    <legend>Viewing Options</legend>
+                           <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
+                           <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
+                           <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
+                         <br>  <br>Click UE to view SIR profile
+                         <br>(graph is plotted below,else check POPUP ACTIVE on the left side)
+                </fieldset>
+                </form>
+             </div>
+          </div>
+        
+      </div>
+        </div>
+</div> 
 
--->
-                  </div>
+
 <div class="panel panel-default">
      <div class="panel-heading">Outputs</div>
      <div class="panel-body">
           <form id="putdata">
-                ROI <input id="LastSIR" type="number" step="0.01"  style="width: 65px;" >    
-                Pre SINR <input id="PreSINR" type="number" step="0.01" style="width: 65px;"> 
-                Post SINR <input id="PostSINR" type="number" step="0.01" style="width: 65px;">              
+                ROI <input id="LastSIR" type="number" step="0.01"  style="width: 5%;" >    
+                Pre SINR <input id="PreSINR" type="number" step="0.01" style="width:5%;"> 
+                Post SINR <input id="PostSINR" type="number" step="0.01" style="width: 5%;">              
               </form>
               </div>
             </div>
-          </div>
-          <!--<button type="button" class="btn btn-default" onclick="">Level1</button> -->
-     <!-- <button type="button" class="btn btn-default" onclick="loadMe()">Load Graphics</button>
-      <button type="button" class="btn btn-default" >Plot Initial</button>  onclick="doPlot()"--> 
+          
         </div>
 
       </div>
@@ -388,7 +335,7 @@ function SetSize(){
 zoom = d3.behavior.zoom()
     .x(x)
     .y(y)
-    .scaleExtent([0.01,10000.00 ])   //this controls maximum zooming amount
+    .scaleExtent([0.1,10.00 ])   //this controls maximum zooming amount
     .center([x(1000), y(100)])
     .size([3000, 3000])
     .on("zoom", zoomed);
@@ -406,7 +353,9 @@ var drag = d3.behavior.drag()
     .on("dragstart", dragstarted1)
     .on("drag", dragged1)
     .on("dragend", dragended1);  */  
-svg = d3.select("#drawbox").append("svg").attr("width", width+margin.left + margin.right).attr("height", height+margin.top + margin.bottom).attr("pointer-events",'all').call(zoom);;
+
+   //not that 100% is 1400px hence 1% is 14px approx) 
+svg = d3.select("#drawbox").append("svg").attr("width", "100%").attr("height", height+margin.top + margin.bottom).attr("pointer-events",'all').call(zoom);;
 svgContainer=svg.append("g").attr("id","svgContainer").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 xaxisobject=svgContainer.append("g")
@@ -961,6 +910,8 @@ console.log("BBBB");
   
  } 
   return a;
+
+document.getElementById("loader").style.display = "none";
 }
 
 function level1()
@@ -987,6 +938,8 @@ if(level!=1)
 
 BackObj={perf:"lvlchng",params:1,opflags:validoper,level:level,topbsno:topBSno,frmode:document.getElementById("FR").value };//params is to which level
  console.log(JSON.stringify(BackObj));
+
+document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 }
@@ -994,6 +947,7 @@ level=1;//updating level
 //console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
+document.getElementById("loader").style.display = "none"; 
 
 
 if(topx=="")
@@ -1029,8 +983,6 @@ else
 BackObj={perf:"sir",opflags:validoper,node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-
-
 
 }
 
@@ -1286,6 +1238,8 @@ var validoper=validoperator();
 
 BackObj={perf:"cdf",opflags:validoper,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(BackObj);
+
+document.getElementById("loader").style.display = "block";
  $.post("/update",JSON.stringify(BackObj),plotcdf,"json");//getting from server
 }
 
@@ -1353,17 +1307,13 @@ ctx.fillStyle="#000000";
 ctx.fillText("PoS:1 ",1460,110);
 
 
-
-
-
-
-
-
 var dataUrl = canvas.toDataURL('image');
 
 window.open(dataUrl, "toDataURL() image", "width=600, height=200");
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 //plotcurve(obj.Post_sinr_level1_X,obj.Post_sinr_level1_Y,"PoS1");
+
+document.getElementById("loader").style.display = "none";
  }
 }
 var cdfcount=0;
