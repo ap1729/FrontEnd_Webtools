@@ -138,7 +138,6 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		// params: Any additional details that the perf function may need
 
 		var returnData map[string]interface{}
-		frMode := rxData["frmode"].(string)
 
 		switch rxData["perf"] {
 		case "scmeta":
@@ -148,6 +147,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			returnData = perf.ChangeLevel(scenario, targetLvl)
 			fmt.Println("Level Change complete.")
 		case "sir":
+			frMode := rxData["frmode"].(string)
 			ueID := uint(rxData["node"].(float64))
 			level := uint(rxData["level"].(float64))
 			intCancelCount := uint(rxData["intcnc"].(float64))
@@ -165,6 +165,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, params)
 			fmt.Println("SIR calculation complete.")
 		case "cdf":
+			frMode := rxData["frmode"].(string)
 			intCancelCount := uint(rxData["intcnc"].(float64))
 			var params map[string]interface{}
 			if frMode == "FR3" || frMode == "FFR" {
