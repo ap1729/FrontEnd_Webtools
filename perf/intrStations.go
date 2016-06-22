@@ -12,7 +12,7 @@ import (
 // The params map is optional, and can be used to specify additional arguments
 // that may be required for evaluation at a given frequency-reuse mode. If not
 // needed, pass nil.
-func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool, params map[string]interface{}) []uint {
+func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool, level uint, params map[string]interface{}) []uint {
 	var bsIds []uint
 
 	switch mode {
@@ -81,7 +81,6 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		//params is modified to contain Hexagon details,the no.of Interference cancellers and level.
 		hexMap := params["hexmap"].(*service.HexMap)
 		intrCancelCount := (params["intcnc"].(uint))
-		level := (params["lev"].(uint))
 
 		//Get x,y locations of UE and find the current Hexagon ID
 		uex := sc.GetUserByID(uint(userID)).X()
@@ -118,13 +117,13 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			if userID == usid[ind[j]] {
 				t = 1
 				fmt.Println(" The selected UE ", userID, " follows FR1")
-				bsIds = intrStations("FR1", sc, userID, opEnable, params)
+				bsIds = intrStations("FR1", sc, userID, opEnable, level, params)
 			}
 		}
 		//Assign FR3 to the remaining UEs
 		if t == 0 {
 			fmt.Println(" The selected UE ", userID, " follows FR3")
-			bsIds = intrStations("FR3", sc, userID, opEnable, params)
+			bsIds = intrStations("FR3", sc, userID, opEnable, level, params)
 			break
 		}
 
@@ -134,7 +133,6 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		//params is modified to contain Hexagon details,the no.of Interference cancellers and level.
 		hexMap := params["hexmap"].(*service.HexMap)
 		intrCancelCount := (params["intcnc"].(uint))
-		level := (params["lev"].(uint))
 
 		//Get x,y locations of UE and find the current cell's ID
 		uex := sc.GetUserByID(uint(userID)).X()
@@ -175,7 +173,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			if userID == usid[ind[j]] {
 				t = 1
 				fmt.Println(" The selected UE ", userID, " follows FR1")
-				bsIds = intrStations("FR1", sc, userID, opEnable, params)
+				bsIds = intrStations("FR1", sc, userID, opEnable, level, params)
 				break
 			}
 		}
@@ -186,7 +184,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 				if userID == usid[ind[j]] {
 					t = 1
 					fmt.Println(" The selected UE ", userID, " follows FR3")
-					bsIds = intrStations("FR3", sc, userID, opEnable, params)
+					bsIds = intrStations("FR3", sc, userID, opEnable, level, params)
 					break
 				}
 			}
@@ -199,7 +197,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			for j := (x1 + x2); j < len(ind); j++ {
 				if userID == usid[ind[j]] {
 					fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
-					bsIdsAll := intrStations("FR3", sc, userID, opEnable, params)
+					bsIdsAll := intrStations("FR3", sc, userID, opEnable, level, params)
 					bsIds = *new([]uint)
 					for i := 0; i < len(bsIdsAll); i++ {
 						if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desop {

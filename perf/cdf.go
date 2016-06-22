@@ -91,7 +91,7 @@ func cdfL0L1(temp *model.Scenario, levelValue uint, intfCancelCount uint, frMode
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
 	for userId := 0; userId < numUeCdf; userId++ {
-		intStatIds := intrStations(frMode, temp, uint(userId), opEnable, params)
+		intStatIds := intrStations(frMode, temp, uint(userId), opEnable, levelValue, params)
 		losses, bsId := signalLossProfile(uint(userId), temp, levelValue, intStatIds)
 
 		for i := 0; i < len(bsId); i++ {

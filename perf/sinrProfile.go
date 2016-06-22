@@ -17,7 +17,7 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	returnData := map[string]interface{}{}
 
 	// What stations interfere with the current user, given the system parameters
-	intStatIds := intrStations(frMode, sc, userID, opEnable, params)
+	intStatIds := intrStations(frMode, sc, userID, opEnable, level, params)
 	// The loss profile and corresponding BaseStation source ID's
 	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
 

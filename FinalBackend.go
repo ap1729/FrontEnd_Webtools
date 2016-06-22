@@ -173,7 +173,6 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if frMode == "FFR" || frMode == "AFFR" {
 				params["intcnc"] = intCancelCount
-				params["lev"] = level
 			}
 
 			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, opEnable, params)
