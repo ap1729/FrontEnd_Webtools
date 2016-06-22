@@ -827,21 +827,12 @@ BackObj={perf:"enop",opflags:a};//params is to which level
  console.log(JSON.stringify(BackObj));
 
 document.getElementById("loader").style.display = "block";
-$.post("/update",JSON.stringify(BackObj),recolor,"json");//getting from server
+$.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 document.getElementById("loader").style.display = "none";
 
 }
 
-function recolor(obj){
-  console.log(obj);
-  str1="#UE";
-  for(i=0;i<obj.data.users.length;i++){
-   str2=str1+(i).toString();//UE id starts from UE0 for sectoring
-    d3.select(str2).style("fill",opercolor[obj.data.users[i].opid].color);
- 
-  }
 
-}
 
 function onsuccess1(obj)
 {
