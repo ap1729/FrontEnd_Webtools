@@ -789,6 +789,60 @@ function zoomed() {
   }//above function causes zooming which is called in var zoom
     
 
+function validoperator(){
+  //function to return a array of 0 and 1's to indicate which operators are valid
+  a=[1,1,1,1];
+//doing inactive visual
+
+ var Bsid="";
+ for(j=0;j<4;j++)
+ { //for each operator
+    if(document.getElementById("Oper"+(j+1).toString()).checked)//check if operator is checked or not 
+  {
+     a[j]=1;    
+  }
+   else
+   {
+      a[j]=0;
+   }
+ }
+console.log(a);
+   for(i=0;i<bs.length;i++)
+   {//for all bs
+     Bsid='#BS'+i.toString();
+       if(a[bs[i].opid]==1)
+      {
+        d3.select(Bsid).classed('inactive',false);
+       }
+       else
+        {
+         d3.select(Bsid).classed('inactive',true);
+        }
+
+    }
+
+ 
+  //return a;
+BackObj={perf:"oper",opflags:a};//params is to which level
+ console.log(JSON.stringify(BackObj));
+
+document.getElementById("loader").style.display = "block";
+$.post("/update",JSON.stringify(BackObj),recolor,"json");//getting from server
+document.getElementById("loader").style.display = "none";
+
+}
+
+function recolor(obj){
+  console.log(obj);
+  str1="#UE";
+  for(i=0;i<obj.data.users.length;i++){
+   str2=str1+(i).toString();//UE id starts from UE0 for sectoring
+    d3.select(str2).style("fill",opercolor[obj.data.users[i].opid].color);
+ 
+  }
+
+}
+
 function onsuccess1(obj)
 {
  console.log(obj);
@@ -806,66 +860,15 @@ str1="#UE";
     str2=str1+(i).toString();//UE id starts from UE0 for sectoring
     d3.select(str2).style("fill",opercolor[obj.data.opconn[i]].color);
    }
-  
-}
-}
-function validoperator(){
-  //function to return a array of 0 and 1's to indicate which operators are valid
-  a=[1,1,1,1];
-//doing inactive visual
-
-
-var j=0;
-var i=0;
-var lb=0;
-var ub=0;
- var Bsid="";
- for(j=0;j<4;j++)
- { //for each operator
-  ub+=bsno[j].bsno;
-  if(document.getElementById("Oper"+(j+1).toString()).checked)//check if operator is checked or not 
-  {
- 
-a[j]=1;    
-
-  for(i=lb;i<ub;i++)
-  {//active
-    
-    Bsid='#BS'+i.toString();
-    d3.select(Bsid).classed('inactive',false);
+   
   }
- }
- else
- {
-a[j]=0;
-console.log("BBBB");
-  for(i=lb;i<ub;i++)
-  {// inactive bs 
-    Bsid='#BS'+i.toString();
-    d3.select(Bsid).classed('inactive',true);
- }
 }
-  lb+=bsno[j].bsno;
-  
- } 
-  //return a;
-BackObj={perf:"oper",opflags:a};//params is to which level
- console.log(JSON.stringify(BackObj));
 
-document.getElementById("loader").style.display = "block";
-$.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
-document.getElementById("loader").style.display = "none";
-}
 
 function level1()
 {
 
 
-  if(document.getElementById("loader").style.display =="none")
-  {
-    console.log("changed")
-    document.getElementById("loader").style.display = "block";
-  }
 
 //console.log("BBBBBB",currselected);//row no 
 topBSno=document.getElementById("TopBSno").value;
@@ -896,11 +899,10 @@ if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
-
 if(currselected!=-1) 
 {
 
-BackObj1={perf:"sir",node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj1={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj1));
 $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
@@ -911,9 +913,17 @@ $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from serve
 function level0()
 { //level 0 reset
   level=0;
- var uecircles = svgContainer.selectAll("ue").data(ue)
- .style("fill",function(d,i) { console.log(d);return opercolor[d.opid].color;} ) ; 
+  console.log("level0,",ue);
 
+str1="#UE";
+ for(i=0;i<ue.length;i++)
+   {
+    str2=str1+(i).toString();//UE id starts from UE0 for sectoring
+    d3.select(str2).style("fill",opercolor[ue[i].opid].color);
+   }
+
+
+console.log("reached level 0");
 topBSno=document.getElementById("TopBSno").value;
 if(topBSno=="")
  topBSno=10;
@@ -926,7 +936,7 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-BackObj={perf:"sir",node:currselected,level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 
