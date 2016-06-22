@@ -37,13 +37,14 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 			continue
 		}
 
-		nodeType := row[1][0:2]                                   // row[0][0:2] Temporary fix
-		opId, err := strconv.ParseUint(string(row[1][2]), 10, 64) // (row[0][2]) Temporary fix
+		nodeType := row[1][0:2]                                 // row[0][0:2] Temporary fix
+		op, err := strconv.ParseUint(string(row[1][2]), 10, 64) // (row[0][2]) Temporary fix
 		if err != nil {
 			return false
 		}
-		if !sb.OperatorExists(uint(opId)) {
-			sb.AddOperator(uint(opId))
+		opId := uint(op) - 1
+		if !sb.OperatorExists(opId) {
+			sb.AddOperator(opId)
 		}
 		x, err := strconv.ParseFloat(row[2], 64) // (row[1], 64) Temporary fix
 		if err != nil {
@@ -53,7 +54,7 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 		if err != nil {
 			return false
 		}
-		err2 := sb.AddNode(nodeType, x, y, 0, uint(opId))
+		err2 := sb.AddNode(nodeType, x, y, 0, opId)
 		if err2 == false {
 			return false
 		}

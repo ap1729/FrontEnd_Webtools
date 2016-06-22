@@ -80,7 +80,6 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			bsIds[p] = fr3bsno[p]
 		}
 		//fmt.Println("Bsids :", bsIds, "\n len:", len(bsIds))
-		return bsIds
 
 	case "FFR":
 		hexMap := params["hexmap"].(*service.HexMap)
@@ -253,10 +252,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			//fmt.Println("--op :",op2)
 
 		}
-
-	}
 }
-	return bsIds
 	default:
 		return nil
 	}
