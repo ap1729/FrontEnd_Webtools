@@ -3,6 +3,7 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"fmt"
+	"math"
 )
 
 // Returns the operators that users connect to, if the cooperation level was set
@@ -18,8 +19,8 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) map[string
 
 	} else if targetLvl == 1 {
 		for i := 0; i < len(newOper); i++ {
-			id := 0
-			max := sc.Loss(uint(i), 0)
+			id := -1
+			max := math.Inf(-1)
 			for j := 0; j < len(sc.BaseStations()); j++ { //for all bs
 				if opEnable[sc.BaseStations()[j].OwnerOp().ID()] == true && max < sc.Loss(uint(i), uint(j)) {
 					max = sc.Loss(uint(i), uint(j))
