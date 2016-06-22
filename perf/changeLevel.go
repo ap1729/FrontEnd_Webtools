@@ -7,7 +7,7 @@ import (
 )
 
 // Returns the operators that users connect to, if the cooperation level was set
-// to targetLvl.
+// to targetLvl. This is a cosmetic change, and no internal data is modified.
 func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) map[string]interface{} {
 	returnData := map[string]interface{}{}
 	newOper := make([]uint, len(sc.Users()))

@@ -2,6 +2,9 @@ package service
 
 import "FrontEnd_WebTools/model"
 
+// Packages the scenario object into a map that can be directly marshalled
+// into a JSON object. The map contains three object arrays for BaseStations,
+// Users and Operators with relevant properties each.
 func PackageScenario(sc *model.Scenario) map[string]interface{} {
 	data := map[string]interface{}{}
 
