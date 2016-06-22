@@ -935,11 +935,12 @@ if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
-
+if(currselected!=-1)
+ { 
 BackObj={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
-$.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-
+$.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server 
+ }
 }
 
 function Reset()
