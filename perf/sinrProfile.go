@@ -16,7 +16,9 @@ import "FrontEnd_WebTools/model"
 func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint, opEnable []bool, params map[string]interface{}) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
+	// What stations interfere with the current user, given the system parameters
 	intStatIds := intrStations(frMode, sc, userID, opEnable, params)
+	// The loss profile and corresponding BaseStation source ID's
 	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
 
 	op := make([]uint, len(bsId))
@@ -26,11 +28,15 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	}
 
 	// Calculate SINR and ROI
-
 	sinrVals := sinr(losses, intrCancelCount)
 	returnData["pre"] = sinrVals[0]
 	returnData["post"] = sinrVals[1]
 	returnData["roi"] = sinrVals[2]
+
+	if profileTopN > uint(len(losses)) {
+		profileTopN = uint(len(losses))
+	}
+
 	returnData["bsid"] = bsId[0:profileTopN]
 	returnData["opno"] = op[0:profileTopN]
 	returnData["sir"] = losses[0:profileTopN]

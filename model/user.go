@@ -6,6 +6,8 @@ type User struct {
 	x, y, ht  float64
 	defaultOp *Operator
 
+	// A public property for setting the current operator. This property has no internal implications,
+	// it is present as for convenience and encapsulation.
 	CurrOp *Operator
 }
 

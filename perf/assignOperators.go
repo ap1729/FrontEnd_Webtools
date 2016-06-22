@@ -6,6 +6,11 @@ import (
 	"math/rand"
 )
 
+// Assign an operator to each user, based on the enabled operators as specified
+// by the enable flags.
+//
+// The function always assigns to a user its registered operator if that operator
+// is enabled. If not, it randomly assigns it to one of the enabled operators.
 func AssignOperators(sc *model.Scenario, enFlags []bool) map[string]interface{} {
 
 	valOps := []uint{}
