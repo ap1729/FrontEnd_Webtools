@@ -17,6 +17,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 
 	switch mode {
 	case "FR1":
+		//FR1 sends the list of BS in cells that match the operator(s) received
 		bsIds = *new([]uint)
 		fmt.Printf("Enable flags: %v", opEnable)
 		for i := uint(0); i < uint(len(sc.BaseStations())); i++ {
@@ -27,20 +28,18 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		fmt.Printf("Allowed BS: %v\n", bsIds)
 
 	case "FR3":
+		//FR3 sends a list of BS in FR3 cells that match the operator(s) received
 		hexMap := params["hexmap"].(*service.HexMap)
-		//get x,y locations of UE
+
+		//Get x,y locations of UE and find the current Hexagon ID
 		uex := sc.GetUserByID(uint(userID)).X()
 		uey := sc.GetUserByID(uint(userID)).Y()
-		//fmt.Println("UE : ",userID, " x :",uex, " y : ",uey)
-		//func to find the hex containing the UE
 		currenthex := hexMap.FindContainingHex(uex, uey)
-		//fmt.Println("currenthex: \n",currenthex)
 
 		//cn is the current cell id
 		cn := currenthex.ID
-		//fmt.Printf("\n\nConent in map: %v\n\n", params)
-
 		fmt.Println("UE : ", userID, " Hexagon id :", cn)
+
 		//2nd tier neighbors
 		//2nd tier cells are in the array snids
 		sneigh := hexMap.SecondNeighbours(cn)
@@ -48,13 +47,11 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		for i := 0; i < len(sneigh); i++ {
 			snids = append(snids, sneigh[i].ID)
 		}
-		//fmt.Println("2nd tier cells:",snids)
 
-		//array frc stores the fr3 cellids
+		//The 2nd tier cells are assigned a code; Each cell's code ia matched with the current cell's code to find if that is a FR3 cells and stored in the array frc
 		frc := []uint{}
 		code := [19]uint{2, 1, 3, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 2, 1, 3}
 		f := code[cn]
-		//fmt.Println("f: ",f)
 		for k := 0; k < len(code); k++ {
 			for j := 0; j < len(snids); j++ {
 				if f == code[snids[j]] {
@@ -63,16 +60,15 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			}
 			break
 		}
-		//fmt.Println("FR3 cells :",frc)
-		//append the current cell also to the list of fr3 cells
 		frc = append(frc, cn)
 		fmt.Println("FR3 cells :", frc)
-		//array fr3bsno stores the BS IDS in fr3 cells
+
+		//array bsIds stores the BS IDS of the required operators in fr3 cells
 		bsIds = *new([]uint)
 		for k := 0; k < len(frc); k++ {
-			//append each cell's bsid to fr3bsno
 			bs := hexMap.FindContainedStations(frc[k])
 			for m := 0; m < len(bs); m++ {
+				//check if the BS is of the required operator
 				if opEnable[bs[m].OwnerOp().ID()] == true {
 					bsIds = append(bsIds, bs[m].ID())
 				}
@@ -80,20 +76,23 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		}
 
 	case "FFR":
+		//FFR uses both FR1 and FR3; All UEs from the current node's cell are found; Post SINR of all UEs in the current cell are found using FR1. Then the top 50% of users are assigned FR1. The remaining 50% of users are assigned FR3.
+
+		//params is modified to contain Hexagon details,the no.of Interference cancellers and level.
 		hexMap := params["hexmap"].(*service.HexMap)
 		intrCancelCount := (params["intcnc"].(uint))
-		//get x,y locations of UE
+		level := (params["lev"].(uint))
+
+		//Get x,y locations of UE and find the current Hexagon ID
 		uex := sc.GetUserByID(uint(userID)).X()
 		uey := sc.GetUserByID(uint(userID)).Y()
-
-		//func to find the hex containing the UE
 		currenthex := hexMap.FindContainingHex(uex, uey)
 
 		//cn is the current cell id
 		cn := currenthex.ID
 		fmt.Println("UE : ", userID, " Hexagon id :", cn)
 
-		//finding the UEs in a cell
+		//Finding all UEs in the current cell
 		usid := []uint{}
 		us := hexMap.FindContainedUsers(cn)
 		for j := 0; j < len(us); j++ {
@@ -101,63 +100,19 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			usid = append(usid, id)
 		}
 
-		//finding FR1 Post SINR for all UEs in the current cell, and store it in an array called posarr
+		//Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called posarr
 		posarr := []float64{}
 		for k := 0; k < len(usid); k++ {
-			// bsIds1 := intrStations("FR1", sc, uint(k), nil)
-			// losses, bsId := signalLossProfile(uint(k), sc, 1, bsIds1)
-			//fmt.Println("losses: ",losses)
-			//fmt.Println("bsid:",bsId)
-			// op := make([]uint, len(bsId))
-			// for i := 0; i < len(bsId); i++ {
-			// 	losses[i] += 46.0
-			// 	op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
-			// }
-			// arr := []float64{}
-			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, opEnable, nil)
+			values := SinrProfile(sc, "FR1", usid[k], level, intrCancelCount, 1, opEnable, nil)
 			posarr = append(posarr, values["post"].(float64))
 		}
-		//fmt.Println("POST SINR :",posarr)
-		//fmt.Println("len(sinr): ",len(posarr))
-
+		//Sort the array values
 		posarr, ind := sort(posarr)
 
-		/*l1:=filter(posarr,usid)
-		los,in:=sort(l1)
-		usid1:=make([]uint,len(in))
-		var x uint
-		for j:=0;j<len(in);j++{
-			x=usid[in[j]]
-			usid1[j]=sc.GetUserByID(x).ID()
-		}*/
-		//fmt.Println("--After sort :--")
-		//fmt.Println("PoSarr: ",posarr)
-		//fmt.Println(usid)
-		//
-		// var perc float64
-		// var percval float64
-		// //give the values as %..i.e.if 60%, give as 60
+		//Fix a threshold value
 		perc := 50
-		// //fmt.Println("Length of ue1 :",lenue1)
-		// percval = (perc / 100.0) * float64(len(usid))
-		// top1 := int(math.Floor(percval))
-		// rem1 := len(usid) - int(top1)
-		//fmt.Println("Perc:",perc," percval :",percval)
-		//fmt.Println(" Top1:",top1," Rem1 :",rem1)
-		// fmt.Println("Out of ", len(usid), " UEs in the cell ", cn, " ,")
-		// fmt.Println("the no.of cells that follow FR1 :", top1)
-		// fmt.Println("the no.of cells that follow FR3 :", rem1)
-		// fr1ues := []uint{}
-		// fr3ues := []uint{}
-		// for i := 0; i < len(usid); i++ {
-		// 	if i < top1 {
-		// 		fr1ues = append(fr1ues, usid[ind[i]])
-		// 	} else {
-		// 		fr3ues = append(fr3ues, usid[ind[i]])
-		// 	}
-		// }
-		//fmt.Println("FR1 : ",fr1ues,"len :",len(fr1ues))
-		//fmt.Println("FR3 : ",fr3ues,"len :",len(fr3ues))
+
+		//Assign FR1 to UEs that lie in the top perc % of the power array
 		t := 0
 		for j := 0; j < len(ind)*perc/100; j++ {
 			if userID == usid[ind[j]] {
@@ -166,6 +121,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 				bsIds = intrStations("FR1", sc, userID, opEnable, params)
 			}
 		}
+		//Assign FR3 to the remaining UEs
 		if t == 0 {
 			fmt.Println(" The selected UE ", userID, " follows FR3")
 			bsIds = intrStations("FR3", sc, userID, opEnable, params)
@@ -173,20 +129,23 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 		}
 
 	case "AFFR":
+		//AFFR uses both FR1 and FR3; All UEs from the current node's cell are found; Post SINR of all UEs in the current cell are found using FR1. Then the top 50% of users are assigned FR1. The next 40% of users are assigned FR3; the last 10% are assigned FR3, but with only one operator.
+
+		//params is modified to contain Hexagon details,the no.of Interference cancellers and level.
 		hexMap := params["hexmap"].(*service.HexMap)
 		intrCancelCount := (params["intcnc"].(uint))
-		//get x,y locations of UE
+		level := (params["lev"].(uint))
+
+		//Get x,y locations of UE and find the current cell's ID
 		uex := sc.GetUserByID(uint(userID)).X()
 		uey := sc.GetUserByID(uint(userID)).Y()
-
-		//func to find the hex containing the UE
 		currenthex := hexMap.FindContainingHex(uex, uey)
 
 		//cn is the current cell id
 		cn := currenthex.ID
 		fmt.Println("UE : ", userID, " Hexagon id :", cn)
 
-		//finding the UEs in a cell
+		//Finding all the UEs in the current cell
 		usid := []uint{}
 		us := hexMap.FindContainedUsers(cn)
 		for j := 0; j < len(us); j++ {
@@ -194,17 +153,23 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			usid = append(usid, id)
 		}
 
+		//Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called posarr
 		posarr := []float64{}
 		for k := 0; k < len(usid); k++ {
-			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, opEnable, nil)
+			values := SinrProfile(sc, "FR1", usid[k], level, intrCancelCount, 1, opEnable, nil)
 			posarr = append(posarr, values["post"].(float64))
 		}
 
+		//Sort the power array
 		posarr, ind := sort(posarr)
-		th1 := 20
-		th2 := 10
+
+		// Fix two threholds
+		th1 := 50
+		th2 := 40
 		x1 := len(ind) * th1 / 100
 		x2 := len(ind) * th2 / 100
+
+		//Assign FR1 to UEs that lie in the top th1 % of the power array
 		t := 0
 		for j := 0; j < x1; j++ {
 			if userID == usid[ind[j]] {
@@ -214,6 +179,8 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 				break
 			}
 		}
+
+		//Assign FR3 to UEs that lie in the next th2 % of the power array
 		if t == 0 {
 			for j := (x1); j < (x1 + x2 - 1); j++ {
 				if userID == usid[ind[j]] {
@@ -224,6 +191,8 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 				}
 			}
 		}
+
+		//Assign FR3, but with only one operator from each FR3 cell to UEs that  remain.
 		if t == 0 {
 			var desop uint
 			desop = sc.GetUserByID(userID).CurrOp.ID()
