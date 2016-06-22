@@ -14,6 +14,7 @@ import (
 // needed, pass nil.
 func intrStations(mode string, sc *model.Scenario, userID uint, params map[string]interface{}) []uint {
 	var bsIds []uint
+	var bsIds1 []uint
 
 	switch mode {
 	case "FR1":
@@ -78,7 +79,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 		for p := 0; p < len(fr3bsno); p++ {
 			bsIds[p] = fr3bsno[p]
 		}
-		fmt.Println("Bsids :", bsIds, "\n len:", len(bsIds))
+		//fmt.Println("Bsids :", bsIds, "\n len:", len(bsIds))
 		return bsIds
 
 	case "FFR":
@@ -178,6 +179,84 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 		}
 
 	case "AFFR":
+
+		hexMap := params["hexmap"].(*service.HexMap)
+		intrCancelCount := (params["intcnc"].(uint))
+		//get x,y locations of UE
+		uex := sc.GetUserByID(uint(userID)).X()
+		uey := sc.GetUserByID(uint(userID)).Y()
+
+		//func to find the hex containing the UE
+		currenthex := hexMap.FindContainingHex(uex, uey)
+
+		//cn is the current cell id
+		cn := currenthex.ID
+		fmt.Println("UE : ", userID, " Hexagon id :", cn)
+
+		//finding the UEs in a cell
+		usid := []uint{}
+		us := hexMap.FindContainedUsers(cn)
+		for j := 0; j < len(us); j++ {
+			id := us[j].ID()
+			usid = append(usid, id)
+		}
+
+		posarr := []float64{}
+		for k := 0; k < len(usid); k++ {
+			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, nil)
+			posarr = append(posarr, values["post"].(float64))
+		}
+
+		posarr, ind := sort(posarr)
+		th1 := 20
+		th2 := 10
+		x1 := len(ind)*th1/100
+		x2 := len(ind)*th2/100
+		t:=0
+		for j := 0; j < x1; j++ {
+			if userID == usid[ind[j]] {
+				t=1
+				fmt.Println(" The selected UE ", userID, " follows FR1")
+				bsIds = intrStations("FR1", sc, userID, params)
+			}
+		}
+		if t==0{
+		for j := (x1); j < (x1+x2-1); j++ {
+			if userID == usid[ind[j]] {
+				t=1
+				fmt.Println(" The selected UE ", userID, " follows FR3")
+				bsIds = intrStations("FR3", sc, userID, params)
+			}
+		}
+	}
+	op1:=[]uint{}
+	op2:=[]uint{}
+	var desop uint
+	desop = sc.GetUserByID(userID).DefaultOp().ID()
+	if t==0{
+	for j := (x1+x2); j < len(ind); j++ {
+		if userID == usid[ind[j]] {
+			fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
+			bsIds1 = intrStations("FR3", sc, userID, params)
+			for i:=0;i<len(bsIds1);i++{
+			op1 = append(op1,sc.GetStationByID(bsIds1[i]).OwnerOp().ID())
+			}
+			//fmt.Println("BS :",bsIds1)
+			//fmt.Println("op : ",op1)
+			for k:=0;k<len(bsIds1);k++{
+				if op1[k]==desop {
+						bsIds = append(bsIds,bsIds1[k])
+						op2 = append(op2,op1[k])
+				}
+			}
+			//fmt.Println("---BS :",bsIds)
+			//fmt.Println("--op :",op2)
+
+		}
+
+	}
+}
+	return bsIds
 	default:
 		return nil
 	}
