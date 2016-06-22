@@ -21,7 +21,7 @@ func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationI
 	}
 
 	if level == 0 {
-		actualOper := sc.GetUserByID(userID).DefaultOp().ID()
+		actualOper := sc.GetUserByID(userID).CurrOp.ID()
 		for i := 0; i < len(ind); i++ {
 			if sc.GetStationByID(ind[i]).OwnerOp().ID() == actualOper {
 				tempInd := ind[i]

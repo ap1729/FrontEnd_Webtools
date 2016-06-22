@@ -22,6 +22,7 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) map[string]interface{} 
 		sc.Users()[i].CurrOp = sc.Users()[i].DefaultOp()
 		if enFlags[sc.Users()[i].CurrOp.ID()] == false {
 			sc.Users()[i].CurrOp = sc.GetOperatorByID(uint(rand.Intn(valN-1)) + 1)
+			newOps[i] = sc.Users()[i].CurrOp.ID()
 		}
 	}
 

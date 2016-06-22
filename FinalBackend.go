@@ -157,7 +157,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			returnData = perf.AssignOperators(scenario, opEnable)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
-			returnData = perf.ChangeLevel(scenario, targetLvl)
+			returnData = perf.ChangeLevel(scenario, targetLvl, opEnable)
 			fmt.Println("Level Change complete.")
 		case "sir":
 			frMode := rxData["frmode"].(string)
