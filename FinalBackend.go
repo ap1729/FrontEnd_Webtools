@@ -155,11 +155,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			topN := uint(rxData["topbsno"].(float64))
 
 			var params map[string]interface{}
-			if frMode == "FR3" || frMode == "FFR" {
+			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
 				params = map[string]interface{}{}
 				params["hexmap"] = hexMap
 			}
-			if frMode == "FFR" {
+			if frMode == "FFR" || frMode == "AFFR"{
 				params["intcnc"] = intCancelCount
 			}
 
