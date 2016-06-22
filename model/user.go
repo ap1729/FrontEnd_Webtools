@@ -5,6 +5,8 @@ type User struct {
 	id        uint
 	x, y, ht  float64
 	defaultOp *Operator
+
+	CurrOp *Operator
 }
 
 // Getter methods for all User properties that are not exported (read-only).
@@ -36,5 +38,5 @@ func (ue *User) DefaultOp() *Operator {
 
 // Constructor to instantiate a User. The constructor must be used to create new objects as all properties are read-only.
 func NewUser(id uint, x, y, ht float64, op *Operator) *User {
-	return &User{id: id, x: x, y: y, ht: ht, defaultOp: op}
+	return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op}
 }
