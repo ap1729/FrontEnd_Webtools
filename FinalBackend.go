@@ -18,6 +18,7 @@ import (
 // (Try them out by invoking the suggestion tool by typing the "dot")!
 var scenario *model.Scenario
 var hexMap *service.HexMap
+var opEnable []bool
 
 // A package level object to store return data
 var responseData map[string]interface{}
@@ -50,6 +51,10 @@ func initialize() bool {
 	}
 	scenario = sb.Finalize()
 	sb = nil
+	opEnable = make([]bool, len(scenario.Operators()))
+	for i := 0; i < len(scenario.Operators()); i++ {
+		opEnable[i] = true
+	}
 
 	// Time stamp 3
 	lap3 := time.Now()
@@ -143,6 +148,13 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		switch rxData["perf"] {
 		case "scmeta":
 			returnData = service.PackageScenario(scenario)
+		case "enop":
+			vals := rxData["opflags"].([]interface{})
+			for i := 0; i < len(scenario.Operators()); i++ {
+				opEnable[i] = vals[i].(float64) == 1
+			}
+			fmt.Printf("Enable flags: %v", opEnable)
+			returnData = perf.AssignOperators(scenario, opEnable)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			returnData = perf.ChangeLevel(scenario, targetLvl)
@@ -159,24 +171,24 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				params = map[string]interface{}{}
 				params["hexmap"] = hexMap
 			}
-			if frMode == "FFR" || frMode == "AFFR"{
+			if frMode == "FFR" || frMode == "AFFR" {
 				params["intcnc"] = intCancelCount
 			}
 
-			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, params)
+			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, opEnable, params)
 			fmt.Println("SIR calculation complete.")
 		case "cdf":
 			frMode := rxData["frmode"].(string)
 			intCancelCount := uint(rxData["intcnc"].(float64))
 			var params map[string]interface{}
-			if frMode == "FR3" || frMode == "FFR" {
+			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
 				params = map[string]interface{}{}
 				params["hexmap"] = hexMap
 			}
-			if frMode == "FFR" {
+			if frMode == "FFR" || frMode == "AFFR" {
 				params["intcnc"] = intCancelCount
 			}
-			returnData = perf.CDF(scenario, frMode, intCancelCount, params)
+			returnData = perf.CDF(scenario, frMode, intCancelCount, opEnable, params)
 			fmt.Println("CDF calc done")
 		default:
 			fmt.Println("Unknown command")

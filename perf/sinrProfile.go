@@ -13,10 +13,10 @@ import "FrontEnd_WebTools/model"
 // frMode - frequency-reuse mode
 // intrCancelCount - the number of interferers to cancel
 // profileTopN - for how many top stations the power profile must be returned
-func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint, params map[string]interface{}) map[string]interface{} {
+func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint, opEnable []bool, params map[string]interface{}) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
-	intStatIds := intrStations(frMode, sc, userID, params)
+	intStatIds := intrStations(frMode, sc, userID, opEnable, params)
 	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
 
 	op := make([]uint, len(bsId))

@@ -12,16 +12,19 @@ import (
 // The params map is optional, and can be used to specify additional arguments
 // that may be required for evaluation at a given frequency-reuse mode. If not
 // needed, pass nil.
-func intrStations(mode string, sc *model.Scenario, userID uint, params map[string]interface{}) []uint {
+func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool, params map[string]interface{}) []uint {
 	var bsIds []uint
-	var bsIds1 []uint
 
 	switch mode {
 	case "FR1":
-		bsIds = make([]uint, len(sc.BaseStations()))
-		for i := 0; i < len(sc.BaseStations()); i++ {
-			bsIds[i] = uint(i)
+		bsIds = *new([]uint)
+		fmt.Printf("Enable flags: %v", opEnable)
+		for i := uint(0); i < uint(len(sc.BaseStations())); i++ {
+			if opEnable[sc.GetStationByID(i).OwnerOp().ID()] == true {
+				bsIds = append(bsIds, i)
+			}
 		}
+		fmt.Printf("Allowed BS: %v\n", bsIds)
 
 	case "FR3":
 		hexMap := params["hexmap"].(*service.HexMap)
@@ -65,21 +68,16 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 		frc = append(frc, cn)
 		fmt.Println("FR3 cells :", frc)
 		//array fr3bsno stores the BS IDS in fr3 cells
-		fr3bsno := []uint{}
+		bsIds = *new([]uint)
 		for k := 0; k < len(frc); k++ {
 			//append each cell's bsid to fr3bsno
-			bs1 := hexMap.FindContainedStations(frc[k])
-			for m := 0; m < len(bs1); m++ {
-				id := bs1[m].ID()
-				fr3bsno = append(fr3bsno, id)
+			bs := hexMap.FindContainedStations(frc[k])
+			for m := 0; m < len(bs); m++ {
+				if opEnable[bs[m].OwnerOp().ID()] == true {
+					bsIds = append(bsIds, bs[m].ID())
+				}
 			}
 		}
-
-		bsIds = make([]uint, len(fr3bsno))
-		for p := 0; p < len(fr3bsno); p++ {
-			bsIds[p] = fr3bsno[p]
-		}
-		//fmt.Println("Bsids :", bsIds, "\n len:", len(bsIds))
 
 	case "FFR":
 		hexMap := params["hexmap"].(*service.HexMap)
@@ -103,9 +101,6 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			usid = append(usid, id)
 		}
 
-		//fmt.Println("Users :",usid)
-		//fmt.Println("len :",len(usid))
-
 		//finding FR1 Post SINR for all UEs in the current cell, and store it in an array called posarr
 		posarr := []float64{}
 		for k := 0; k < len(usid); k++ {
@@ -119,7 +114,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			// 	op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
 			// }
 			// arr := []float64{}
-			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, nil)
+			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, opEnable, nil)
 			posarr = append(posarr, values["post"].(float64))
 		}
 		//fmt.Println("POST SINR :",posarr)
@@ -168,17 +163,16 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 			if userID == usid[ind[j]] {
 				t = 1
 				fmt.Println(" The selected UE ", userID, " follows FR1")
-				bsIds = intrStations("FR1", sc, userID, params)
+				bsIds = intrStations("FR1", sc, userID, opEnable, params)
 			}
 		}
 		if t == 0 {
 			fmt.Println(" The selected UE ", userID, " follows FR3")
-			bsIds = intrStations("FR3", sc, userID, params)
+			bsIds = intrStations("FR3", sc, userID, opEnable, params)
 			break
 		}
 
 	case "AFFR":
-
 		hexMap := params["hexmap"].(*service.HexMap)
 		intrCancelCount := (params["intcnc"].(uint))
 		//get x,y locations of UE
@@ -202,57 +196,50 @@ func intrStations(mode string, sc *model.Scenario, userID uint, params map[strin
 
 		posarr := []float64{}
 		for k := 0; k < len(usid); k++ {
-			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, nil)
+			values := SinrProfile(sc, "FR1", usid[k], 1, intrCancelCount, 1, opEnable, nil)
 			posarr = append(posarr, values["post"].(float64))
 		}
 
 		posarr, ind := sort(posarr)
 		th1 := 20
 		th2 := 10
-		x1 := len(ind)*th1/100
-		x2 := len(ind)*th2/100
-		t:=0
+		x1 := len(ind) * th1 / 100
+		x2 := len(ind) * th2 / 100
+		t := 0
 		for j := 0; j < x1; j++ {
 			if userID == usid[ind[j]] {
-				t=1
+				t = 1
 				fmt.Println(" The selected UE ", userID, " follows FR1")
-				bsIds = intrStations("FR1", sc, userID, params)
+				bsIds = intrStations("FR1", sc, userID, opEnable, params)
+				break
 			}
 		}
-		if t==0{
-		for j := (x1); j < (x1+x2-1); j++ {
-			if userID == usid[ind[j]] {
-				t=1
-				fmt.Println(" The selected UE ", userID, " follows FR3")
-				bsIds = intrStations("FR3", sc, userID, params)
-			}
-		}
-	}
-	op1:=[]uint{}
-	op2:=[]uint{}
-	var desop uint
-	desop = sc.GetUserByID(userID).DefaultOp().ID()
-	if t==0{
-	for j := (x1+x2); j < len(ind); j++ {
-		if userID == usid[ind[j]] {
-			fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
-			bsIds1 = intrStations("FR3", sc, userID, params)
-			for i:=0;i<len(bsIds1);i++{
-			op1 = append(op1,sc.GetStationByID(bsIds1[i]).OwnerOp().ID())
-			}
-			//fmt.Println("BS :",bsIds1)
-			//fmt.Println("op : ",op1)
-			for k:=0;k<len(bsIds1);k++{
-				if op1[k]==desop {
-						bsIds = append(bsIds,bsIds1[k])
-						op2 = append(op2,op1[k])
+		if t == 0 {
+			for j := (x1); j < (x1 + x2 - 1); j++ {
+				if userID == usid[ind[j]] {
+					t = 1
+					fmt.Println(" The selected UE ", userID, " follows FR3")
+					bsIds = intrStations("FR3", sc, userID, opEnable, params)
+					break
 				}
 			}
-			//fmt.Println("---BS :",bsIds)
-			//fmt.Println("--op :",op2)
-
 		}
-}
+		if t == 0 {
+			var desop uint
+			desop = sc.GetUserByID(userID).CurrOp.ID()
+			for j := (x1 + x2); j < len(ind); j++ {
+				if userID == usid[ind[j]] {
+					fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
+					bsIdsAll := intrStations("FR3", sc, userID, opEnable, params)
+					bsIds = *new([]uint)
+					for i := 0; i < len(bsIdsAll); i++ {
+						if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desop {
+							bsIds = append(bsIds, bsIdsAll[i])
+						}
+					}
+				}
+			}
+		}
 	default:
 		return nil
 	}
