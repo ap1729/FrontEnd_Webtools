@@ -19,13 +19,11 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 	case "FR1":
 		//FR1 sends the list of BS in cells that match the operator(s) received
 		bsIds = *new([]uint)
-		fmt.Printf("Enable flags: %v", opEnable)
 		for i := uint(0); i < uint(len(sc.BaseStations())); i++ {
 			if opEnable[sc.GetStationByID(i).OwnerOp().ID()] == true {
 				bsIds = append(bsIds, i)
 			}
 		}
-		fmt.Printf("Allowed BS: %v\n", bsIds)
 
 	case "FR3":
 		//FR3 sends a list of BS in FR3 cells that match the operator(s) received
@@ -38,7 +36,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 
 		//cn is the current cell id
 		cn := currenthex.ID
-		fmt.Println("UE : ", userID, " Hexagon id :", cn)
+		// fmt.Println("UE : ", userID, " Hexagon id :", cn)
 
 		//2nd tier neighbors
 		//2nd tier cells are in the array snids
@@ -61,7 +59,7 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 			break
 		}
 		frc = append(frc, cn)
-		fmt.Println("FR3 cells :", frc)
+		// fmt.Println("FR3 cells :", frc)
 
 		//array bsIds stores the BS IDS of the required operators in fr3 cells
 		bsIds = *new([]uint)
@@ -192,18 +190,27 @@ func intrStations(mode string, sc *model.Scenario, userID uint, opEnable []bool,
 
 		//Assign FR3, but with only one operator from each FR3 cell to UEs that  remain.
 		if t == 0 {
+			fmt.Printf("\nRare case reached!\n")
+			fmt.Printf("User ID: %v, x1: %v, x2: %v", userID, x1, x2)
 			var desop uint
 			desop = sc.GetUserByID(userID).CurrOp.ID()
-			for j := (x1 + x2); j < len(ind); j++ {
+			fmt.Printf("Dest Op: %v, Max users: %v, Max ind: %v", desop, len(usid), len(ind))
+
+			fmt.Printf("User ID's: %v", usid)
+
+			for j := (x1 + x2 - 1); j < len(ind); j++ {
+				fmt.Printf("Loop reached, iteration: %v, usid: %v\n", ind[j], usid[ind[j]])
 				if userID == usid[ind[j]] {
 					fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
 					bsIdsAll := intrStations("FR3", sc, userID, opEnable, level, params)
 					bsIds = *new([]uint)
 					for i := 0; i < len(bsIdsAll); i++ {
+						fmt.Printf("Desired: %v, Iteration: %v", desop, sc.GetStationByID(bsIdsAll[i]).OwnerOp())
 						if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desop {
 							bsIds = append(bsIds, bsIdsAll[i])
 						}
 					}
+					break
 				}
 			}
 		}
