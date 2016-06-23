@@ -49,6 +49,7 @@ svg {
     stroke-width: 1px;
     fill: black;
     fill-opacity: 0.05;
+    pointer-events: none;
 }
 
 
@@ -83,8 +84,8 @@ div.visible {
     border-top: 16px solid #3498db; /* Blue */
     border-radius: 50%;
     position:absolute;
-    top:400px;
-    left:600px;
+    top:200px;
+    left:400px;
     width: 120px;
     height: 120px;
     display: none;
@@ -242,9 +243,10 @@ field{
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 5%;" >    
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width:5%;"> 
                 Post SINR <input id="PostSINR" type="number" step="0.01" style="width: 5%;">              
-              </form>
-              </div>
-            </div>
+          </form>
+        </div>
+             
+    </div>
           
         </div>
 
@@ -300,9 +302,7 @@ field{
   var currselected=-1; //latest selected circle
   var wcount=0;//window number for cdf plot
   var wcount1=0;
- // var BScord=[];//basestation coords 
-  //var idtochange=""; // for dragging , unnecessary
-  
+
 
 var x = d3.scale.linear()
     .domain([-2200, (2300 )]) // changes range of values for x axis
@@ -367,14 +367,13 @@ svgContainer.append("g")
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),doPlot,"json");
-document.getElementById("loader").style.display = "none";
+
 
 
 //temporary to make opflags as 1,1,1,1
 BackObj1={perf:"enop",opflags:[1,1,1,1]};//params is to which level
  console.log(JSON.stringify(BackObj1));
 
-document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj1),onsuccess1,"json");//getting from server
 document.getElementById("loader").style.display = "none";
 
@@ -454,6 +453,7 @@ function mouseOver(d, i) {
     d3.select(this).classed('over', true);
     if(level==0)
     { 
+        console.log("AA",d.id);
        d3.select(this).attr("title","UE"+d.id);
       }
       else if(level==1)
@@ -838,7 +838,7 @@ BackObj={perf:"enop",opflags:a};//params is to which level
 
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
-document.getElementById("loader").style.display = "none";
+
 
 }
 
@@ -863,13 +863,14 @@ str1="#UE";
    }
    
   }
+  document.getElementById("loader").style.display = "none";
 }
 
 
 function level1()
 {
 
-
+document.getElementById("loader").style.display = "block";
 
 //console.log("BBBBBB",currselected);//row no 
 topBSno=document.getElementById("TopBSno").value;
@@ -884,7 +885,7 @@ else
 BackObj={perf:"lvlchng",params:1,frmode:document.getElementById("FR").value };//params is to which level
  console.log(JSON.stringify(BackObj));
 
-document.getElementById("loader").style.display = "block";
+
 $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 
@@ -892,16 +893,13 @@ level=1;//updating level
 //console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
-document.getElementById("loader").style.display = "none"; 
-
-
 if(topx=="")
  topx=3;
 else
   topx=parseInt(topx);
 if(currselected!=-1) 
 {
-
+document.getElementById("loader").style.display = "block";
 BackObj1={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj1));
 $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
@@ -939,7 +937,6 @@ BackObj={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,nois
 console.log(JSON.stringify(BackObj));
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server 
  }
- document.getElementById("loader").style.display = "none";
 }
 
 function Reset()
@@ -1049,6 +1046,7 @@ var y = d3.scale.linear()
   grid.enter()
   .sort(function(a, b) { return a.id - b.id; })
   .append("circle")
+  .attr("class","tile")
   .attr("cx",function(d){ return x(d.centroid[0]); })
   .attr("cy",function(d){ return y(d.centroid[1]);})
   .attr("r", (40)) //radius of 200=40*5 m //linear scale of 5
@@ -1227,8 +1225,8 @@ ctx.font="30px Arial";//font and size of text
 ctx.fillText("CDF CURVES:",600,100);//heading
 ctx.fillText(document.getElementById("FR").value,820,100);
 plotcurve(obj.data.sinr,obj.data.pre0,"#3399ff");//blue
-plotcurve(obj.data.sinr,obj.data.post0,"#ff0066");//pink
-plotcurve(obj.data.sinr,obj.data.pre1,"#ff9933");//orange
+plotcurve(obj.data.sinr,obj.data.pre1,"#ff0066");//pink
+plotcurve(obj.data.sinr,obj.data.post0,"#ff9933");//orange
 plotcurve(obj.data.sinr,obj.data.post1,"#800000");//brown
 ctx.fillText("SINR value in dBm",600,2500);
 //creating legend
