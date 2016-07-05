@@ -160,8 +160,10 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			returnData = perf.ChangeLevel(scenario, targetLvl, opEnable)
 			fmt.Println("Level Change complete.")
 		case "emer":
+			fmt.Println("Emergency reached.")
 			returnData = perf.EmDownlink(scenario, hexMap, opEnable)
 			fmt.Println("Emergency downlink complete.")
+			fmt.Println("\nData:\n", returnData)
 		case "sir":
 			frMode := rxData["frmode"].(string)
 			ueID := uint(rxData["node"].(float64))
