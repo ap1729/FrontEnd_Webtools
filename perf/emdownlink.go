@@ -8,7 +8,7 @@ import (
 	"math/rand"
 )
 
-func EmDownlink(sc model.Scenario, hexMap service.HexMap, opEnable []bool) map[string]interface{} {
+func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map[string]interface{} {
 	nBS := len(sc.BaseStations())
 	nUE := len(sc.Users())
 
