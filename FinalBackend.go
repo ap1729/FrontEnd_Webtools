@@ -14,6 +14,11 @@ import (
 	"time"
 )
 
+// Data generation modes:
+// Read CSV - "import"
+// Generate manually - "manual"
+const dataGenOpt = "import"
+
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
 var scenario *model.Scenario
@@ -29,26 +34,48 @@ var responseData map[string]interface{}
 
 func initialize() bool {
 
+	// Time stamp variables
+	var lap1, lap2, lap3 time.Time
+
 	// Time stamp 1
-	lap1 := time.Now()
+	lap1 = time.Now()
 
-	// Read all nodes (BS and UE)
 	sb := model.NewScenarioBuilder()
-	suc := service.ReadNodes(sb, "data/SectorLocations.csv")
-	if suc == false {
-		// fmt.Printf("Error: %v", err)
+	if dataGenOpt == "import" {
+
+		// Read all nodes (BS and UE)
+		suc := service.ReadNodes(sb, "data/SectorLocations.csv")
+		if suc == false {
+			// fmt.Printf("Error: %v", err)
+			return false
+		}
+		// Time stamp 2
+		lap2 = time.Now()
+		// Import loss values into Scenario object
+		suc = service.ReadLossTable(sb, "data/SectorLosses.csv")
+		if suc == false {
+			// fmt.Printf("Error: %v", err)
+			return false
+		}
+
+	} else if dataGenOpt == "manual" {
+
+		suc := service.GenerateMap(sb)
+		if suc == false {
+			return false
+		}
+		// Time stamp 2
+		lap2 = time.Now()
+		// Generate losses using path loss model manually
+		suc = sb.Seal("calc", nil)
+		if suc == false {
+			return false
+		}
+
+	} else {
 		return false
 	}
 
-	// Time stamp 2
-	lap2 := time.Now()
-
-	// Import loss values into Scenario object
-	suc = service.ReadLossTable(sb, "data/SectorLosses.csv")
-	if suc == false {
-		// fmt.Printf("Error: %v", err)
-		return false
-	}
 	scenario = sb.Finalize()
 	sb = nil
 	opEnable = make([]bool, len(scenario.Operators()))
@@ -57,7 +84,7 @@ func initialize() bool {
 	}
 
 	// Time stamp 3
-	lap3 := time.Now()
+	lap3 = time.Now()
 
 	// Generate hexagonal cell map of ISD 1000 and upto 3 tiers
 	hm := service.NewHexMap(500*2/math.Sqrt(3), 3)
