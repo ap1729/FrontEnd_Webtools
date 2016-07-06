@@ -39,10 +39,6 @@ svg {
     background: white;
 }
 
-.bounds {
-    stroke: red;
-    fill: none;
-}
 
 .tile {
     stroke: black;
@@ -54,7 +50,6 @@ svg {
 
 
 .ue {
-  
   stroke: steelblue;
   stroke-width: 0.6px;
 }
@@ -73,6 +68,7 @@ svg {
   fill: black!important;
   fill-opacity: 0.15;
 }  
+
 
 
 div.visible {
@@ -136,6 +132,7 @@ field{
    svgContainer {
   font: 10px sans-serif;
   shape-rendering: crispEdges;
+  pointer-events:none;
    }
   rect {
   fill: #ddd;
@@ -224,6 +221,7 @@ field{
                            <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
                            <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
                            <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
+                           <button type="button" class="btn btn-default" title="Emergency heatmap" data-toggle="tooltip" onclick="emergency()">Emergency</button>
                          <br>  <br>Click UE to view SIR profile
                          <br>(graph is plotted below,else check POPUP ACTIVE on the left side)
                 </fieldset>
@@ -453,8 +451,8 @@ function mouseOver(d, i) {
     d3.select(this).classed('over', true);
     if(level==0)
     { 
-        console.log("AA",d.id);
-       d3.select(this).attr("title","UE"+d.id);
+     // console.log("AA",this.id,d.id);
+       d3.select(this).attr("title",this.id);
       }
       else if(level==1)
       {
@@ -479,6 +477,7 @@ function mouseOver(d, i) {
         {
          currop=5;
         }
+        
         d3.select(this).attr("title","UE" +(d.id)+" Def:"+d.opid+" Curr:"+currop);
 
       }
@@ -500,7 +499,7 @@ if(checkerr(obj.status)<0)
 {
    console.log("backend error");
 } 
-else{
+else{9
 //obj.SIR is SIR
 //obj.SINR has PreSINr,PostSINR and ROI in a array
 //obj.BSid is top x basestation id's
@@ -552,6 +551,12 @@ if(document.getElementById("TopBS").checked == true)
 PlotBarGraph(barData,obj.data.pre,obj.data.post);
 
 document.getElementById("loader").style.display = "none";
+      if(document.getElementById("popup").checked == true)
+      {
+      wcount++;
+      newwindow();//plot on graph
+       }
+
  }
 }
 
@@ -590,12 +595,7 @@ $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 //above change the backend code and do parsing
 
-if(document.getElementById("popup").checked == true)
-{
-wcount++;
-newwindow(d.id);//plot on graph
 
-}
 
     var element = d3.select(this),
         selected = element.classed('selected');
@@ -1051,8 +1051,7 @@ var y = d3.scale.linear()
   .attr("cy",function(d){ return y(d.centroid[1]);})
   .attr("r", (40)) //radius of 200=40*5 m //linear scale of 5
   .style("fill","none")
-  .style("stroke","blue")
-  .attr('pointer-events', 'none');
+  .style("stroke","blue");
  
   grid.exit().remove();
 }
@@ -1160,11 +1159,11 @@ function getVisibleData() {
 })();
 
 var node;
-function newwindow(idno){
+function newwindow(){
   //function to open a new window and put graph
   var embedded_svg = document.getElementById("Output");//visual
   //console.log(embedded_svg);
- 
+  
   var svg_win = window.open("", "svg_win"+wcount.toString(),"width=500,height=500");
   //var title=svg_win.document.createElement("title")
 
@@ -1466,6 +1465,20 @@ $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");
 */
  }
 }
+function emergency(){
+
+BackObj={perf:"emer"};
+ console.log(JSON.stringify(BackObj));
+document.getElementById("loader").style.display = "block";
+$.post("/update",JSON.stringify(BackObj),heatmap,"json");//getting from server
+
+}
+function heatmap(obj){
+ 
+ console.log(obj,"is recieved");
+  document.getElementById("loader").style.display = "none";
+}
+
     </script>
 
   </body>
