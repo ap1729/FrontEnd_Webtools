@@ -103,6 +103,7 @@ func (sb *ScenarioBuilder) Seal(lossOpt string, lossTable [][]float64) bool {
 		goto successCase
 	}
 	if lossOpt == "calc" {
+		sb.scenario.lossTable = make([][]float64, M)
 		for i := 0; i < M; i++ {
 			sb.scenario.lossTable[i] = make([]float64, N)
 			for j := 0; j < N; j++ {

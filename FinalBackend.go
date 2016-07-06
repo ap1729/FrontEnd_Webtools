@@ -17,7 +17,7 @@ import (
 // Data generation modes:
 // Read CSV - "import"
 // Generate manually - "manual"
-const dataGenOpt = "import"
+const dataGenOpt = "manual"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
