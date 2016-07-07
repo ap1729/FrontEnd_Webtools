@@ -2,13 +2,15 @@ package model
 
 import . "math"
 
+// TODO: Sectoring gain is to be incorporated. Currently it behaves omnidirectional.
+
 func HataLoss(x1, y1, x2, y2 float64) float64 {
 	var dist float64     // Link Distance (km)
-	var hB float64 = 20  // Height of BS (m)
-	var hM float64 = 5   // Height of MS (m)
-	var fr float64 = 500 // Frequency (MHz)
+	var hB float64 = 25  // Height of BS (m)
+	var hM float64 = 1.5 // Height of MS (m)
+	var fr float64 = 400 // Frequency (MHz)
 	var cH float64       // Antenna correction factor
-	const citySize string = "large"
+	const citySize string = "medium"
 
 	dist = euclideanDist(x1, y1, x2, y2) / 1000
 	if citySize == "small" || citySize == "medium" {

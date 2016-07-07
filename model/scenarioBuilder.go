@@ -107,7 +107,7 @@ func (sb *ScenarioBuilder) Seal(lossOpt string, lossTable [][]float64) bool {
 		for i := 0; i < M; i++ {
 			sb.scenario.lossTable[i] = make([]float64, N)
 			for j := 0; j < N; j++ {
-				sb.scenario.lossTable[i][j] = HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
+				sb.scenario.lossTable[i][j] = -1 * HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
 					sb.scenario.Users()[i].X(), sb.scenario.Users()[i].Y())
 			}
 		}
