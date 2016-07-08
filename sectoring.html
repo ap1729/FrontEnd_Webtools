@@ -1476,6 +1476,25 @@ $.post("/update",JSON.stringify(BackObj),heatmap,"json");//getting from server
 function heatmap(obj){
  
  console.log(obj,"is recieved");
+ if(checkerr(obj.status)<0)
+{
+ console.log("error");
+}
+else{
+      //UE id starts from UE0
+      var color = d3.scale.linear()
+            .domain([-45,-25]) //domain of value  corresponding to colour
+            .range(['blue','red']);//colour to go change value
+      str1="#UE";
+       for(i=0;i<obj.data.rxpow.length;i++)
+         {
+          str2=str1+(i).toString();//UE id starts from UE0 for sectoring
+          //obj.data.rxpow[i] is a value for which corresponding colour is given,change below linear
+          d3.select(str2).style("fill",color(obj.data.rxpow[i]));
+   }
+   
+}
+
   document.getElementById("loader").style.display = "none";
 }
 
