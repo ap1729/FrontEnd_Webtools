@@ -8,11 +8,11 @@
     <!-- Bootstrap CSS -->
 
   <script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
-    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">   
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script src="/bower_components/d3/d3.js" type="text/javascript" charset="utf-8" async defer></script>
     <script type="text/javascript" src="/js/jquery.js"></script>
       <script src="/js/bootstrap.min.js"></script>
-      <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script> 
+      <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -32,7 +32,7 @@ svg {
 }
 
 .ue {
-  
+
   stroke: yellow;
   stroke-width: 0.6px;
 }
@@ -46,14 +46,14 @@ svg {
 
 
 .over {
-    fill: black!important;  /* to show selected on hover*/    
+    fill: black!important;  /* to show selected on hover*/
     fill-opacity: 0.8 !important;
   }
 
 .inactive{
   fill: black!important;
   fill-opacity: 0.15;
-}  
+}
 
 
 div.visible {
@@ -109,7 +109,7 @@ div.visible {
   fill: none;
   stroke: #fff;
   }
- 
+
    </style>
     </head>
 
@@ -127,12 +127,12 @@ div.visible {
    <h1 class="text-center">Emergency Hexagonal Grid</h1>
 
     <div class="panel panel-default">
-      
+
       <div class="panel-body">
         <div class="well">
            <div id="drawbox">
             <div class="loader" id="loader"></div>
-          
+
 
            </div>
         </div>
@@ -143,8 +143,8 @@ div.visible {
   <!-- Bootstrap JavaScript -->
 
  <!-- <script src="//d3js.org/d3.v3.min.js"></script> -->  <!-- Needs internet -->
-   <script type="text/javascript" src="/d3/d3.min.js"></script> 
-  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script> 
+   <script type="text/javascript" src="/d3/d3.min.js"></script>
+  <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
 
 <script type="text/javascript">
 var x = d3.scale.linear()
@@ -162,7 +162,7 @@ function SetSize(){
 var color = d3.scale.linear()
             .domain([-50,-30,-20,-10]) //domain of value  corresponding to colour
             .range(['black','red','blue','green']);//colour to go change value
-  
+
   xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom")
@@ -220,15 +220,15 @@ d3.csv('/data/emergency.csv',//Sectorlocations.csv'
                     var i=0;
 
                  var circles = svgContainer.selectAll("circle").data(rows).enter().append("circle");
-            circles.attr("r", function(d,i) { return (3.5);}) 
-           /* .attr("id",function(d,i){ 
-           
+            circles.attr("r", function(d,i) { return (3.5);})
+           /* .attr("id",function(d,i){
+
               return "UE"+d.col1//original "UE"+d.node[2].toString()+"-"+d.col1
 
              })*/
           .attr("class","ue")
             .attr("cx",function(d,i) { return x(d.X); })
-            .attr("cy",function(d,i) { return y(d.Y); })  
+            .attr("cy",function(d,i) { return y(d.Y); })
             .style("fill",function(d,i) { //return "blue";
                                           return color(d.RxPow);
                                          // return opercolor[parseInt(d.node[2])-1].color;
@@ -256,7 +256,6 @@ function zoomed() {
 
 
 
-
 //Hexagon creation here
 var data = [];
 
@@ -274,7 +273,7 @@ var w = 4000, // width
     padding = 50;
 
 var translate = [0, 0];
- 
+
 
 function initialize() {
       fillMap();
@@ -289,7 +288,7 @@ function fillMap() {
     for (var j = -radius; j <= radius; j++) {
         var i = limit1;
         while (i <= limit2) {
-          
+
             data.push({
                 id: id++,
                 coordinates: [i-2, j],  //i-2 to centralise hexagons
@@ -338,7 +337,7 @@ function renderMap() {
         .attr('points', function(d) {
             return hex(d.centroid, size, tilted).join(' '); //creates hexagon
         }) .style("pointer-events", "none").attr("transform", "translate(0," + 0 + ")");
- 
+
  var x = d3.scale.linear()
     .domain([-2200, (2300 )]) // changes range of values for x axis
     .range([0, 900]); //900 is width value which is defined in Setsize()
@@ -355,7 +354,7 @@ var y = d3.scale.linear()
   .style("fill","none")
   .style("stroke","blue")
   .attr('pointer-events', 'none');
- 
+
   grid.exit().remove();
 }
 
@@ -381,7 +380,7 @@ function moveMap() {
         d.visible = false;
         return d;
     });
-    
+
     data.filter(function(d) {
         var x = d.centroid[0] + dx,
             y = d.centroid[1] + dy;
@@ -391,9 +390,9 @@ function moveMap() {
         return d;
     });
     //
-    
+
     renderMap();
-    
+
     svg.selectAll('.tile')
         .attr('transform', 'translate(' + [dx, dy] + ')');
 }
@@ -407,7 +406,7 @@ function removeAll() {
 }
 
 function hex(centroid) {
-    var a = 1000/Math.sqrt(3),//size / 2, 
+    var a = 1000/Math.sqrt(3),//size / 2,
         b = 500,//(Math.sqrt(3) * a) / 2,
         x = centroid[0],
         y = centroid[1];
@@ -455,7 +454,7 @@ function zoom(amount) {
     move(dx, dy);
 }
 
-function getVisibleData() { 
+function getVisibleData() {
     return data.filter(function(d) { return d.visible; });
 }
 
