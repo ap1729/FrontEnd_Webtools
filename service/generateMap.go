@@ -37,7 +37,7 @@ func GenerateMap(sb *model.ScenarioBuilder) bool {
 	step := float64(50)
 
 	// From manual calculations, equation of border line to 3-tier cell map is:
-	// x = (|y| - 4*side) / sqrt(3)
+	// x = (|y| - 8*side) / sqrt(3)
 	// We can tightly fit the map by varying y as [-4*side, 4*side]
 
 	numOp := len(scTemp.Operators())
@@ -45,7 +45,7 @@ func GenerateMap(sb *model.ScenarioBuilder) bool {
 	for i = -4 * side; i <= 4*side; i += step {
 		y := i
 		iniX := (Abs(y) - 8*side) / Sqrt(3)
-		for j = iniX; j < Abs(iniX); j += step {
+		for j = iniX; j <= Abs(iniX); j += step {
 			x := j
 			sb.AddNode("UE", x, y, 0, scTemp.GetOperatorByID(uint(rand.Intn(numOp))).ID())
 		}

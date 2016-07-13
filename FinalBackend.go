@@ -14,10 +14,13 @@ import (
 	"time"
 )
 
+// TODO: Move these consts to a config file.
 // Data generation modes:
 // Read CSV - "import"
 // Generate manually - "manual"
 const dataGenOpt = "import"
+const locFilePath = "data/MyLocations.csv"
+const lossFilePath = "data/MyLosses.csv"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
@@ -44,7 +47,7 @@ func initialize() bool {
 	if dataGenOpt == "import" {
 
 		// Read all nodes (BS and UE)
-		suc := service.ReadNodes(sb, "data/SectorLocations.csv")
+		suc := service.ReadNodes(sb, locFilePath)
 		if suc == false {
 			// fmt.Printf("Error: %v", err)
 			return false
@@ -52,7 +55,7 @@ func initialize() bool {
 		// Time stamp 2
 		lap2 = time.Now()
 		// Import loss values into Scenario object
-		suc = service.ReadLossTable(sb, "data/SectorLosses.csv")
+		suc = service.ReadLossTable(sb, lossFilePath)
 		if suc == false {
 			// fmt.Printf("Error: %v", err)
 			return false
