@@ -1,6 +1,7 @@
 package perf
 
 import "FrontEnd_WebTools/model"
+import "FrontEnd_WebTools/service"
 
 // TODO: Truncating the profile values as per end-user request is wrongly handled
 // here. The job of this function is to solely compute results independent of
@@ -10,16 +11,15 @@ import "FrontEnd_WebTools/model"
 //
 // Parameter description:
 //
-// frMode - frequency-reuse mode
-// intrCancelCount - the number of interferers to cancel
+// p - The parameters of the model to be simulated
 // profileTopN - for how many top stations the power profile must be returned
-func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, intrCancelCount uint, profileTopN uint, opEnable []bool, params map[string]interface{}) map[string]interface{} {
+func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profileTopN uint, p *Params) map[string]interface{} {
 	returnData := map[string]interface{}{}
 
 	// What stations interfere with the current user, given the system parameters
-	intStatIds := intrStations(frMode, sc, userID, opEnable, level, params)
+	intStatIds := intrStations(sc, hexMap, userID, p)
 	// The loss profile and corresponding BaseStation source ID's
-	losses, bsId := signalLossProfile(userID, sc, level, intStatIds)
+	losses, bsId := lossProfile(sc, hexMap, userID, intStatIds, p)
 
 	op := make([]uint, len(bsId))
 	for i := 0; i < len(bsId); i++ {
@@ -28,7 +28,7 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	}
 
 	// Calculate SINR and ROI
-	sinrVals := sinr(losses, intrCancelCount)
+	sinrVals := sinr(losses, p.IntCancellers)
 	returnData["pre"] = sinrVals[0]
 	returnData["post"] = sinrVals[1]
 	returnData["roi"] = sinrVals[2]
@@ -36,7 +36,6 @@ func SinrProfile(sc *model.Scenario, frMode string, userID uint, level uint, int
 	if profileTopN > uint(len(losses)) {
 		profileTopN = uint(len(losses))
 	}
-
 	returnData["bsid"] = bsId[0:profileTopN]
 	returnData["opno"] = op[0:profileTopN]
 	returnData["sir"] = losses[0:profileTopN]

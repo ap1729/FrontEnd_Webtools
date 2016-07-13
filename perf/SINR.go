@@ -1,7 +1,6 @@
 package perf
 
 import (
-	// "fmt"
 	"math"
 )
 
@@ -18,22 +17,22 @@ import (
 // Note: This function does not order the signal profile and computes results
 // directly on the array in the same order of elements it is passed.
 func sinr(values []float64, intrCancelCount uint) []float64 {
-	// Values is recieved signal powers
+	// Values is the recieved signal powers
 	var calc = []float64{}
 
-	//Pre Processing SINR
+	// Pre Processing SINR
 	var sum float64 = 0.0
 	for i := 1; i < len(values); i++ {
 		sum += math.Pow(10, (values[i] / 10))
 	}
-	calc = append(calc, values[0]-10*math.Log10(sum)) //Pre SINR
+	calc = append(calc, values[0]-10*math.Log10(sum)) // Pre SINR
 
-	//Post Processing SINR
+	// Post Processing SINR
 	sum = 0.0
 	for i := int(intrCancelCount) + 1; i < len(values); i++ {
 		sum += math.Pow(10, (values[i] / 10))
 	}
-	calc = append(calc, values[0]-10*math.Log10(sum)) //Post SINR
-	calc = append(calc, 10*math.Log10(sum))           //ROI
+	calc = append(calc, values[0]-10*math.Log10(sum)) // Post SINR
+	calc = append(calc, 10*math.Log10(sum))           // ROI
 	return calc
 }

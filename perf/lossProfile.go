@@ -2,6 +2,7 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
+	"FrontEnd_WebTools/service"
 )
 
 // Retreives the signal loss profile for a user and its interfering stations
@@ -11,7 +12,7 @@ import (
 // additionally incorporating any order constraints specified by the level of
 // cooperation. The second return value specifies the BaseStation indices
 // corresponding to the source of the loss value.
-func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationIds []uint) ([]float64, []uint) {
+func lossProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, intrStationIds []uint, p *Params) ([]float64, []uint) {
 	losses := filter(sc.LossProfile(userID), intrStationIds)
 	losses, ind := sort(losses)
 	// The sort indices were created for the loss array, and are sequential from
@@ -20,7 +21,7 @@ func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationI
 		ind[i] = intrStationIds[ind[i]]
 	}
 
-	if level == 0 {
+	if p.Level == 0 {
 		actualOper := sc.GetUserByID(userID).CurrOp.ID()
 		for i := 0; i < len(ind); i++ {
 			if sc.GetStationByID(ind[i]).OwnerOp().ID() == actualOper {
@@ -38,7 +39,7 @@ func signalLossProfile(userID uint, sc *model.Scenario, level uint, intrStationI
 		return losses, ind
 	}
 
-	if level == 1 {
+	if p.Level == 1 {
 		return losses, ind
 	}
 

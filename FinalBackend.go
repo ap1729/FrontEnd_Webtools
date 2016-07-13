@@ -175,6 +175,14 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		var returnData map[string]interface{}
 
+		// This is safe; if the key does not exist, the variable is assigned its default zero value.
+		frMode, _ := rxData["frmode"].(string)
+		ueID, _ := rxData["node"].(float64)
+		curLevel, _ := rxData["level"].(float64)
+		intCancelCount, _ := rxData["intcnc"].(float64)
+		topN, _ := rxData["topbsno"].(float64)
+		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: uint(opEnable)}
+
 		switch rxData["perf"] {
 		case "scmeta":
 			returnData = service.PackageScenario(scenario)
@@ -183,66 +191,20 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			for i := 0; i < len(scenario.Operators()); i++ {
 				opEnable[i] = vals[i].(float64) == 1
 			}
-			fmt.Printf("Enable flags: %v", opEnable)
 			returnData = perf.AssignOperators(scenario, opEnable)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			returnData = perf.ChangeLevel(scenario, targetLvl, opEnable)
-			fmt.Println("Level Change complete.")
 		case "emer":
-			fmt.Println("Emergency reached.")
 			returnData = perf.EmDownlink(scenario, hexMap, opEnable)
-			fmt.Println("Emergency downlink complete.")
-			fmt.Println("\nData:\n", returnData)
 		case "sir":
-			frMode := rxData["frmode"].(string)
-			ueID := uint(rxData["node"].(float64))
-			level := uint(rxData["level"].(float64))
-			intCancelCount := uint(rxData["intcnc"].(float64))
-			topN := uint(rxData["topbsno"].(float64))
-
-			var params map[string]interface{}
-			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
-				params = map[string]interface{}{}
-				params["hexmap"] = hexMap
-			}
-			if frMode == "FFR" || frMode == "AFFR" {
-				params["intcnc"] = intCancelCount
-			}
-
-			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, opEnable, params)
-			fmt.Println("SIR calculation complete.")
+			returnData = perf.SinrProfile(scenario, hexMap, ueID, uint(topN), params)
 		case "heatmap":
-			frMode := rxData["frmode"].(string)
-			level := uint(rxData["level"].(float64))
-			intCancelCount := uint(rxData["intcnc"].(float64))
-
-			var params map[string]interface{}
-			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
-				params = map[string]interface{}{}
-				params["hexmap"] = hexMap
-			}
-			if frMode == "FFR" || frMode == "AFFR" {
-				params["intcnc"] = intCancelCount
-			}
-
-			returnData = perf.SinrHeatMap(scenario, frMode, level, intCancelCount, opEnable, params)
-			fmt.Println("Heat Map calculation complete.")
+			returnData = perf.SinrHeatMap(scenario, hexMap, params)
 		case "cdf":
-			frMode := rxData["frmode"].(string)
-			intCancelCount := uint(rxData["intcnc"].(float64))
-			var params map[string]interface{}
-			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
-				params = map[string]interface{}{}
-				params["hexmap"] = hexMap
-			}
-			if frMode == "FFR" || frMode == "AFFR" {
-				params["intcnc"] = intCancelCount
-			}
 			returnData = perf.CDF(scenario, frMode, intCancelCount, opEnable, params)
-			fmt.Println("CDF calc done")
 		default:
-			fmt.Println("Unknown command")
+			fmt.Println("\nFATAL: Unknown command")
 			return
 		}
 
