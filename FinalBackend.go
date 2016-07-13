@@ -212,6 +212,22 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 			returnData = perf.SinrProfile(scenario, frMode, ueID, level, intCancelCount, topN, opEnable, params)
 			fmt.Println("SIR calculation complete.")
+		case "heatmap":
+			frMode := rxData["frmode"].(string)
+			level := uint(rxData["level"].(float64))
+			intCancelCount := uint(rxData["intcnc"].(float64))
+
+			var params map[string]interface{}
+			if frMode == "FR3" || frMode == "FFR" || frMode == "AFFR" {
+				params = map[string]interface{}{}
+				params["hexmap"] = hexMap
+			}
+			if frMode == "FFR" || frMode == "AFFR" {
+				params["intcnc"] = intCancelCount
+			}
+
+			returnData = perf.SinrHeatMap(scenario, frMode, level, intCancelCount, opEnable, params)
+			fmt.Println("Heat Map calculation complete.")
 		case "cdf":
 			frMode := rxData["frmode"].(string)
 			intCancelCount := uint(rxData["intcnc"].(float64))

@@ -3,7 +3,6 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
-	"fmt"
 	"math"
 	"math/cmplx"
 	"math/rand"
@@ -36,7 +35,7 @@ func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map
 		return nil
 	}
 
-	fmt.Printf("Fset: %v\n", fSet)
+	// fmt.Printf("Fset: %v\n", fSet)
 
 	rxPows := make([]float64, nUE)
 	for i := 0; i < nUE; i++ {
@@ -49,15 +48,15 @@ func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map
 			Eb := math.Sqrt(math.Pow(10, (sc.Loss(uint(i), uint(j))+46)/10-3))
 			rWave := complex(Eb*math.Cos(ph), Eb*math.Sin(ph))
 
-			fmt.Printf("Loss: %v, Phase: %v\nReceived fields: %v\n", sc.Loss(uint(i), uint(j)), ph, rWave)
+			// fmt.Printf("Loss: %v, Phase: %v\nReceived fields: %v\n", sc.Loss(uint(i), uint(j)), ph, rWave)
 
 			bs := sc.GetStationByID(uint(j))
 			rootHex := hexMap.FindContainingHex(bs.X(), bs.Y())
 			// Significant optimization needed, we can directly loop through hexmap
 			// instead of searching for containing hex for each BS.
 
-			fmt.Printf("Detected frequency: %v, for fset: %v, opID: %v and sector: %v", idToFreq(fSet[rootHex.ID],
-				bs.OwnerOp().ID(), bs.ID()%3), fSet[rootHex.ID], bs.OwnerOp().ID(), bs.ID()%3)
+			// fmt.Printf("Detected frequency: %v, for fset: %v, opID: %v and sector: %v", idToFreq(fSet[rootHex.ID],
+			//	bs.OwnerOp().ID(), bs.ID()%3), fSet[rootHex.ID], bs.OwnerOp().ID(), bs.ID()%3)
 
 			freqTaps[idToFreq(fSet[rootHex.ID], bs.OwnerOp().ID(), bs.ID()%3)] += rWave
 		}

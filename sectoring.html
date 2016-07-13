@@ -1483,7 +1483,7 @@ function heatmap(obj){
 else{
       //UE id starts from UE0
       var color = d3.scale.linear()
-            .domain([-100, -60, -45, -30, -15, 10]) //domain of value  corresponding to colour
+            .domain([-100, -60, -35, -10, 15, 100]) //domain of value  corresponding to colour
             .range(['#000000', '#000000', '#FF0000', '#FFA500', '#FFFF00', '#FFFF00']);//colour to go change value ('#FF3000','#0030FF')
       str1="#UE";
       temprx=obj.data.rxpow;
