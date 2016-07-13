@@ -2,7 +2,6 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
-	"fmt"
 	"math/rand"
 )
 
@@ -23,8 +22,6 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) map[string]interface{} 
 	valN := len(valOps)
 	rand.Seed(19)
 	newOps := make([]uint, len(sc.Users()))
-
-	fmt.Printf("The valid operators: %v", valOps)
 
 	for i := 0; i < len(sc.Users()); i++ {
 		if valN == 1 {

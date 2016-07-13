@@ -181,7 +181,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		curLevel, _ := rxData["level"].(float64)
 		intCancelCount, _ := rxData["intcnc"].(float64)
 		topN, _ := rxData["topbsno"].(float64)
-		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: uint(opEnable)}
+		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: opEnable}
 
 		switch rxData["perf"] {
 		case "scmeta":
@@ -198,11 +198,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		case "emer":
 			returnData = perf.EmDownlink(scenario, hexMap, opEnable)
 		case "sir":
-			returnData = perf.SinrProfile(scenario, hexMap, ueID, uint(topN), params)
+			returnData = perf.SinrProfile(scenario, hexMap, uint(ueID), uint(topN), params)
 		case "heatmap":
 			returnData = perf.SinrHeatMap(scenario, hexMap, params)
 		case "cdf":
-			returnData = perf.CDF(scenario, frMode, intCancelCount, opEnable, params)
+			returnData = perf.CDF(scenario, hexMap, params)
 		default:
 			fmt.Println("\nFATAL: Unknown command")
 			return

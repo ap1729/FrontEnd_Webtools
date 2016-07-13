@@ -1,7 +1,9 @@
 package perf
 
-import "FrontEnd_WebTools/model"
-import "FrontEnd_WebTools/service"
+import (
+	"FrontEnd_WebTools/model"
+	"FrontEnd_WebTools/service"
+)
 
 // TODO: Truncating the profile values as per end-user request is wrongly handled
 // here. The job of this function is to solely compute results independent of

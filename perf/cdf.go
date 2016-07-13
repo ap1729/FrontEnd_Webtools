@@ -2,6 +2,7 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
+	"FrontEnd_WebTools/service"
 	"fmt"
 	"math"
 	s "sort"
@@ -31,13 +32,17 @@ type prefxPosfx struct{			// pre and post fix 0s and 1s to CDF
 }
 */
 
-func CDF(sc *model.Scenario, frMode string, intrCancelCount uint, opEnable []bool, params map[string]interface{}) map[string]interface{} {
+func CDF(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[string]interface{} {
 	var cdfL0Obj, cdfL1Obj cdfL0L1Ret
 	returnData := map[string]interface{}{}
 	fmt.Println("CDF func reached")
 
-	cdfL0Obj = cdfL0L1(sc, uint(0), intrCancelCount, frMode, opEnable, params)
-	cdfL1Obj = cdfL0L1(sc, uint(1), intrCancelCount, frMode, opEnable, params)
+	paramL0 := *p
+	paramL0.Level = 0
+	cdfL0Obj = cdfL0L1(sc, hexMap, paramL0)
+	paramL1 := *p
+	paramL1.Level = 1
+	cdfL1Obj = cdfL0L1(sc, hexMap, paramL1)
 
 	var sinrMinCollectArr = []float64{} //collect all minimum in X
 	sinrMinCollectArr = append(sinrMinCollectArr, cdfL0Obj.prsDbXArr[0])
@@ -84,20 +89,20 @@ func pre0Post1(cdfArr []float64, firstEleXArr float64, lenMinus1 float64) []floa
 	return cdfArr
 }
 
-func cdfL0L1(temp *model.Scenario, levelValue uint, intfCancelCount uint, frMode string, opEnable []bool, params map[string]interface{}) cdfL0L1Ret {
+func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params) cdfL0L1Ret {
 	var cdfL0L1RetObj cdfL0L1Ret
 	var calCdfObj calCdfRet
 	var prsPosRoiArr = []float64{} //array containing pre , post processing SINR and ROI values
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
 	for userId := 0; userId < numUeCdf; userId++ {
-		intStatIds := intrStations(frMode, temp, uint(userId), opEnable, levelValue, params)
-		losses, bsId := signalLossProfile(uint(userId), temp, levelValue, intStatIds)
+		intStatIds := intrStations(sc, hexMap, uint(userId), &p)
+		losses, bsId := lossProfile(sc, hexMap, uint(userId), intStatIds, &p)
 
 		for i := 0; i < len(bsId); i++ {
 			losses[i] += 46
 		}
-		prsPosRoiArr = sinr(losses, intfCancelCount)
+		prsPosRoiArr = sinr(losses, p.IntCancellers)
 		prsArrDb = append(prsArrDb, prsPosRoiArr[0])
 		posArrDb = append(posArrDb, prsPosRoiArr[1])
 	}

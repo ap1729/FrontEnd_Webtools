@@ -2,7 +2,6 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
-	"fmt"
 	"math"
 )
 
@@ -33,8 +32,6 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) map[string
 	} else {
 		newOper = nil
 	}
-
-	fmt.Println("Level 1 reached")
 
 	returnData["opconn"] = newOper
 	return returnData
