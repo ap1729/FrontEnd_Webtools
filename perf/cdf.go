@@ -24,14 +24,6 @@ type calCdfRet struct { //structure to hold SINR CDF
 	cdfYArr    []float64 //cdf y-axis
 }
 
-/*
-type prefxPosfx struct{			// pre and post fix 0s and 1s to CDF
-      cdfValues []float64
-      num0Prefix float64
-      num1Postfix float64
-}
-*/
-
 func CDF(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[string]interface{} {
 	var cdfL0Obj, cdfL1Obj cdfL0L1Ret
 	returnData := map[string]interface{}{}
@@ -95,9 +87,13 @@ func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params) cdfL0L1Ret {
 	var prsPosRoiArr = []float64{} //array containing pre , post processing SINR and ROI values
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
-	for userId := 0; userId < numUeCdf; userId++ {
-		intStatIds := intrStations(sc, hexMap, uint(userId), &p)
-		losses, bsId := lossProfile(sc, hexMap, uint(userId), intStatIds, &p)
+
+	users := hexMap.FindContainedUsers(9)
+
+	for i := 0; i < len(users); i++ {
+		intStatIds := intrStations(sc, hexMap, users[i].ID(), &p)
+		losses, bsId := lossProfile(sc, hexMap, users[i].ID(), intStatIds, &p)
+		// fmt.Println("User ID:", users[i].ID())
 
 		for i := 0; i < len(bsId); i++ {
 			losses[i] += 46
