@@ -222,6 +222,7 @@ field{
                            <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
                            <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
                            <button type="button" class="btn btn-default" title="Emergency heatmap" data-toggle="tooltip" onclick="emergency()">Emergency</button>
+                           <button type="button" class="btn btn-default" title="Post processing SINR heatmap" data-toggle="tooltip" onclick="sinrheatmap()">SINR Heatmap</button>
                          <br>  <br>Click UE to view SIR profile
                          <br>(graph is plotted below,else check POPUP ACTIVE on the left side)
                 </fieldset>
@@ -1497,6 +1498,39 @@ else{
 }
 
   document.getElementById("loader").style.display = "none";
+}
+
+function sinrheatmap()
+{
+
+BackObj={perf:"heatmap",level:level,intcnc:topx,frmode:document.getElementById("FR").value };
+console.log(JSON.stringify(BackObj));
+document.getElementById("loader").style.display = "block";
+$.post("/update",JSON.stringify(BackObj),sinrcolor,"json");//getting from server
+}
+function sinrcolor(obj)
+{
+  console.log(obj,"is recieved");
+   if(checkerr(obj.status)<0)
+{
+ console.log("error");
+}
+else{
+      //UE id starts from UE0
+      var color = d3.scale.linear()
+            .domain([-40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
+            .range(['#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
+      str1="#UE";
+      temprx=obj.data.post;
+       for(i=0;i<obj.data.post.length;i++)
+         {
+          str2=str1+(i).toString();//UE id starts from UE0 for sectoring
+          //obj.data.post[i] is a value for which corresponding colour is given,change below linear
+          d3.select(str2).style("fill",color(obj.data.post[i]));
+        }
+  }
+  document.getElementById("loader").style.display = "none";
+
 }
 
     </script>
