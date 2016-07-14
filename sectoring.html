@@ -500,7 +500,7 @@ if(checkerr(obj.status)<0)
 {
    console.log("backend error");
 }
-else{9
+else{
 //obj.SIR is SIR
 //obj.SINR has PreSINr,PostSINR and ROI in a array
 //obj.BSid is top x basestation id's
@@ -546,7 +546,7 @@ if(document.getElementById("TopBS").checked == true)
  var barData=[];
   for(i=0;i<obj.data.bsid.length;i++)
   {
-    barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':obj.data.opno[i]});
+    barData.push({'x':obj.data.bsid[i],'y':obj.data.sir[i],'co':bs[obj.data.bsid[i]].opid});
   }
 
 PlotBarGraph(barData,obj.data.pre,obj.data.post);
@@ -1485,7 +1485,8 @@ else{
       //UE id starts from UE0
       var color = d3.scale.linear()
             .domain([-100, -60, -35, -10, 15, 100]) //domain of value  corresponding to colour
-            .range(['#000000', '#000000', '#FF0000', '#FFA500', '#FFFF00', '#FFFF00']);//colour to go change value ('#FF3000','#0030FF')
+            .range(['#000000', '#FF0000', '#FFA500', '#FFA5A5', '#A5FFFF', '#FFFFFF']);
+            // .range(['#000000', '#000000', '#FF0000', '#FFA500', '#FFFF00', '#FFFF00']);//colour to go change value ('#FF3000','#0030FF')
       str1="#UE";
       temprx=obj.data.rxpow;
        for(i=0;i<obj.data.rxpow.length;i++)
@@ -1518,8 +1519,8 @@ function sinrcolor(obj)
 else{
       //UE id starts from UE0
       var color = d3.scale.linear()
-            .domain([-40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
-            .range(['#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
+            .domain([-100, -40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
+            .range(['#000000', '#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
       str1="#UE";
       temprx=obj.data.post;
        for(i=0;i<obj.data.post.length;i++)

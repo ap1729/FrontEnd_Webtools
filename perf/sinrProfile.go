@@ -23,12 +23,6 @@ func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profil
 	// The loss profile and corresponding BaseStation source ID's
 	losses, bsId := lossProfile(sc, hexMap, userID, intStatIds, p)
 
-	op := make([]uint, len(bsId))
-	for i := 0; i < len(bsId); i++ {
-		losses[i] += 46
-		op[i] = sc.GetStationByID(bsId[i]).OwnerOp().ID()
-	}
-
 	// Calculate SINR and ROI
 	sinrVals := sinr(losses, p.IntCancellers)
 	returnData["pre"] = sinrVals[0]
@@ -39,7 +33,6 @@ func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profil
 		profileTopN = uint(len(losses))
 	}
 	returnData["bsid"] = bsId[0:profileTopN]
-	returnData["opno"] = op[0:profileTopN]
 	returnData["sir"] = losses[0:profileTopN]
 
 	return returnData

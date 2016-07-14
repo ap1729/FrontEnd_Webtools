@@ -13,6 +13,7 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 		if hexMap.FindContainingHex(sc.Users()[i].X(), sc.Users()[i].Y()) == nil {
 			preSinrVals[i] = math.NaN()
 			postSinrVals[i] = math.NaN()
+			continue
 		}
 		temp := SinrProfile(sc, hexMap, sc.Users()[i].ID(), 0, p)
 		preSinrVals[i] = temp["pre"].(float64)
