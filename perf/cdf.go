@@ -88,17 +88,25 @@ func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params) cdfL0L1Ret {
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
 
+	//
 	users := hexMap.FindContainedUsers(9)
 
 	for i := 0; i < len(users); i++ {
-		intStatIds := intrStations(sc, hexMap, users[i].ID(), &p)
-		losses, bsId := lossProfile(sc, hexMap, users[i].ID(), intStatIds, &p)
-		// fmt.Println("User ID:", users[i].ID())
-
+		intStatIds, err := intrStations(sc, hexMap, users[i].ID(), &p)
+		if err != nil {
+			// TODO
+		}
+		losses, bsId, err := lossProfile(sc, hexMap, users[i].ID(), intStatIds, &p)
+		if err != nil {
+			// TODO
+		}
 		for i := 0; i < len(bsId); i++ {
 			losses[i] += 46
 		}
-		prsPosRoiArr = sinr(losses, p.IntCancellers)
+		prsPosRoiArr, err = sinr(losses, p.IntCancellers)
+		if err != nil {
+			// TODO
+		}
 		prsArrDb = append(prsArrDb, prsPosRoiArr[0])
 		posArrDb = append(posArrDb, prsPosRoiArr[1])
 	}

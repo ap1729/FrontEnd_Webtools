@@ -1,5 +1,6 @@
-package main
-// Gist pulled from https://gist.github.com/wiless/b97637e1b5625248784d 
+package main2
+
+// Gist pulled from https://gist.github.com/wiless/b97637e1b5625248784d
 import (
 	"fmt"
 	"net"
@@ -42,5 +43,5 @@ func main() {
 		fmt.Println("Error Starting Listen ", err)
 	}
 
-	 fmt.Println("\n")
+	fmt.Println()
 }

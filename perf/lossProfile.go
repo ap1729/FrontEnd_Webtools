@@ -3,6 +3,8 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
+	"errors"
+	"fmt"
 )
 
 // Retreives the signal loss profile for a user and its interfering stations
@@ -12,7 +14,13 @@ import (
 // additionally incorporating any order constraints specified by the level of
 // cooperation. The second return value specifies the BaseStation indices
 // corresponding to the source of the loss value.
-func lossProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, intrStationIds []uint, p *Params) ([]float64, []uint) {
+func lossProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, intrStationIds []uint, p *Params) ([]float64, []uint, error) {
+
+	// Handling argument nil exception
+	if sc == nil || hexMap == nil || p == nil || intrStationIds == nil {
+		return nil, nil, errors.New(ARG_NIL)
+	}
+
 	losses := filter(sc.LossProfile(userID), intrStationIds)
 	losses, ind := sort(losses)
 	// The sort indices were created for the loss array, and are sequential from
@@ -36,12 +44,13 @@ func lossProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, intrSt
 				break
 			}
 		}
-		return losses, ind
+		return losses, ind, nil
 	}
 
 	if p.Level == 1 {
-		return losses, ind
+		return losses, ind, nil
 	}
 
-	return nil, nil
+	// As of now, we only level 0 and 1 implementations exist.
+	return nil, nil, fmt.Errorf(LVL_INV_FMT, p.Level)
 }

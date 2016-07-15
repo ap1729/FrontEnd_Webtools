@@ -9,14 +9,16 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 	preSinrVals := make([]float64, len(sc.Users()))
 	postSinrVals := make([]float64, len(sc.Users()))
 	for i := 0; i < len(sc.Users()); i++ {
-		if hexMap.FindContainingHex(sc.Users()[i].X(), sc.Users()[i].Y()) == nil {
+		vals, err := SinrProfile(sc, hexMap, sc.Users()[i].ID(), 0, p)
+		if err != nil {
+			// TODO: As of now, heat map ignores error and assigns them a fallback value.
 			preSinrVals[i] = -1000
 			postSinrVals[i] = -1000
-			continue
+		} else {
+			preSinrVals[i] = vals["pre"].(float64)
+			postSinrVals[i] = vals["post"].(float64)
 		}
-		temp := SinrProfile(sc, hexMap, sc.Users()[i].ID(), 0, p)
-		preSinrVals[i] = temp["pre"].(float64)
-		postSinrVals[i] = temp["post"].(float64)
+
 	}
 	return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals}
 }

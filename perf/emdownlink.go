@@ -3,12 +3,18 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
+	"errors"
 	"math"
 	"math/cmplx"
 	"math/rand"
 )
 
-func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map[string]interface{} {
+func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) (map[string]interface{}, error) {
+
+	if sc == nil || hexMap == nil || opEnable == nil {
+		return nil, errors.New(ARG_NIL)
+	}
+
 	nBS := len(sc.BaseStations())
 	nUE := len(sc.Users())
 
@@ -32,10 +38,8 @@ func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map
 		fSet = [19]uint{2, 1, 3, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 3, 2, 1, 2, 1, 3}
 		idToFreq = func(fs, opId, sect uint) uint { return 4*(fs-1) + opId }
 	} else {
-		return nil
+		return nil, errors.New("Invalid enable flags; Only single or four operators are supported.")
 	}
-
-	// fmt.Printf("Fset: %v\n", fSet)
 
 	rxPows := make([]float64, nUE)
 	for i := 0; i < nUE; i++ {
@@ -67,5 +71,5 @@ func EmDownlink(sc *model.Scenario, hexMap *service.HexMap, opEnable []bool) map
 		rxPows[i] = 10 * math.Log10(rxPows[i]*1000)
 	}
 
-	return map[string]interface{}{"rxpow": rxPows}
+	return map[string]interface{}{"rxpow": rxPows}, nil
 }

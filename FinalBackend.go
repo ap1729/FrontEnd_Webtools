@@ -5,6 +5,7 @@ import (
 	"FrontEnd_WebTools/perf"
 	"FrontEnd_WebTools/service"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,7 +30,7 @@ var hexMap *service.HexMap
 var opEnable []bool
 
 // A package level object to store return data
-var responseData map[string]interface{}
+var response *Response
 
 // E.g for sending from browser
 // Obj={id:"32",Column1:30,Column2:-45,Column3:-34,Column4:-40}
@@ -140,6 +141,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request Headers", r.Header)
 
 	// A safety net for handling panics
+	response = nil
 	defer sendResponse(&w)
 
 	content, err := ioutil.ReadAll(r.Body)
@@ -173,7 +175,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		// opflags: The flags that specify which operators are active (array of binary)
 		// params: Any additional details that the perf function may need
 
-		var returnData map[string]interface{}
+		var r = NewResponse()
 
 		// This is safe; if the key does not exist, the variable is assigned its default zero value.
 		frMode, _ := rxData["frmode"].(string)
@@ -181,28 +183,35 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		curLevel, _ := rxData["level"].(float64)
 		intCancelCount, _ := rxData["intcnc"].(float64)
 		topN, _ := rxData["topbsno"].(float64)
+
+		if ueID < 0 || topN < 0 || intCancelCount < 0 {
+			r.err = errors.New("Invalid parameters in request.")
+			// TODO: We need to give a status that indicates user error and not back-end error.
+		}
+
 		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: opEnable}
 
 		switch rxData["perf"] {
 		case "scmeta":
-			returnData = service.PackageScenario(scenario)
+			r.data = service.PackageScenario(scenario)
 		case "enop":
 			vals := rxData["opflags"].([]interface{})
 			for i := 0; i < len(scenario.Operators()); i++ {
 				opEnable[i] = vals[i].(float64) == 1
 			}
-			returnData = perf.AssignOperators(scenario, opEnable)
+			r.data, r.err = perf.AssignOperators(scenario, opEnable)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
-			returnData = perf.ChangeLevel(scenario, targetLvl, opEnable)
+			r.data, r.err = perf.ChangeLevel(scenario, targetLvl, opEnable)
 		case "emer":
-			returnData = perf.EmDownlink(scenario, hexMap, opEnable)
+			r.data, r.err = perf.EmDownlink(scenario, hexMap, opEnable)
 		case "sir":
-			returnData = perf.SinrProfile(scenario, hexMap, uint(ueID), uint(topN), params)
+			fmt.Printf("topN is: %v, and somehow uint(topN) is %v", topN, uint(topN))
+			r.data, r.err = perf.SinrProfile(scenario, hexMap, uint(ueID), uint(topN), params)
 		case "heatmap":
-			returnData = perf.SinrHeatMap(scenario, hexMap, params)
+			r.data = perf.SinrHeatMap(scenario, hexMap, params)
 		case "cdf":
-			returnData = perf.CDF(scenario, hexMap, params)
+			r.data = perf.CDF(scenario, hexMap, params)
 		default:
 			fmt.Println("\nFATAL: Unknown command")
 			return
@@ -210,28 +219,49 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Console feedback
 		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["perf"])
-		responseData = returnData
+		fmt.Printf("\nAn error occured in perf:\n%v", err)
+		response = r
 
 	}
 }
 
 func sendResponse(w *http.ResponseWriter) {
 	rStat := recover()
-	response := map[string]interface{}{}
 
-	if rStat == nil {
-		fmt.Printf("\nSuccesful execution.\n")
-		response["status"] = 0
-		response["data"] = responseData
+	var status int
+	var msg string
+	var data map[string]interface{} = nil
 
-	} else {
+	// If panic takes place, recover status in non-nil.
+	if rStat != nil {
+		status = 1
+		msg = "An unknown error occured at our end."
+		// Print stack trace for debugging assitance
 		debug.PrintStack()
 		fmt.Printf("\n\nRecovered :)\nError encountered: %v\n\n", rStat)
-		response["status"] = 1
-		response["data"] = ""
+	} else if response == nil {
+		status = 1
+		msg = "An unknown error occured at our end."
+		fmt.Println("\nSomething funny and unexplained happened :/")
+	} else {
+		if response.err == nil {
+			status = 0
+			msg = "Successful execution."
+		} else {
+			status = 2
+			msg = "We encountered an error, which has been logged and will be fixed soon."
+		}
 	}
 
-	serializedData, _ := json.Marshal(response)
+	if status == 0 {
+		data = response.data
+	}
+
+	var respMap = map[string]interface{}{}
+	respMap["status"] = status
+	respMap["data"] = data
+	respMap["msg"] = msg
+	serializedData, _ := json.Marshal(respMap)
 	txbytes, err := (*w).Write(serializedData)
 	if err != nil {
 		log.Println("Failed to send response to user.\nError: ", err)
@@ -239,4 +269,14 @@ func sendResponse(w *http.ResponseWriter) {
 		log.Println("Response sent:\n", string(txbytes))
 	}
 
+}
+
+type Response struct {
+	status int
+	data   map[string]interface{}
+	err    error
+}
+
+func NewResponse() *Response {
+	return &Response{status: -1, data: nil, err: nil}
 }

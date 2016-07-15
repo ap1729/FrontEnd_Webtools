@@ -3,13 +3,25 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
+	"errors"
 	"fmt"
 )
 
+// TODO: Major optimization opportunity exists in intrStations; for FFR and AFFR
+// where every user in the cell needs to be compared, a cache mechanism could be
+// implemented to save the resultant calculation frMode in a hash table.
+
 // Returns a list of ID's that identify interfering BaseStations for a user in
 // the scenario with given frequency-reuse mode.
-func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Params) []uint {
+func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Params) ([]uint, error) {
+
+	// Handling argument nil exception
+	if sc == nil || hexMap == nil || p == nil {
+		return nil, errors.New(ARG_NIL)
+	}
+
 	var bsIds []uint
+
 	switch p.FrMode {
 
 	case "FR1":
@@ -22,14 +34,18 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		}
 
 	case "FR3":
-		//FR3 sends a list of BS in FR3 cells that match the operator(s) enabled.
-		//Get x,y locations of UE and find the current Hexagon ID:
+		// FR3 sends a list of BS in FR3 cells that match the operator(s) enabled.
+		// Get x,y locations of UE and find the current Hexagon ID:
 		ueX := sc.GetUserByID(uint(userID)).X()
 		ueY := sc.GetUserByID(uint(userID)).Y()
 		currHex := hexMap.FindContainingHex(ueX, ueY)
 
-		//2nd tier neighbours
-		//2nd tier cells are in the array snIds
+		if currHex == nil {
+			return nil, fmt.Errorf("The userID %d requested is not associated with any cell.", userID)
+		}
+
+		// 2nd tier neighbours
+		// 2nd tier cells are in the array snIds
 		sNeighs := hexMap.SecondNeighbours(currHex.ID)
 		snIds := []uint{}
 		for i := 0; i < len(sNeighs); i++ {
@@ -66,38 +82,51 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 	case "FFR":
 		// FFR uses both FR1 and FR3; All UEs in the current node's cell are found.
 		// Post SINR of all UEs in the current cell are found at mode FR1. Then the
-		// top 'perc' % of users are assigned FR1. The remaining users are assigned FR3.
-		perc := 50
+		// top 'th' % of users are assigned FR1. The remaining users are assigned FR3.
+		th := 50
 
 		//Get x,y locations of UE and find the current Hexagon ID
 		ueX := sc.GetUserByID(uint(userID)).X()
 		ueY := sc.GetUserByID(uint(userID)).Y()
 		currHex := hexMap.FindContainingHex(ueX, ueY)
+
+		if currHex == nil {
+			return nil, fmt.Errorf("The userID %d requested is not associated with any cell.", userID)
+		}
+
 		// Finding all UEs in the current cell
 		rootUsers := hexMap.FindContainedUsers(currHex.ID)
 
 		// Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called postSinrs
 		postSinrs := []float64{}
 		for k := 0; k < len(rootUsers); k++ {
-			values := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			if err != nil {
+				return nil, fmt.Errorf("Failed to evaluate user profiles, at userID: %d", rootUsers[k].ID())
+			}
 			postSinrs = append(postSinrs, values["post"].(float64))
 		}
 
-		//Sort the array values
+		// Sort the array values
 		postSinrs, ind := sort(postSinrs)
 
-		// Assign FR1 to UEs that lie in the top perc % of the power array
+		var err error
+		// Assign FR1 to UEs that lie in the top 'th' % of the power array
 		found := false
-		for j := 0; j < len(ind)*perc/100; j++ {
+		for j := 0; j < len(ind)*th/100; j++ {
 			if userID == rootUsers[ind[j]].ID() {
 				found = true
-				bsIds = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
 				break
 			}
 		}
-		//Assign FR3 to the remaining UEs
+		// Assign FR3 to the remaining UEs
 		if found == false {
-			bsIds = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+		}
+
+		if err != nil {
+			return nil, err
 		}
 
 	case "AFFR":
@@ -112,13 +141,21 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		ueX := sc.GetUserByID(uint(userID)).X()
 		ueY := sc.GetUserByID(uint(userID)).Y()
 		currHex := hexMap.FindContainingHex(ueX, ueY)
+
+		if currHex == nil {
+			return nil, fmt.Errorf("The userID %d requested is not associated with any cell.", userID)
+		}
+
 		// Finding all the UEs in the current cell
 		rootUsers := hexMap.FindContainedUsers(currHex.ID)
 
 		// Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called postSinrs
 		postSinrs := []float64{}
 		for k := 0; k < len(rootUsers); k++ {
-			values := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			if err != nil {
+				return nil, fmt.Errorf("Failed to evaluate user profiles, at userID: %d", rootUsers[k].ID())
+			}
 			postSinrs = append(postSinrs, values["post"].(float64))
 		}
 
@@ -127,12 +164,13 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 
 		x1 := len(ind) * th1 / 100
 		x2 := len(ind) * th2 / 100
+		var err error
 		// Assign FR1 to UEs that lie in the top 'th1' % of the power array
 		found := false
 		for j := 0; j < x1; j++ {
 			if userID == rootUsers[ind[j]].ID() {
 				found = true
-				bsIds = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
 				break
 			}
 		}
@@ -141,7 +179,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 			for j := x1; j < (x1 + x2 - 1); j++ {
 				if userID == rootUsers[ind[j]].ID() {
 					found = false
-					bsIds = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+					bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
 					break
 				}
 			}
@@ -150,23 +188,26 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		if found == false {
 			fmt.Printf("\nRare case reached!\n")
 			var desOp = sc.GetUserByID(userID).CurrOp.ID()
-			// for j := (x1 + x2 - 1); j < len(ind); j++ {
-			// fmt.Printf("Loop reached, iteration: %v, usid: %v\n", ind[j], usid[ind[j]])
-			// if userID == rootUsers[ind[j]].ID {
-			// fmt.Println(" The selected UE ", userID, " follows FR3 with one operator")
-			bsIdsAll := intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
-			bsIds = *new([]uint)
-			for i := 0; i < len(bsIdsAll); i++ {
-				// fmt.Printf("Desired: %v, Iteration: %v", desOp, sc.GetStationByID(bsIdsAll[i]).OwnerOp())
-				if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desOp {
-					bsIds = append(bsIds, bsIdsAll[i])
+			var bsIdsAll []uint
+			bsIdsAll, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			if err == nil {
+				bsIds = *new([]uint)
+				for i := 0; i < len(bsIdsAll); i++ {
+					// fmt.Printf("Desired: %v, Iteration: %v", desOp, sc.GetStationByID(bsIdsAll[i]).OwnerOp())
+					if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desOp {
+						bsIds = append(bsIds, bsIdsAll[i])
+					}
 				}
 			}
 		}
 
+		if err != nil {
+			return nil, err
+		}
+
 	default:
-		return nil
+		return nil, errors.New("Unsupported FR mode requested in parameters.")
 	}
 
-	return bsIds
+	return bsIds, nil
 }

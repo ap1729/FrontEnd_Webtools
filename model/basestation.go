@@ -1,5 +1,7 @@
 package model
 
+// PONDER: Enforce non-nil values in all reference types for safety and easier error handling in future?
+
 // BaseStation is a taggable structure that stores location, operator and other properties.
 type BaseStation struct {
 	id       uint

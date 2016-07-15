@@ -4,7 +4,14 @@ package perf
 // at the locations specified by filtIndices.
 //
 // Note: This function does not modify the original data.
+//
+// If one or more arguments are nil, the function returns a nil and does not panic.
 func filter(values []float64, filtIndices []uint) []float64 {
+
+	if values == nil || filtIndices == nil {
+		return nil
+	}
+
 	val := make([]float64, len(filtIndices))
 	for i := 0; i < len(filtIndices); i++ {
 		val[i] = values[filtIndices[i]]
@@ -16,7 +23,14 @@ func filter(values []float64, filtIndices []uint) []float64 {
 // that identify the locations of the sorted value in the original array.
 //
 // Note: This function does not modify the original data.
+//
+// If the argument is nil, the function returns a nil and does not panic.
 func sort(values []float64) ([]float64, []uint) {
+
+	if values == nil {
+		return nil, nil
+	}
+
 	ind := make([]uint, len(values))
 	val := make([]float64, len(values))
 	for i := 0; i < len(values); i++ {

@@ -111,8 +111,10 @@ func (hm *HexMap) AssociateUsers(users []*model.User) int {
 }
 
 // Returns a list of hexagons that are first neighbours to the root hexagon specified by its ID.
+//
+// If no first neighbours exist, the function returns an empty array, without panicing.
 func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
-	var neighs []Hexagon
+	var neighs []Hexagon = *new([]Hexagon)
 	for i := 0; i < len(hm.hexagons); i++ {
 		if hm.adjMat[root][i] == 1 {
 			neighs = append(neighs, hm.hexagons[i])
@@ -122,8 +124,9 @@ func (hm *HexMap) FirstNeighbours(root uint) []Hexagon {
 }
 
 // Returns a list of second-tier neighbours to the root hexagon specified by its ID.
-//
 // Simply put, these are the neighbours of neighbours of the root hexagon.
+//
+// If no second neighbours exist, the function returns an empty array, without panicing.
 func (hm *HexMap) SecondNeighbours(root uint) []Hexagon {
 	sum := make([]int, len(hm.adjMat))
 	N := len(hm.hexagons)
@@ -136,7 +139,7 @@ func (hm *HexMap) SecondNeighbours(root uint) []Hexagon {
 			}
 		}
 	}
-	var neighs []Hexagon
+	var neighs []Hexagon = *new([]Hexagon)
 	// A non-zero element in sum is a second tier neighbour if it is not connected to root
 	for i := uint(0); i < uint(N); i++ {
 		if hm.adjMat[root][i] == 0 && sum[i] > 0 && root != i {
@@ -159,15 +162,29 @@ func (hm *HexMap) FindContainingHex(x, y float64) *Hexagon {
 // Retreive all BaseStations that are contained in the specified hexagon.
 //
 // This function essentially retreives the stations as parsed by AssociateStations().
+//
+// An empty array is returned if no BaseStations are found in the root hexagon.
 func (hm *HexMap) FindContainedStations(root uint) []*model.BaseStation {
-	return hm.stationMap[hm.hexagons[root]]
+	s := hm.stationMap[hm.hexagons[root]]
+	if s == nil {
+		return *new([]*model.BaseStation)
+	} else {
+		return s
+	}
 }
 
 // Retreive all Users that are contained in the specified hexagon.
 //
 // This function essentially retreives the users as parsed by AssociateUsers().
+//
+// An empty array is returned if no Users are found in the root hexagon.
 func (hm *HexMap) FindContainedUsers(root uint) []*model.User {
-	return hm.userMap[hm.hexagons[root]]
+	u := hm.userMap[hm.hexagons[root]]
+	if u == nil {
+		return *new([]*model.User)
+	} else {
+		return u
+	}
 }
 
 // Private helper function: Euclidean distance between two points (x1, y1) and (x2, y2).
