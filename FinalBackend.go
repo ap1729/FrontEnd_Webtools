@@ -5,7 +5,6 @@ import (
 	"FrontEnd_WebTools/perf"
 	"FrontEnd_WebTools/service"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,6 +29,7 @@ var hexMap *service.HexMap
 var opEnable []bool
 
 // A package level object to store return data
+// *See notes regarding this in "updatehandler()"
 var response *Response
 
 // E.g for sending from browser
@@ -46,7 +46,6 @@ func initialize() bool {
 
 	sb := model.NewScenarioBuilder()
 	if dataGenOpt == "import" {
-
 		// Read all nodes (BS and UE)
 		suc := service.ReadNodes(sb, locFilePath)
 		if suc == false {
@@ -63,7 +62,6 @@ func initialize() bool {
 		}
 
 	} else if dataGenOpt == "manual" {
-
 		suc := service.GenerateMap(sb)
 		if suc == false {
 			return false
@@ -102,12 +100,10 @@ func initialize() bool {
 	// Display execution times
 	fmt.Printf("\nPreliminary initialization time estimate:\n")
 	fmt.Printf("Location read time: %v\nLosses read time: %v\nCell map init time: %v\n", lap2.Sub(lap1), lap3.Sub(lap2), lap4.Sub(lap3))
-
 	return true
 }
 
 func main() {
-
 	initSuccess := initialize()
 	if initSuccess == false {
 		fmt.Println("Fatal error! Failed to load data.")
@@ -142,7 +138,12 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// A safety net for handling panics
 	response = nil
+	// TODO: Try making a pointer to a response object and capture it in the defer command.
+	// Perhaps then, updating the values in this function will reflect on the deferred
+	// execution. (Instead of making a global variable which is absolutely not thread safe IMO.)
 	defer sendResponse(&w)
+	// Additionally, sending back any response with HTTP codes still invokes the deferred
+	// response function, due to which multiple responses may be issued.
 
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -185,8 +186,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		topN, _ := rxData["topbsno"].(float64)
 
 		if ueID < 0 || topN < 0 || intCancelCount < 0 {
-			r.err = errors.New("Invalid parameters in request.")
-			// TODO: We need to give a status that indicates user error and not back-end error.
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid parameters in request."))
+			return
 		}
 
 		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: opEnable}
