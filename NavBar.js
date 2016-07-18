@@ -7,7 +7,9 @@
      /*  ' <li class="active">'+
           '<a href="#">Reload</a>'+
         '</li>'+*/	
+        '<a class="navbar-brand  navbar-right" href="login.html">Logout</a>'+
           '<a class="navbar-brand  navbar-right" href="index1.html">Home</a>'+
       '<a class="navbar-brand  navbar-right" href="Mosssaic.html">About MOSSSAIC</a>';
+        
 
 

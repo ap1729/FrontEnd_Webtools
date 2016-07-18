@@ -1,0 +1,97 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>MOSSSAIC LOGIN PAGE</title>
+
+<script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript" charset="utf-8" async defer></script>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <script src="/bower_components/d3/d3.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+      <script src="/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+      
+      <script type="text/javascript">
+      function validatedata(){
+            window.alert();
+            BackObj={perf:"login",user:document.getElementById("username").value,pwd:document.getElementById("password").value};//params is to which level
+            console.log(JSON.stringify(BackObj));
+            $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
+            
+        }
+
+     function onsuccess(obj){
+       
+       }
+
+      </script>
+
+
+f
+<style type="text/css">
+<!--/*--><![CDATA[/*><!--*/
+  body { padding-top: 70px; 
+    padding-left: 70px;
+  }
+  #content { width: 90%; 
+    max-width: 800px;}
+/*]]>*/-->
+</style>
+</head>
+
+<body>
+
+
+<div id="content">
+<!-- Add actual content followed by footer -->
+<h1> MOSSSAIC LOGIN PAGE </h1>
+
+<h2>Please Log in</h2>
+
+<form class="form-horizontal">
+<fieldset>
+
+<!-- Form Name -->
+
+   
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="username">Username</label>  
+  <div class="col-md-4">
+  <input id="username" name="userLogin" type="text" placeholder="username" class="form-control input-md" required="">
+  </div>
+</div>
+
+<!-- Password input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="password">Password</label>
+  <div class="col-md-4">
+    <input id="password" name="userPassword" type="password" placeholder="password" class="form-control input-md" required="">
+    
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="submit"></label>
+  <div class="col-md-4">
+    <button id="submit" name="submit" onclick="validatedata()" class="btn btn-primary">Log in</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+
+<div class="alert">
+<h2>LOGIN DETAILS</h2>
+
+Please Enter Credentials given. For extra information contact ISL LAB.
+
+</div> <!-- the content div -->
+</body>
+
+
+
+</html>
