@@ -496,7 +496,7 @@ function mouseOut(d, i) {
 
 function onsuccess(obj){
 console.log(obj);
-if(checkerr(obj.status)<0)
+if(checkerr(obj.status,obj.msg)<0)
 {
    console.log("backend error");
 }
@@ -578,6 +578,7 @@ if(topBSno=="")
  topBSno=10;
 else
   topBSno=parseInt(topBSno);
+
 currselected=d.id.toString();
 
 topx=document.getElementById("topx").value;
@@ -587,15 +588,22 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-
-//Use this in type for all BackObj to do necessary//console.log(document.getElementById("FR").value);
-BackObj={perf:"sir",node:parseInt(d.id),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+//console.log()
+if (topBSno<0){
+  window.alert("NEGATIVE TOPBSNO");
+}
+else if (topx<0)  {
+  window.alert("NEGATIVE NO.IC");
+}
+else{
+//Use this in type for all BackObj to do necessary//console.log(document.getlementById("FR").value);
+BackObj={perf:"sir",node:parseInt(d.id),level:level,topbsno:topBSno,noise:-92,intcnc:topx,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
 //document.getElementById("loader").style.display = "none";
 //above change the backend code and do parsing
-
+}
 
 
     var element = d3.select(this),
@@ -848,7 +856,7 @@ $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from serve
 function onsuccess1(obj)
 {
  console.log(obj);
-if(checkerr(obj.status)<0)
+if(checkerr(obj.status,obj.msg)<0)
 {
  console.log("error");
 }
@@ -1212,7 +1220,7 @@ document.getElementById("loader").style.display = "block";
 function plotcdf(obj)
 {//cdf to be plotted here
  console.log(obj,"is recieved");
- if(checkerr(obj.status)<0)
+ if(checkerr(obj.status,obj.msg)<0)
 {
  console.log(error);
 }
@@ -1410,14 +1418,14 @@ console.log(d3.event);
  }
 }
 
-function checkerr(stat){
+function checkerr(stat,errmsg){
   if(stat==0)
-
-     return 1;
+      return 1;
   else
   {
     document.getElementById("loader").style.display = "none";
-    window.alert("Some Error in Backend ");
+    window.alert(errmsg);
+    console.log(errmsg);
     return -1;
   }
 }
@@ -1475,9 +1483,9 @@ $.post("/update",JSON.stringify(BackObj),heatmap,"json");//getting from server
 
 }
 function heatmap(obj){
+console.log(obj,"is recieved");
 
- console.log(obj,"is recieved");
- if(checkerr(obj.status)<0)
+ if(checkerr(obj.status,obj.msg)<0)
 {
  console.log("error");
 }
@@ -1504,15 +1512,18 @@ else{
 function sinrheatmap()
 {
 
-BackObj={perf:"heatmap",level:level,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"heatmap",level:level,intcnc:document.getElementById("topx").value,frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),sinrcolor,"json");//getting from server
+
+
 }
+
 function sinrcolor(obj)
 {
   console.log(obj,"is recieved");
-   if(checkerr(obj.status)<0)
+   if(checkerr(obj.status,obj.msg)<0)
 {
  console.log("error");
 }
