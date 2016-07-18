@@ -193,7 +193,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		params := &perf.Params{FrMode: frMode, Level: uint(curLevel), IntCancellers: uint(intCancelCount), OpEnableFlags: opEnable}
 
-		switch rxData["perf"] {	
+		switch rxData["perf"] {
 		case "scmeta":
 			r.data = service.PackageScenario(scenario)
 		case "enop":
