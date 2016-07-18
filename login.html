@@ -15,21 +15,26 @@
       
       <script type="text/javascript">
       function validatedata(){
-            window.alert();
+            
             BackObj={perf:"login",user:document.getElementById("username").value,pwd:document.getElementById("password").value};//params is to which level
             console.log(JSON.stringify(BackObj));
             $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
-            
+        
+         window.alert();
+
         }
 
      function onsuccess(obj){
-       
+      console.log(obj);
+
+        if(1==1){
+        
+        window.location.assign("/index1.html");
+      }
        }
 
       </script>
 
-
-f
 <style type="text/css">
 <!--/*--><![CDATA[/*><!--*/
   body { padding-top: 70px; 
@@ -50,7 +55,7 @@ f
 
 <h2>Please Log in</h2>
 
-<form class="form-horizontal">
+<form class="form-horizontal"> 
 <fieldset>
 
 <!-- Form Name -->
