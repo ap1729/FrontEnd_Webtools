@@ -19,8 +19,8 @@ import (
 // Read CSV - "import"
 // Generate manually - "manual"
 const dataGenOpt = "import"
-const locFilePath = "data/MyLocations.csv"
-const lossFilePath = "data/MyLosses.csv"
+const locFilePath = "data/HataMossNodelocations.csv"
+const lossFilePath = "data/HataMossLosses.csv"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
