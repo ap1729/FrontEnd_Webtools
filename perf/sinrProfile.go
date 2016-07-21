@@ -36,8 +36,14 @@ func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profil
 	if err != nil {
 		return nil, fmt.Errorf("Loss profile could not be evaluated:\n%v", err.Error())
 	}
+
 	// Calculate SINR and ROI
-	sinrVals, err := sinr(losses, p.IntCancellers)
+	rxPows := make([]float64, len(losses))
+	for i := 0; i < len(losses); i++ {
+		// Add transmit power to each loss value
+		rxPows[i] = losses[i] + 46
+	}
+	sinrVals, err := sinr(rxPows, p.IntCancellers)
 	if err != nil {
 		return nil, fmt.Errorf("Could not calculate SINR:\n%v", err.Error())
 	}
@@ -47,11 +53,11 @@ func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profil
 	returnData["post"] = sinrVals[1]
 	returnData["roi"] = sinrVals[2]
 	// To avoid slicing the array beyond its bounds, which may occur unobviously.
-	if profileTopN > uint(len(losses)) {
-		profileTopN = uint(len(losses))
+	if profileTopN > uint(len(rxPows)) {
+		profileTopN = uint(len(rxPows))
 	}
 	returnData["bsid"] = bsId[0:profileTopN]
-	returnData["sir"] = losses[0:profileTopN]
+	returnData["sir"] = rxPows[0:profileTopN]
 
 	return returnData, nil
 }
