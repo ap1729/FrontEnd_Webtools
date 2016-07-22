@@ -19,8 +19,8 @@ import (
 // Read CSV - "import"
 // Generate manually - "manual"
 const dataGenOpt = "import"
-const locFilePath = "data/HataMossNodelocations.csv"
-const lossFilePath = "data/HataMossLosses.csv"
+const locFilePath = "data/HataMossLocations.csv"
+const lossFilePath = "data/HataMossLosses_Ant.csv"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
@@ -221,7 +221,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Console feedback
 		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["perf"])
-		fmt.Printf("\nAn error occured in perf:\n%v", err)
+		fmt.Printf("\nAn error occured in perf:\n%v\n", err)
 		response = r
 
 	}
