@@ -504,6 +504,7 @@ else{
 //obj.SIR is SIR
 //obj.SINR has PreSINr,PostSINR and ROI in a array
 //obj.BSid is top x basestation id's
+
 obj.data.post=Math.round(obj.data.post * 100) / 100;
 obj.data.pre=Math.round(obj.data.pre * 100) / 100;
 obj.data.roi=Math.round(obj.data.roi * 100) / 100;
@@ -1512,7 +1513,7 @@ else{
 function sinrheatmap()
 {
 
-BackObj={perf:"heatmap",level:level,intcnc:document.getElementById("topx").value,frmode:document.getElementById("FR").value };
+BackObj={perf:"heatmap",level:level,intcnc:parseInt(document.getElementById("topx").value),frmode:document.getElementById("FR").value };
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),sinrcolor,"json");//getting from server
@@ -1530,10 +1531,12 @@ function sinrcolor(obj)
 else{
       //UE id starts from UE0
       var color = d3.scale.linear()
-            .domain([-100, -40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
-            .range(['#000000', '#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
+      .domain([-100,-50,-20,0,20,100])
+       .range(['#000000', '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFFFF']);
+      //      .domain([-100, -40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
+        //    .range(['#000000', '#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
       str1="#UE";
-      temprx=obj.data.post;
+      temprx1=obj.data.post;
        for(i=0;i<obj.data.post.length;i++)
          {
           str2=str1+(i).toString();//UE id starts from UE0 for sectoring
