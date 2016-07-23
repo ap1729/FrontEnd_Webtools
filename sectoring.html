@@ -238,6 +238,12 @@ field{
 <div class="panel panel-default">
      <div class="panel-heading">Outputs</div>
      <div class="panel-body">
+      <form id= "rate">
+        Pre SINR Sum Rate<input id="PreSumRate" type="number" step="0.01" style="width:5%;">
+        Post SINR Sum Rate<input id="PostSumRate" type="number" step="0.01" style="width: 5%;">
+      </form>
+     </div> 
+     <div class="panel-body">
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 5%;" >
                 Pre SINR <input id="PreSINR" type="number" step="0.01" style="width:5%;">
@@ -1531,10 +1537,10 @@ function sinrcolor(obj)
 else{
       //UE id starts from UE0
       var color = d3.scale.linear()
-      .domain([-100,-50,-20,0,20,100])
-       .range(['#000000', '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFFFF']);
-      //      .domain([-100, -40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
-        //    .range(['#000000', '#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
+         .domain([-100, -40, -25, -10, 5, 20, 100]) //domain of value  corresponding to colour
+            .range(['#000000', '#000000', '#FF0000', '#FFA500', '#00FFFF', '#FFFFFF', '#FFFFFF']);//colour to go change value ('#FF3000','#0030FF')
+            //      .domain([-100,-50,-20,0,20,100])
+       //.range(['#000000', '#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFFFF']);
       str1="#UE";
       temprx1=obj.data.post;
        for(i=0;i<obj.data.post.length;i++)
@@ -1544,6 +1550,8 @@ else{
           d3.select(str2).style("fill",color(obj.data.post[i]));
         }
   }
+  document.getElementById("PostSumRate").value=Math.round(100*obj.data.postSumRate)/100;
+  document.getElementById("PreSumRate").value=Math.round(100*obj.data.preSumRate)/100;
   document.getElementById("loader").style.display = "none";
 
 }
