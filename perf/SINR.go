@@ -5,9 +5,6 @@ import (
 	"math"
 )
 
-// TODO: Cleanup function, fix bug of dBm -> linear conversion
-// (Technically, it doesnt matter when we convert it back, e-3 and e+3 cancel)
-
 // Computes the pre- and post- processing SINR rxPows, and additionally returns
 // remaining interference power (ROI) for the given array of signal powers (dBm).
 //
@@ -29,21 +26,22 @@ func sinr(rxPows []float64, intrCancelCount uint) ([]float64, error) {
 
 	// Values is the recieved signal powers
 	var vals = make([]float64, 3)
+	var noise float64 = 1e-9 // Watts
 
 	// Pre Processing SINR calculation
 	var sum float64 = 0.0
 	for i := 1; i < len(rxPows); i++ {
-		sum += math.Pow(10, (rxPows[i] / 10))
+		sum += math.Pow(10, (rxPows[i]/10)) / 1000
 	}
-	vals[0] = rxPows[0] - 10*math.Log10(sum) // Pre SINR
+	vals[0] = rxPows[0] - 10*math.Log10((sum+noise)*1000) // Pre SINR
 
 	// Post Processing SINR and ROI calculation
 	sum = 0.0
 	for i := int(intrCancelCount) + 1; i < len(rxPows); i++ {
-		sum += math.Pow(10, (rxPows[i] / 10))
+		sum += math.Pow(10, (rxPows[i]/10)) / 1000
 	}
-	vals[1] = rxPows[0] - 10*math.Log10(sum) // Post SINR
-	vals[2] = 10 * math.Log10(sum)           // ROI
+	vals[1] = rxPows[0] - 10*math.Log10((sum+noise)*1000) // Post SINR
+	vals[2] = 10 * math.Log10(sum*1000)                   // ROI
 
 	return vals, nil
 }

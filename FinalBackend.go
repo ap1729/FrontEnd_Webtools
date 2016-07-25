@@ -20,7 +20,7 @@ import (
 // Generate manually - "manual"
 const dataGenOpt = "import"
 const locFilePath = "data/HataMossLocations.csv"
-const lossFilePath = "data/HataMossLosses_Ant.csv"
+const lossFilePath = "data/HataMossLosses.csv"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!

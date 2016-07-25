@@ -3,7 +3,7 @@ package perf
 import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
-    "math"
+	"math"
 )
 
 func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[string]interface{} {
@@ -19,11 +19,11 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 			postSinrVals[i] = -1000
 		} else {
 			preSinrVals[i] = vals["pre"].(float64)
-			preSumRate += math.Log10(1+math.Pow(10,preSinrVals[i]/10)) 
+			preSumRate += math.Log10(1 + math.Pow(10, preSinrVals[i]/10))
 			postSinrVals[i] = vals["post"].(float64)
-			postSumRate += math.Log10(1+math.Pow(10,postSinrVals[i]/10))
+			postSumRate += math.Log10(1 + math.Pow(10, postSinrVals[i]/10))
 		}
 
 	}
-	return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals , "preSumRate" : preSumRate,"postSumRate" : postSumRate}
+	return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals, "preSumRate": preSumRate, "postSumRate": postSumRate}
 }
