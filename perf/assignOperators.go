@@ -2,6 +2,7 @@ package perf
 
 import (
 	"FrontEnd_WebTools/model"
+	"FrontEnd_WebTools/service"
 	"errors"
 	"math/rand"
 	"fmt"
@@ -53,11 +54,15 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}
 
 
 //below function for new assigning of single operator case
-//Each sector of each basestation connects to 10 strongest
+//Take each cell's users(approx 200)
+//divide into 4 parts of 50 each
+//take 12 sectors of 4 operator's stations
+//to each group of 50 assign one operator and connect top10 to each sector
+///leave 20 in each group as vacant
 
 
 
-func AssignSingleOperator(sc *model.Scenario, enFlags []bool) (map[string]interface{}, error) {
+func AssignSingleOperator(sc *model.Scenario,hexMap *service.HexMap, enFlags []bool) (map[string]interface{}, error) {
  //Single Operator Assigning is different
 
  // Handling argument nil exception
@@ -82,8 +87,70 @@ for i := 0; i < len(sc.Users()); i++ {
  sc.Users()[i].CurrOp = model.NewOperator(uint(10)) //default operator is 10
 }	
 
+
 var flag uint
 var assigned = []uint{}
+var usersPerBS uint
+for i:=0;i<19;i++{
+	//for each hexagon
+   ue:=hexMap.FindContainedUsers(uint(i))
+   bs:=hexMap.FindContainedStations(uint(i))
+   //ue's and bs in that cell are got
+   //bs should be 12 in number
+   
+   usersPerBS =uint(len(ue)/4)
+ //number of users associated to each basestation .approx 50
+
+   for j:=0;j<4;j++{
+   	//going by operator ,each sector has at max 10
+   	for t:=0;t<3;t++{
+   		//for each sector
+   		var losses = []float64{} //to have losses for that basestation
+   	 for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
+        losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
+   	  //ue[k] are id's to be considered	
+   	   }
+   	   //losses is now got for all 50 users assigned to that operator 
+        losses,ind := sort(losses)
+        for l:=0;l<len(ind);l++{
+        	ind[l]=ue[l+int(j*int(usersPerBS))].ID()
+        }   
+       var count uint  
+     count=0
+     
+     for b:=0;b<int(usersPerBS);b++{
+       flag=0
+      //checking if already assigned
+		      for k:=0;k<len(assigned);k++{
+		          if assigned[k]==ind[b]{
+		          	   flag=1
+		             	break
+		              } 
+		          } 
+		       if flag==0{
+             //assigning now
+		       	    count+=1
+			     	sc.Users()[ind[b]].CurrOp = bs[3*j+t].OwnerOp()
+				    assigned=append(assigned,ind[b])
+				    newOps[ind[b]] = sc.Users()[ind[b]].CurrOp.ID()
+		       }
+		       if count==10{
+		       	break
+		       }
+       }
+
+
+
+   	 }
+   }
+
+   
+}//each hexagon
+
+
+
+
+/*
 for i := 0; i < len(sc.BaseStations()); i++ {
 	var losses = []float64{} //to have losses for that basestation
     for j:=0;j<len(sc.Users());j++{
@@ -116,7 +183,7 @@ for i := 0; i < len(sc.BaseStations()); i++ {
     }
 //the ue's not assigned to any bs have to be assigned a null operator
 }
-
+*/
 
     returnData := map[string]interface{}{}
     returnData["opconn"] = newOps

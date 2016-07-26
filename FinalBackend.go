@@ -204,7 +204,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			if perf.NoUsers(opEnable)!=1{
 			 r.data, r.err = perf.AssignOperators(scenario, opEnable)
 		    } else{
-		     r.data, r.err = perf.AssignSingleOperator(scenario, opEnable)
+		     r.data, r.err = perf.AssignSingleOperator(scenario,hexMap, opEnable)
 		    }
 
 		case "lvlchng":

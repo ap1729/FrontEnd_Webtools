@@ -879,7 +879,7 @@ str1="#UE";
  for(i=0;i<obj.data.opconn.length;i++)
    {
     str2=str1+(i).toString();//UE id starts from UE0 for sectoring
-    if(obj.data.opconn[i]==4)
+    if(obj.data.opconn[i]>3)
     {
        console.log("YAY");
        d3.select(str2).classed('inactive',true);
