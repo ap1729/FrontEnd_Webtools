@@ -201,7 +201,12 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			for i := 0; i < len(scenario.Operators()); i++ {
 				opEnable[i] = vals[i].(float64) == 1
 			}
-			r.data, r.err = perf.AssignOperators(scenario, opEnable)
+			if perf.NoUsers(opEnable)!=1{
+			 r.data, r.err = perf.AssignOperators(scenario, opEnable)
+		    } else{
+		     r.data, r.err = perf.AssignSingleOperator(scenario, opEnable)
+		    }
+
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			r.data, r.err = perf.ChangeLevel(scenario, targetLvl, opEnable)

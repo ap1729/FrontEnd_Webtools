@@ -19,7 +19,6 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 	if sc == nil || hexMap == nil || p == nil {
 		return nil, errors.New(ARG_NIL)
 	}
-
 	var bsIds []uint
 
 	switch p.FrMode {

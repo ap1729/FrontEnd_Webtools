@@ -51,3 +51,15 @@ func sort(values []float64) ([]float64, []uint) {
 	}
 	return val, ind
 }
+
+func NoUsers(opflags []bool) uint{
+ //function for number of users
+  var sum uint
+  sum=0
+  for i:=0;i<4;i++{
+   if opflags[i]==true{
+     sum+=1
+    }
+  }
+  return sum
+}

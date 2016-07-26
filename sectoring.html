@@ -66,7 +66,7 @@ svg {
 
 .inactive{
   fill: black!important;
-  fill-opacity: 0.15;
+  fill-opacity: 0.05;
 }
 
 
@@ -302,7 +302,7 @@ field{
   var ue=[],bs=[];//stores ue and bs data
   var level=0;//which level it is currently in
   var topBsno=10;//no of Bs to show on click and in bar graph
-  var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
+  var opercolor=[{'color':"lime"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"black"}];//add as many as operators
   var bscolor=[{'color':"green"},{'color':"orange"},{'color':"red"},{'color':"brown"},{'color':"yellow"}];//add as many as operators
   var currselected=-1; //latest selected circle
   var wcount=0;//window number for cdf plot
@@ -833,6 +833,9 @@ function validoperator(){
    }
  }
 console.log(a);
+
+//Visual part of basestation inactivated
+/*
    for(i=0;i<bs.length;i++)
    {//for all bs
      Bsid='#BS'+i.toString();
@@ -846,7 +849,7 @@ console.log(a);
         }
 
     }
-
+*/
 
   //return a;
 BackObj={perf:"enop",opflags:a};//params is to which level
@@ -863,6 +866,7 @@ $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from serve
 function onsuccess1(obj)
 {
  console.log(obj);
+ OBJ=obj.data.opconn;
 if(checkerr(obj.status,obj.msg)<0)
 {
  console.log("error");
@@ -875,7 +879,16 @@ str1="#UE";
  for(i=0;i<obj.data.opconn.length;i++)
    {
     str2=str1+(i).toString();//UE id starts from UE0 for sectoring
+    if(obj.data.opconn[i]==4)
+    {
+       console.log("YAY");
+       d3.select(str2).classed('inactive',true);
+    }
+    else{
+      d3.select(str2).classed('inactive',false);
     d3.select(str2).style("fill",opercolor[obj.data.opconn[i]].color);
+     }
+   
    }
 
   }
