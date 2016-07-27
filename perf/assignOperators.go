@@ -89,7 +89,9 @@ for i := 0; i < len(sc.Users()); i++ {
 
 
 var flag uint
-var assigned = []uint{}
+var total uint
+total=0
+var ASSIGNED =[]float64{}
 var usersPerBS uint
 for i:=0;i<19;i++{
 	//for each hexagon
@@ -103,36 +105,52 @@ for i:=0;i<19;i++{
 
    for j:=0;j<4;j++{
    	//going by operator ,each sector has at max 10
-   	for t:=0;t<3;t++{
+     	//var assigned = []uint{}
+   	     for t:=0;t<3;t++{
    		//for each sector
-   		var losses = []float64{} //to have losses for that basestation
-   	 for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
-        losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
-   	  //ue[k] are id's to be considered	
-   	   }
+   		     var losses = []float64{} //to have losses for that basestation
+   		
+   		     fmt.Println("        BASESTaTION:",bs[3*j+t].ID())
+   
+   	       for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
+                 losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
+   	                 }
+
+
    	   //losses is now got for all 50 users assigned to that operator 
+
         losses,ind := sort(losses)
+        ind1 := make([]uint, len(ind))
+        
         for l:=0;l<len(ind);l++{
-        	ind[l]=ue[l+int(j*int(usersPerBS))].ID()
-        }   
-       var count uint  
+        	//ind[l]=ue[l+int(j*int(usersPerBS))].ID()
+        	ind1[l]=ue[ind[l]].ID()
+
+        	//fmt.Println(ind[l],ind1[l],losses[l])
+        }  
+         //ind1 has ue id's 
+
+     var count uint  
      count=0
      
-     for b:=0;b<int(usersPerBS);b++{
+     for b:=0;b<len(ind1);b++{
        flag=0
       //checking if already assigned
-		      for k:=0;k<len(assigned);k++{
-		          if assigned[k]==ind[b]{
+		      for k:=0;k<len(ASSIGNED);k++{
+		          if ASSIGNED[k]==float64(ind1[b]){
 		          	   flag=1
 		             	break
 		              } 
 		          } 
 		       if flag==0{
              //assigning now
+		      // 	fmt.Println(bs[3*j+t].OwnerOp())
 		       	    count+=1
-			     	sc.Users()[ind[b]].CurrOp = bs[3*j+t].OwnerOp()
-				    assigned=append(assigned,ind[b])
-				    newOps[ind[b]] = sc.Users()[ind[b]].CurrOp.ID()
+		       	    total+=1
+		       	    ASSIGNED=append(ASSIGNED,float64(ind1[b]))	
+			     	sc.Users()[ind1[b]].CurrOp = bs[3*j+t].OwnerOp()
+				   // assigned=append(assigned,ind1[b]) 
+				    newOps[ind1[b]] = sc.Users()[ind1[b]].CurrOp.ID()
 		       }
 		       if count==10{
 		       	break
@@ -140,14 +158,17 @@ for i:=0;i<19;i++{
        }
 
 
-
+     
    	 }
    }
 
    
 }//each hexagon
 
-
+ASSIGNED,e :=sort(ASSIGNED)
+e[0]=0.0
+fmt.Println(ASSIGNED)
+fmt.Println("TOTAL",total)
 
 
 /*

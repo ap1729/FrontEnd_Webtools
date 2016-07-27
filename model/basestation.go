@@ -7,6 +7,8 @@ type BaseStation struct {
 	id       uint
 	x, y, ht float64
 	ownerOp  *Operator
+	//which users are it connected to
+	ConnectedUsers []*User //which users are the bs connected to
 }
 
 // Getter methods for all BaseStation properties that are not exported (read-only):

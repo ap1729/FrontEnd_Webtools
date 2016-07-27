@@ -5,9 +5,10 @@ type User struct {
 	id        uint
 	x, y, ht  float64
 	defaultOp *Operator
-
+    
 	// A public property for setting the current operator. This property has no internal implications,
 	// it is present as for convenience and encapsulation.
+	ConnectedBs *BaseStation //basestation it is connected to 
 	CurrOp *Operator
 }
 
