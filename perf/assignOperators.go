@@ -110,7 +110,7 @@ for i:=0;i<19;i++{
    		//for each sector
    		     var losses = []float64{} //to have losses for that basestation
    		
-   		     fmt.Println("        BASESTaTION:",bs[3*j+t].ID())
+   		     fmt.Println("        BASESTaTION:",bs[3*j+t].ID(),"OPER",bs[3*j+t].OwnerOp().ID())
    
    	       for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
                  losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
@@ -132,12 +132,14 @@ for i:=0;i<19;i++{
 
      var count uint  
      count=0
-     
+     fmt.Println(len(ind1))
      for b:=0;b<len(ind1);b++{
+     	fmt.Println("Count",count)
        flag=0
       //checking if already assigned
 		      for k:=0;k<len(ASSIGNED);k++{
 		          if ASSIGNED[k]==float64(ind1[b]){
+		          	   fmt.Println("Denied",ASSIGNED[k],"connected to",sc.Users()[int(ASSIGNED[k])].ConnectedBs.ID())
 		          	   flag=1
 		             	break
 		              } 
@@ -145,10 +147,13 @@ for i:=0;i<19;i++{
 		       if flag==0{
              //assigning now
 		      // 	fmt.Println(bs[3*j+t].OwnerOp())
+		       	    fmt.Println("ASSIGNED")
 		       	    count+=1
 		       	    total+=1
 		       	    ASSIGNED=append(ASSIGNED,float64(ind1[b]))	
 			     	sc.Users()[ind1[b]].CurrOp = bs[3*j+t].OwnerOp()
+			     	sc.Users()[ind1[b]].ConnectedBs = bs[3*j+t]
+			     	bs[3*j+t].ConnectedUsers=append(bs[3*j+t].ConnectedUsers,sc.Users()[ind1[b]])
 				   // assigned=append(assigned,ind1[b]) 
 				    newOps[ind1[b]] = sc.Users()[ind1[b]].CurrOp.ID()
 		       }
@@ -170,7 +175,9 @@ e[0]=0.0
 fmt.Println(ASSIGNED)
 fmt.Println("TOTAL",total)
 
-
+for i:=0;i<228;i++{
+	fmt.Println("BS",i," ",len(sc.BaseStations()[i].ConnectedUsers))
+}
 /*
 for i := 0; i < len(sc.BaseStations()); i++ {
 	var losses = []float64{} //to have losses for that basestation
