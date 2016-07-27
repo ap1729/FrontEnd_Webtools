@@ -95,8 +95,10 @@ var ASSIGNED =[]float64{}
 var usersPerBS uint
 for i:=0;i<19;i++{
 	//for each hexagon
+   fmt.Println("HEXAGON ",i)
    ue:=hexMap.FindContainedUsers(uint(i))
    bs:=hexMap.FindContainedStations(uint(i))
+
    //ue's and bs in that cell are got
    //bs should be 12 in number
    
@@ -110,10 +112,11 @@ for i:=0;i<19;i++{
    		//for each sector
    		     var losses = []float64{} //to have losses for that basestation
    		
-   		     fmt.Println("        BASESTaTION:",bs[3*j+t].ID(),"OPER",bs[3*j+t].OwnerOp().ID())
-   
+   	//	     fmt.Println("        BASESTaTION:",bs[3*j+t].ID(),"OPER",bs[3*j+t].OwnerOp().ID())
+    //          fmt.Println("UE")
    	       for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
                  losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
+            //     fmt.Println(ue[k].ID()) //id's of users concerned with this bs
    	                 }
 
 
@@ -124,30 +127,26 @@ for i:=0;i<19;i++{
         
         for l:=0;l<len(ind);l++{
         	//ind[l]=ue[l+int(j*int(usersPerBS))].ID()
-        	ind1[l]=ue[ind[l]].ID()
-
-        	//fmt.Println(ind[l],ind1[l],losses[l])
+        	ind1[l]=ue[j*int(usersPerBS)+int(ind[l])].ID()
         }  
          //ind1 has ue id's 
+fmt.Println(ind1)
 
      var count uint  
      count=0
-     fmt.Println(len(ind1))
      for b:=0;b<len(ind1);b++{
-     	fmt.Println("Count",count)
        flag=0
       //checking if already assigned
 		      for k:=0;k<len(ASSIGNED);k++{
 		          if ASSIGNED[k]==float64(ind1[b]){
-		          	   fmt.Println("Denied",ASSIGNED[k],"connected to",sc.Users()[int(ASSIGNED[k])].ConnectedBs.ID())
+		        //  	   fmt.Println("Denied",ASSIGNED[k],"connected to",sc.Users()[int(ASSIGNED[k])].ConnectedBs.ID())
 		          	   flag=1
 		             	break
 		              } 
 		          } 
 		       if flag==0{
              //assigning now
-		      // 	fmt.Println(bs[3*j+t].OwnerOp())
-		       	    fmt.Println("ASSIGNED")
+		       	   // fmt.Println("ASSIGNED")
 		       	    count+=1
 		       	    total+=1
 		       	    ASSIGNED=append(ASSIGNED,float64(ind1[b]))	
@@ -160,24 +159,22 @@ for i:=0;i<19;i++{
 		       if count==10{
 		       	break
 		       }
-       }
-
-
-     
-   	 }
-   }
+       }  //b loop
+   	 }//t loop ,i.e sectors of bs
+   }//j loop bs
 
    
 }//each hexagon
 
-ASSIGNED,e :=sort(ASSIGNED)
-e[0]=0.0
-fmt.Println(ASSIGNED)
+
+
 fmt.Println("TOTAL",total)
 
 for i:=0;i<228;i++{
 	fmt.Println("BS",i," ",len(sc.BaseStations()[i].ConnectedUsers))
 }
+
+
 /*
 for i := 0; i < len(sc.BaseStations()); i++ {
 	var losses = []float64{} //to have losses for that basestation
