@@ -29,9 +29,9 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 			postSinrVals[i] = -1000
 		} else{	
 			preSinrVals[i] = vals["pre"].(float64)
-			preSumRate += math.Log10(1 + math.Pow(10, preSinrVals[i]/10))
+			preSumRate += math.Log2(1 + math.Pow(10, preSinrVals[i]/10))
 			postSinrVals[i] = vals["post"].(float64)
-			postSumRate += math.Log10(1 + math.Pow(10, postSinrVals[i]/10))
+			postSumRate += math.Log2(1 + math.Pow(10, postSinrVals[i]/10))
 		}
        }
 	}//for loop over
@@ -43,8 +43,8 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 		if centerUsers[i].CurrOp.ID() != 10{
           vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p)
          if err == nil {
-			CenterPreRate += math.Log10(1 + math.Pow(10, vals["pre"].(float64)/10))
-			CenterPostRate += math.Log10(1 + math.Pow(10, vals["post"].(float64)/10))
+			CenterPreRate += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
+			CenterPostRate += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
 		     }
 
 

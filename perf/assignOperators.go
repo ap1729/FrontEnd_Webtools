@@ -8,6 +8,46 @@ import (
 	"fmt"
 )
 
+
+func NewAssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}, error){
+// Handling argument nil exception
+	if sc == nil || enFlags == nil {
+		return nil, errors.New(ARG_NIL)
+	}
+//newOps is Operator Id's to return to frontend
+	newOps := make([]uint, len(sc.Users()))
+  
+  //making all basestations connections as null
+	/*
+ for i:=0;i<len(sc.BaseStations());i++{
+ 	sc.BaseStations()[i].ConnectedUsers=[]
+ } 
+*/
+for i := 0; i < len(sc.Users()); i++ {
+
+  sc.Users()[i].ConnectedBs=sc.Users()[i].BS0()//connecting bs to ue
+  sc.Users()[i].CurrOp= sc.Users()[i].BS0().OwnerOp()//finding currop
+  sc.Users()[i].BS0().ConnectedUsers=append(sc.Users()[i].BS0().ConnectedUsers,sc.Users()[i])//attaching users to basestation
+  newOps[i]=sc.Users()[i].BS0().OwnerOp().ID()//setting newOps
+}  
+
+
+
+
+ returnData := map[string]interface{}{}
+	returnData["opconn"] = newOps
+	return returnData, nil	
+}
+
+
+
+
+
+
+
+
+
+
 // Change the registered operator of each user, based on the enabled operators as specified
 // by the flags.
 //
@@ -83,7 +123,7 @@ func AssignSingleOperator(sc *model.Scenario,hexMap *service.HexMap, enFlags []b
  newOps := make([]uint, len(sc.Users()))
 
 for i := 0; i < len(sc.Users()); i++ {
- newOps[i]=4;
+ newOps[i]=10;
  sc.Users()[i].CurrOp = model.NewOperator(uint(10)) //default operator is 10
 }	
 
@@ -214,3 +254,5 @@ for i := 0; i < len(sc.BaseStations()); i++ {
     returnData["opconn"] = newOps
 	return returnData, nil
 }
+
+

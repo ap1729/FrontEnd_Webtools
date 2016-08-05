@@ -19,8 +19,8 @@ import (
 // Read CSV - "import"
 // Generate manually - "manual"
 const dataGenOpt = "import"
-const locFilePath = "data/HataMossLocations.csv"
-const lossFilePath = "data/HataMossLosses.csv"
+const locFilePath = "data/NewNodelocations.csv"
+const lossFilePath = "data/NewLoss.csv"
 
 // Package scope variables that encapsulate all required data
 // (Try them out by invoking the suggestion tool by typing the "dot")!
@@ -62,7 +62,9 @@ func initialize() bool {
 		}
 
 	} else if dataGenOpt == "manual" {
-		suc := service.GenerateMap(sb)
+		//currently the generateMap func not exist
+	//	suc := service.GenerateMap(sb)
+		suc := false
 		if suc == false {
 			return false
 		}
@@ -202,7 +204,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				opEnable[i] = vals[i].(float64) == 1
 			}
 			if perf.NoUsers(opEnable)!=1{
-			 r.data, r.err = perf.AssignOperators(scenario, opEnable)
+			 r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,opEnable)//temp
 		    } else{
 		     r.data, r.err = perf.AssignSingleOperator(scenario,hexMap, opEnable)
 		    }

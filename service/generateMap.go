@@ -1,5 +1,6 @@
-package service
 
+package service
+/*
 import (
 	"FrontEnd_WebTools/model"
 	. "math"
@@ -53,3 +54,4 @@ func GenerateMap(sb *model.ScenarioBuilder) bool {
 
 	return true
 }
+*/

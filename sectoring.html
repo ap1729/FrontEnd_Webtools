@@ -373,8 +373,6 @@ console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),doPlot,"json");
 
-
-
 //temporary to make opflags as 1,1,1,1
 BackObj1={perf:"enop",opflags:[1,1,1,1]};//params is to which level
  console.log(JSON.stringify(BackObj1));
@@ -407,8 +405,10 @@ function doPlot(obj) {
             .attr("class", "ue")
             .attr("cx",function(d,i) { return x(d.x); })
             .attr("cy",function(d,i) { return y(d.y); })
-            .style("fill",function(d,i) {
+            .style("fill",function(d,i) {  if(d.opid!=10)
                                           return opercolor[d.opid].color;
+                                          else
+                                             return "black"
                                           } ) // to change colour of each basestation user
             .call(drag)
             .on('mouseover', mouseOver)
@@ -866,7 +866,7 @@ $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from serve
 function onsuccess1(obj)
 {
  console.log(obj);
- OBJ=obj.data.opconn;
+// OBJ=obj.data.opconn;
 if(checkerr(obj.status,obj.msg)<0)
 {
  console.log("error");

@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"os"
 	"strconv"
+	"fmt"
 )
 
 // Reads a CSV file containing locations of nodes, and populates the ScenarioBuilder.
@@ -19,16 +20,16 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 	if err != nil {
 		return false
 	}
+
 	defer file.Close()
+	
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
 		return false
 	}
-
 	// Temporary fix
 	firstLine := true
-
 	for _, row := range records {
 
 		// Temporary fix
@@ -36,13 +37,32 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 			firstLine = false
 			continue
 		}
-
 		nodeType := row[0][0:2]
-		op, err := strconv.ParseUint(string(row[0][2]), 10, 64)
-		if err != nil {
+		//fmt.Println(nodeType)
+		
+
+		        op, err := strconv.ParseInt(string(row[3]), 10, 64)
+				if err != nil {
+					return false
+				}
+
+				if(op==-1){
+				 op=10
+				}
+				opId := uint(op) 
+        lvlbs0,err := strconv.ParseInt(string(row[4]),10,64)
+        if err != nil {
+        	fmt.Println(err)
 			return false
 		}
-		opId := uint(op) - 1
+		//fmt.Println("AA",op,lvlbs0)
+        /*
+        lvlbs1,err := strconv.ParseUint(row[6],64)
+        if err != nil {
+			return false
+		}
+        */
+
 		if !sb.OperatorExists(opId) {
 			sb.AddOperator(opId)
 		}
@@ -54,7 +74,7 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 		if err != nil {
 			return false
 		}
-		err2 := sb.AddNode(nodeType, x, y, 0, opId)
+		err2 := sb.AddNode(nodeType, x, y, 0, opId,lvlbs0)
 		if err2 == false {
 			return false
 		}

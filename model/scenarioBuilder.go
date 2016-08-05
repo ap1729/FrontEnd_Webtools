@@ -1,5 +1,7 @@
 package model
-
+import(
+// "fmt"
+)
 // The ScenarioBuilder type is a robust and safe factory to create new scenarios.
 // It works by adding necessary node details and uses a "sealing" mechanism to prevent multiple references modifying data.
 //
@@ -45,7 +47,7 @@ func (sb *ScenarioBuilder) AddOperator(opID uint) bool {
 // Adds a node with the specified parameters. This function can only be used if the ScenarioBuilder is not sealed.
 //
 // NodeType specifies the type of node - "BS" and "UE" are supported.
-func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint) bool {
+func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,lvlbs0 int64) bool {
 	if *sb.isSealed == true {
 		return false
 	}
@@ -55,12 +57,15 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint)
 		return false
 	}
 	if nodeType == "BS" {
+        
 		bs := NewBaseStation(sb.lastBsId, x, y, ht, op)
 		sb.lastBsId++
 		return sb.scenario.addBaseStation(bs)
 	}
 	if nodeType == "UE" {
-		ue := NewUser(sb.lastUeId, x, y, ht, op)
+		//similarly for bs1
+		bs0 := sb.scenario.GetStationByID(uint(lvlbs0))
+		ue := NewUser(sb.lastUeId, x, y, ht, op,bs0)
 		sb.lastUeId++
 		return sb.scenario.addUser(ue)
 	}

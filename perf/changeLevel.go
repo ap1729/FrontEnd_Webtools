@@ -48,3 +48,28 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) (map[strin
 	returnData["opconn"] = newOper
 	return returnData, nil
 }
+
+
+func newChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) (map[string]interface{}, error){
+	if sc == nil || opEnable == nil {
+		return nil, errors.New(ARG_NIL)
+	}
+//also have to change ue and bs associations
+	returnData := map[string]interface{}{}
+	newOper := make([]int, len(sc.Users()))
+
+	if targetLvl == 0 {
+		for i := 0; i < len(newOper); i++ {
+			newOper[i] = int(sc.Users()[i].DefaultOp().ID())
+		}
+
+	} else if targetLvl == 1 {
+        for i := 0; i < len(newOper); i++ {
+			newOper[i] = int(sc.Users()[i].BS1().OwnerOp().ID())
+			//have to change ue and bs associations	
+		}
+     }
+ 
+ returnData["opconn"] = newOper
+	return returnData, nil
+}
