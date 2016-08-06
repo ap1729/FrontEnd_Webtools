@@ -208,12 +208,12 @@ field{
                        <br>
 
                       Drag Enabled<input type="checkbox" id="dragcheck" >
-                       <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                       VALID OPERATORS  &nbsp; : &nbsp;
-                               Operator 1<input type="checkbox" id="Oper1" checked>
-                               Operator 2 <input type="checkbox" id="Oper2" checked>
-                               Operator 3<input type="checkbox" id="Oper3" checked>
-                               Operator 4<input type="checkbox" id="Oper4" checked>
+                       <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                     OPERATOR MODE <br>
+                     <form id ="opertype">
+                     Single <input type ="checkbox" id="single"> <br>
+                     Multi <input type ="checkbox" id="multi" checked="true"> <br>
+                     </form>
 
                        <button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button>
                     <br><br>
@@ -373,8 +373,8 @@ console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),doPlot,"json");
 
-//temporary to make opflags as 1,1,1,1
-BackObj1={perf:"enop",opflags:[1,1,1,1]};//params is to which level
+//default as multi oper
+BackObj1={perf:"enop",optype:"multi"};//params is to which level
  console.log(JSON.stringify(BackObj1));
 
 $.post("/update",JSON.stringify(BackObj1),onsuccess1,"json");//getting from server
@@ -816,49 +816,24 @@ function zoomed() {
 
 
 function validoperator(){
-  //function to return a array of 0 and 1's to indicate which operators are valid
-  a=[1,1,1,1];
-//doing inactive visual
-
- var Bsid="";
- for(j=0;j<4;j++)
- { //for each operator
-    if(document.getElementById("Oper"+(j+1).toString()).checked)//check if operator is checked or not
-  {
-     a[j]=1;
-  }
-   else
-   {
-      a[j]=0;
+  //function to say if it is single or multi operator
+  
+  if ((document.getElementById("single").checked && document.getElementById("multi").checked) ||((   !document.getElementById("single").checked && !document.getElementById("multi").checked))){
+   window.alert("Choose EXACTLY ONE opertype");
    }
- }
-console.log(a);
-
-//Visual part of basestation inactivated
-/*
-   for(i=0;i<bs.length;i++)
-   {//for all bs
-     Bsid='#BS'+i.toString();
-       if(a[bs[i].opid]==1)
-      {
-        d3.select(Bsid).classed('inactive',false);
-       }
-       else
-        {
-         d3.select(Bsid).classed('inactive',true);
-        }
-
-    }
-*/
-
-  //return a;
-BackObj={perf:"enop",opflags:a};//params is to which level
+  else  {
+    var a;
+  a="multi";
+    if(document.getElementById("single").checked){
+   a="single"
+}
+BackObj={perf:"enop",optype:a};//params is to which level
  console.log(JSON.stringify(BackObj));
 
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
-
-
+ }
+ 
 }
 
 

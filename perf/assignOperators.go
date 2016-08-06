@@ -9,9 +9,9 @@ import (
 )
 
 
-func NewAssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}, error){
+func NewAssignOperators(sc *model.Scenario, optype string) (map[string]interface{}, error){
 // Handling argument nil exception
-	if sc == nil || enFlags == nil {
+	if sc == nil  {
 		return nil, errors.New(ARG_NIL)
 	}
 //newOps is Operator Id's to return to frontend
@@ -24,11 +24,16 @@ func NewAssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interfac
  } 
 */
 for i := 0; i < len(sc.Users()); i++ {
-
+  if sc.Users()[i].BS0()!=nil{
   sc.Users()[i].ConnectedBs=sc.Users()[i].BS0()//connecting bs to ue
   sc.Users()[i].CurrOp= sc.Users()[i].BS0().OwnerOp()//finding currop
   sc.Users()[i].BS0().ConnectedUsers=append(sc.Users()[i].BS0().ConnectedUsers,sc.Users()[i])//attaching users to basestation
   newOps[i]=sc.Users()[i].BS0().OwnerOp().ID()//setting newOps
+
+   }else{
+   	//not assigned to any operator
+   	newOps[i]=10 
+   }
 }  
 
 
@@ -102,23 +107,16 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}
 
 
 
-func AssignSingleOperator(sc *model.Scenario,hexMap *service.HexMap, enFlags []bool) (map[string]interface{}, error) {
+func AssignSingleOperator(sc *model.Scenario,hexMap *service.HexMap, optype string) (map[string]interface{}, error) {
  //Single Operator Assigning is different
 
  // Handling argument nil exception
-	if sc == nil || enFlags == nil {
+	if sc == nil  {
 		return nil, errors.New(ARG_NIL)
 	}
 
-    var valOps uint
-	for i := 0; i < len(enFlags); i++ {
-		if enFlags[i] == true {
-			valOps=uint(i)
-			break
-		}
-	}
-
- fmt.Println("VAL OPS ",valOps)
+  
+ fmt.Println("OPER TYPE",optype)
 
  newOps := make([]uint, len(sc.Users()))
 

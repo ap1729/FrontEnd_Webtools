@@ -199,7 +199,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		case "scmeta":
 			r.data = service.PackageScenario(scenario)
 		case "enop":
-			vals := rxData["opflags"].([]interface{})
+			vals := rxData["optype"].(string)
+			fmt.Println("VALS:",vals)
+			r.data, r.err = perf.NewAssignOperators(scenario,vals)
+			//r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,vals)
+			/*
 			for i := 0; i < len(scenario.Operators()); i++ {
 				opEnable[i] = vals[i].(float64) == 1
 			}
@@ -207,7 +211,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			 r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,opEnable)//temp
 		    } else{
 		     r.data, r.err = perf.AssignSingleOperator(scenario,hexMap, opEnable)
-		    }
+		    }*/
 
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))

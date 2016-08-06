@@ -1,6 +1,6 @@
 package model
 import(
-// "fmt"
+ //"fmt"
 )
 // The ScenarioBuilder type is a robust and safe factory to create new scenarios.
 // It works by adding necessary node details and uses a "sealing" mechanism to prevent multiple references modifying data.
@@ -64,6 +64,8 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,
 	}
 	if nodeType == "UE" {
 		//similarly for bs1
+      
+  //if lvlbs0 =-1 ,then bs0 is nil
 		bs0 := sb.scenario.GetStationByID(uint(lvlbs0))
 		ue := NewUser(sb.lastUeId, x, y, ht, op,bs0)
 		sb.lastUeId++
