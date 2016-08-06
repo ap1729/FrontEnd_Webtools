@@ -53,10 +53,10 @@ func (ue *User) BS1() *BaseStation {
 }
 
 // Constructor to instantiate a User. The constructor must be used to create new objects as all properties are read-only.
-func NewUser(id uint, x, y, ht float64, op *Operator,bs0 *BaseStation) *User {
+func NewUser(id uint, x, y, ht float64, op *Operator,bs0 *BaseStation,bs1 *BaseStation) *User {
 	if(bs0==nil){
 	  return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op}
 	}else{
-	return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op,bs0: bs0}
+	return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op,bs0: bs0,bs1: bs1}
    }
 }

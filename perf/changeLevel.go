@@ -4,7 +4,7 @@ import (
 	"FrontEnd_WebTools/model"
 	"errors"
 	"fmt"
-	"math"
+//	"math"
 )
 
 // Returns the operators that users connect to, if the cooperation level was set
@@ -20,10 +20,23 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) (map[strin
 
 	if targetLvl == 0 {
 		for i := 0; i < len(newOper); i++ {
-			newOper[i] = int(sc.Users()[i].CurrOp.ID())
+			if sc.Users()[i].BS0()!=nil{
+			newOper[i] = int(sc.Users()[i].BS0().OwnerOp().ID())
+		    }else{
+		    	newOper[i]=10
+		    }	
 		}
 
 	} else if targetLvl == 1 {
+		for i := 0; i < len(newOper); i++ {
+          if sc.Users()[i].BS1()!=nil{
+			newOper[i] = int(sc.Users()[i].BS1().OwnerOp().ID())
+		    }else{
+		    	newOper[i]=10
+		    }	
+		}
+
+		/*
 		for i := 0; i < len(newOper); i++ {
 			id := -1
 			max := math.Inf(-1)
@@ -40,7 +53,8 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) (map[strin
 			} else {
 				newOper[i] = int(sc.GetStationByID(uint(id)).OwnerOp().ID())
 			}
-		}
+			}*/
+		
 	} else {
 		return nil, fmt.Errorf(LVL_INV_FMT, targetLvl)
 	}

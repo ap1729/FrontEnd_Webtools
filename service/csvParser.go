@@ -55,13 +55,12 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
         	fmt.Println(err)
 			return false
 		}
-		//fmt.Println("AA",op,lvlbs0)
-        /*
-        lvlbs1,err := strconv.ParseUint(row[6],64)
+		lvlbs1,err := strconv.ParseInt(string(row[5]),10,64)
         if err != nil {
+        	fmt.Println(err)
 			return false
 		}
-        */
+
 
 		if !sb.OperatorExists(opId) {
 			sb.AddOperator(opId)
@@ -74,7 +73,7 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 		if err != nil {
 			return false
 		}
-		err2 := sb.AddNode(nodeType, x, y, 0, opId,lvlbs0)
+		err2 := sb.AddNode(nodeType, x, y, 0, opId,lvlbs0,lvlbs1)
 		if err2 == false {
 			return false
 		}

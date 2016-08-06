@@ -47,7 +47,7 @@ func (sb *ScenarioBuilder) AddOperator(opID uint) bool {
 // Adds a node with the specified parameters. This function can only be used if the ScenarioBuilder is not sealed.
 //
 // NodeType specifies the type of node - "BS" and "UE" are supported.
-func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,lvlbs0 int64) bool {
+func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,lvlbs0 int64,lvlbs1 int64) bool {
 	if *sb.isSealed == true {
 		return false
 	}
@@ -66,8 +66,10 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,
 		//similarly for bs1
       
   //if lvlbs0 =-1 ,then bs0 is nil
+  //if lvlbs1 =-1 ,then bs1 is nil
 		bs0 := sb.scenario.GetStationByID(uint(lvlbs0))
-		ue := NewUser(sb.lastUeId, x, y, ht, op,bs0)
+		bs1 := sb.scenario.GetStationByID(uint(lvlbs1))
+		ue := NewUser(sb.lastUeId, x, y, ht, op,bs0,bs1)
 		sb.lastUeId++
 		return sb.scenario.addUser(ue)
 	}
