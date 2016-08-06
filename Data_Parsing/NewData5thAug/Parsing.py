@@ -11,12 +11,27 @@ while line:
   for i in range(0,12): 
   #  print data[i]
     oper[str(data[i])]=i/3
-    lvl0bs[str(data[i])]=i
+    lvl0bs[str(data[i])]=i%3 +(int(i/3))*57
   line =file.readline()
  else:
   break
-
+file.close()
 #operators are got
+
+#lvl 1
+file =open('operatorlev1.txt')
+lvl1bs={}
+line= file.readline() 
+while line:
+ data = line.split()
+ if len(data)>0:
+  for i in range(0,12): 
+    lvl1bs[str(data[i])]=i%3 +(int(i/3))*57
+  line =file.readline()
+ else:
+  break
+#lvl1 oper got
+print lvl1bs
 
 file =open('Nodelocations1.txt')
 from pylab import *
@@ -32,7 +47,7 @@ elem.append("x")
 elem.append("y")
 elem.append("OPERATOR")
 elem.append("LEVEL0 BS")
-#elem.append("LEVEL1 BS")
+elem.append("LEVEL1 BS")
 xdata=[]
 ydata=[]	
 bs1x=[]
@@ -110,14 +125,17 @@ with open('Nodelocations.csv', 'w') as csvfile:
      uecount+=1
      try:
        elem.append(oper[str(uecount)]) 
-       elem.append(lvl0bs[str(uecount)])    
+       elem.append(lvl0bs[str(uecount)])
+       elem.append(lvl1bs[str(uecount)])    
       # print "UE",oper[str(uecount)]
      except KeyError:
+       elem.append(-1)
        elem.append(-1)
        elem.append(-1)
     else: 
        #it is basestation
       elem.append(int(linedata[0][2])-1)	
+      elem.append(-1)
       elem.append(-1)
   writer.writerow(elem) #For last line 
 '''

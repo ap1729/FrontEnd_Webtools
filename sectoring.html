@@ -217,8 +217,8 @@ field{
                      Single <input type ="checkbox" id="single"> <br>
                      Multi <input type ="checkbox" id="multi" checked="true"> <br>
                      </form>
-
-                       <button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button>
+<!--
+                       <button type="button" class="btn btn-default" title="Validate your valid operators by clicking to record the change" data-toggle="tooltip"  onclick="validoperator()">Validate</button> Dont need button-->
                     <br><br>
                     <legend>Viewing Options</legend>
                            <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
@@ -614,7 +614,7 @@ else if (topx<0)  {
 }
 else{
 //Use this in type for all BackObj to do necessary//console.log(document.getlementById("FR").value);
-BackObj={perf:"sir",node:parseInt(d.id),level:level,topbsno:topBSno,noise:-92,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"sir",node:parseInt(d.id),level:level,topbsno:topBSno,noise:-92,intcnc:topx,frmode:document.getElementById("FR").value,optype:opertype()};
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
@@ -895,7 +895,7 @@ else
 
 
 
-BackObj={perf:"lvlchng",params:1,frmode:document.getElementById("FR").value };//params is to which level
+BackObj={perf:"lvlchng",params:1,frmode:document.getElementById("FR").value,optype:opertype() };//params is to which level
  console.log(JSON.stringify(BackObj));
 
 
@@ -913,7 +913,7 @@ else
 if(currselected!=-1)
 {
 document.getElementById("loader").style.display = "block";
-BackObj1={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj1={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value ,optype:opertype()};
 console.log(JSON.stringify(BackObj1));
 $.post("/update",JSON.stringify(BackObj1),onsuccess,"json");//getting from server
 }
@@ -926,7 +926,7 @@ function level0()
   level=0;
 document.getElementById("loader").style.display = "block";
 
-BackObj={perf:"lvlchng",params:0,frmode:document.getElementById("FR").value };//params is to which level
+BackObj={perf:"lvlchng",params:0,frmode:document.getElementById("FR").value,optype:opertype() };//params is to which level
  console.log(JSON.stringify(BackObj));
 
 
@@ -946,7 +946,7 @@ else
   topx=parseInt(topx);
 if(currselected!=-1)
  {
-BackObj={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"sir",node:parseInt(currselected),level:level,topbsno:topBSno,noise:-90,intcnc:topx,frmode:document.getElementById("FR").value,optype:opertype() };
 console.log(JSON.stringify(BackObj));
 $.post("/update",JSON.stringify(BackObj),onsuccess,"json");//getting from server
  }
@@ -1516,7 +1516,7 @@ else{
 function sinrheatmap()
 {
 
-BackObj={perf:"heatmap",level:level,intcnc:parseInt(document.getElementById("topx").value),frmode:document.getElementById("FR").value };
+BackObj={perf:"heatmap",level:level,intcnc:parseInt(document.getElementById("topx").value),frmode:document.getElementById("FR").value,optype:opertype()};
 console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),sinrcolor,"json");//getting from server
@@ -1553,6 +1553,12 @@ else{
 
 }
 
+function opertype(){
+  if (document.getElementById("multi").checked ==true)
+    return "multi"
+   else
+    return "single" 
+}
     </script>
 
   </body>

@@ -1,7 +1,8 @@
 package service
 
-import "FrontEnd_WebTools/model"
-
+import( "FrontEnd_WebTools/model"
+  "fmt"
+)
 // Packages the scenario object into a map that can be directly marshalled
 // into a JSON object. The map contains three object arrays for BaseStations,
 // Users and Operators with relevant properties each.
@@ -24,6 +25,9 @@ func PackageScenario(sc *model.Scenario) map[string]interface{} {
 		ue[i]["x"] = sc.Users()[i].X()
 		ue[i]["y"] = sc.Users()[i].Y()
 		ue[i]["opid"] = sc.Users()[i].DefaultOp().ID()
+		if(sc.Users()[i].BS0()!=nil){
+        fmt.Println("ACT",sc.Users()[i].DefaultOp().ID(),"BSO",sc.Users()[i].BS0().OwnerOp().ID())
+         }
 	}
 
 	op := make([]map[string]interface{}, len(sc.Operators()))

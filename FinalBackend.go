@@ -198,7 +198,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		switch rxData["perf"] {
 		case "scmeta":
 			r.data = service.PackageScenario(scenario)
+			/* dont need this case
 		case "enop":
+
 			vals := rxData["optype"].(string)
 			//fmt.Println("VALS:",vals)
 			r.data, r.err = perf.NewAssignOperators(scenario,vals)
@@ -211,8 +213,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			 r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,opEnable)//temp
 		    } else{
 		     r.data, r.err = perf.AssignSingleOperator(scenario,hexMap, opEnable)
-		    }*/
+		    } 
 
+
+		    */
+         
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			r.data, r.err = perf.ChangeLevel(scenario, targetLvl, opEnable)
