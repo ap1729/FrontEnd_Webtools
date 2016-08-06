@@ -17,7 +17,7 @@ import (
 //
 // p - The parameters of the model to be simulated
 // profileTopN - for how many top stations the power profile must be returned
-func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profileTopN uint, p *Params) (map[string]interface{}, error) {
+func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profileTopN uint, p *Params,optype string) (map[string]interface{}, error) {
 
 	// Handling argument nil exception
 	if sc == nil || hexMap == nil || p == nil {
@@ -25,28 +25,23 @@ func SinrProfile(sc *model.Scenario, hexMap *service.HexMap, userID uint, profil
 	}
 
 	returnData := map[string]interface{}{}
-    
+	enableFlags := []bool{true,true,true,true}
+   
     //If single operator case,then interfering stations are only 57
     //interfering stations are only those of CurrOp of user
-    if NoUsers(p.OpEnableFlags)==1{
+    if optype=="single"{
     	fmt.Println("SINGLE OPERATOR CASE REACHED\n")
-    	for i:=0;i<4;i++{
-    		p.OpEnableFlags[i]=false
-    	}
-    	if sc.Users()[userID].CurrOp.ID() != 10{
-    	//10 is default operator	
-    	p.OpEnableFlags[sc.Users()[userID].CurrOp.ID()]=true
-       }else{
-       	fmt.Println("This User is Currently not assigned to any operator")
-       }
+    	enableFlags[1]=false
+    	enableFlags[2]=false
+    	enableFlags[3]=false
 
-    }
-   
+    } 
+
    if sc.Users()[userID].CurrOp.ID() != 10{
    //if the user is assigned to an operator
 
 	// What stations interfere with the current user, given the system parameters
-	intStatIds, err := intrStations(sc, hexMap, userID, p)
+	intStatIds, err := intrStations(sc, hexMap, userID, p,enableFlags,optype)
 	if err != nil {
 		return nil, fmt.Errorf("Interfering stations could not be determined:\n%v", err.Error())
 	}

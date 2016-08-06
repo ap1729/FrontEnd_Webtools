@@ -200,7 +200,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			r.data = service.PackageScenario(scenario)
 		case "enop":
 			vals := rxData["optype"].(string)
-			fmt.Println("VALS:",vals)
+			//fmt.Println("VALS:",vals)
 			r.data, r.err = perf.NewAssignOperators(scenario,vals)
 			//r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,vals)
 			/*
@@ -219,12 +219,15 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		case "emer":
 			r.data, r.err = perf.EmDownlink(scenario, hexMap, opEnable)
 		case "sir":
-			fmt.Printf("topN is: %v, and somehow uint(topN) is %v", topN, uint(topN))
-			r.data, r.err = perf.SinrProfile(scenario, hexMap, uint(ueID), uint(topN), params)
+			//fmt.Printf("topN is: %v, and somehow uint(topN) is %v", topN, uint(topN))
+			optype := rxData["optype"].(string)
+			r.data, r.err = perf.SinrProfile(scenario, hexMap, uint(ueID), uint(topN), params,optype)
 		case "heatmap":
-			r.data = perf.SinrHeatMap(scenario, hexMap, params)
+			optype := rxData["optype"].(string)
+			r.data = perf.SinrHeatMap(scenario, hexMap, params,optype)
 		case "cdf":
-			r.data = perf.CDF(scenario, hexMap, params)
+			optype := rxData["optype"].(string)
+			r.data = perf.CDF(scenario, hexMap, params,optype)
 		default:
 			fmt.Println("\nFATAL: Unknown command")
 			return

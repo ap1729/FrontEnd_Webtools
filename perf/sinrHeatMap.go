@@ -7,7 +7,7 @@ import (
 	//"fmt"
 )
 
-func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[string]interface{} {
+func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype string) map[string]interface{} {
 	preSinrVals := make([]float64, len(sc.Users()))
 	postSinrVals := make([]float64, len(sc.Users()))
 	var preSumRate float64 = 0.0
@@ -20,7 +20,7 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
             preSinrVals[i] = -1000
 			postSinrVals[i] = -1000
 		}else{
-		vals, err := SinrProfile(sc, hexMap, sc.Users()[i].ID(), 0, p)
+		vals, err := SinrProfile(sc, hexMap, sc.Users()[i].ID(), 0, p,optype)
 		
 
 		if err != nil {
@@ -41,7 +41,7 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[stri
 	for i:=0;i<len(centerUsers);i++ {
 		//loops over all users in center cell
 		if centerUsers[i].CurrOp.ID() != 10{
-          vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p)
+          vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p,optype)
          if err == nil {
 			CenterPreRate += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
 			CenterPostRate += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))

@@ -24,17 +24,17 @@ type calCdfRet struct { //structure to hold SINR CDF
 	cdfYArr    []float64 //cdf y-axis
 }
 
-func CDF(sc *model.Scenario, hexMap *service.HexMap, p *Params) map[string]interface{} {
+func CDF(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype string) map[string]interface{} {
 	var cdfL0Obj, cdfL1Obj cdfL0L1Ret
 	returnData := map[string]interface{}{}
 	fmt.Println("CDF func reached")
 
 	paramL0 := *p
 	paramL0.Level = 0
-	cdfL0Obj = cdfL0L1(sc, hexMap, paramL0)
+	cdfL0Obj = cdfL0L1(sc, hexMap, paramL0,optype)
 	paramL1 := *p
 	paramL1.Level = 1
-	cdfL1Obj = cdfL0L1(sc, hexMap, paramL1)
+	cdfL1Obj = cdfL0L1(sc, hexMap, paramL1,optype)
 
 	var sinrMinCollectArr = []float64{} //collect all minimum in X
 	sinrMinCollectArr = append(sinrMinCollectArr, cdfL0Obj.prsDbXArr[0])
@@ -81,18 +81,26 @@ func pre0Post1(cdfArr []float64, firstEleXArr float64, lenMinus1 float64) []floa
 	return cdfArr
 }
 
-func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params) cdfL0L1Ret {
+func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params,optype string) cdfL0L1Ret {
 	var cdfL0L1RetObj cdfL0L1Ret
 	var calCdfObj calCdfRet
 	var prsPosRoiArr = []float64{} //array containing pre , post processing SINR and ROI values
 	var prsArrDb = []float64{}     //array variable to store pre processing SINR for number of UEs considered
 	var posArrDb = []float64{}     //array variable to store post processing SINR for number of UEs considered
 
-	//
+	enableFlags := []bool{true,true,true,true}
+     if optype=="single"{
+    	fmt.Println("SINGLE OPERATOR CASE REACHED\n")
+    	enableFlags[1]=false
+    	enableFlags[2]=false
+    	enableFlags[3]=false
+
+    } 
+
 	users := hexMap.FindContainedUsers(9)
 
 	for i := 0; i < len(users); i++ {
-		intStatIds, err := intrStations(sc, hexMap, users[i].ID(), &p)
+		intStatIds, err := intrStations(sc, hexMap, users[i].ID(), &p,enableFlags,optype)
 		if err != nil {
 			// TODO
 		}

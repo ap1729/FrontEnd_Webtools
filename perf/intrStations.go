@@ -13,7 +13,7 @@ import (
 
 // Returns a list of ID's that identify interfering BaseStations for a user in
 // the scenario with given frequency-reuse mode.
-func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Params) ([]uint, error) {
+func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Params,enableFlags []bool,optype string) ([]uint, error) {
 
 	// Handling argument nil exception
 	if sc == nil || hexMap == nil || p == nil {
@@ -27,7 +27,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		// FR1 sends the list of BS in cells that match the operator(s) enabled
 		bsIds = *new([]uint)
 		for i := uint(0); i < uint(len(sc.BaseStations())); i++ {
-			if p.OpEnableFlags[sc.GetStationByID(i).OwnerOp().ID()] == true {
+			if enableFlags[sc.GetStationByID(i).OwnerOp().ID()] == true {
 				bsIds = append(bsIds, i)
 			}
 		}
@@ -72,7 +72,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 			bs := hexMap.FindContainedStations(frCells[k])
 			for m := 0; m < len(bs); m++ {
 				// Check if the BS's operator is enabled
-				if p.OpEnableFlags[bs[m].OwnerOp().ID()] == true {
+				if enableFlags[bs[m].OwnerOp().ID()] == true {
 					bsIds = append(bsIds, bs[m].ID())
 				}
 			}
@@ -99,7 +99,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		// Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called postSinrs
 		postSinrs := []float64{}
 		for k := 0; k < len(rootUsers); k++ {
-			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, IntCancellers: p.IntCancellers},optype)
 			if err != nil {
 				return nil, fmt.Errorf("Failed to evaluate user profiles, at userID: %d", rootUsers[k].ID())
 			}
@@ -115,13 +115,13 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		for j := 0; j < len(ind)*th/100; j++ {
 			if userID == rootUsers[ind[j]].ID() {
 				found = true
-				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, IntCancellers: p.IntCancellers},enableFlags,optype)
 				break
 			}
 		}
 		// Assign FR3 to the remaining UEs
 		if found == false {
-			bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, IntCancellers: p.IntCancellers},enableFlags,optype)
 		}
 
 		if err != nil {
@@ -151,7 +151,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		// Calculating the FR1 Post SINR for all UEs in the current cell, and store it in an array called postSinrs
 		postSinrs := []float64{}
 		for k := 0; k < len(rootUsers); k++ {
-			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			values, err := SinrProfile(sc, hexMap, rootUsers[k].ID(), 0, &Params{FrMode: "FR1", Level: p.Level, IntCancellers: p.IntCancellers},optype)
 			if err != nil {
 				return nil, fmt.Errorf("Failed to evaluate user profiles, at userID: %d", rootUsers[k].ID())
 			}
@@ -169,7 +169,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		for j := 0; j < x1; j++ {
 			if userID == rootUsers[ind[j]].ID() {
 				found = true
-				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+				bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR1", Level: p.Level, IntCancellers: p.IntCancellers},enableFlags,optype)
 				break
 			}
 		}
@@ -178,7 +178,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 			for j := x1; j < (x1 + x2 - 1); j++ {
 				if userID == rootUsers[ind[j]].ID() {
 					found = false
-					bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+					bsIds, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, IntCancellers: p.IntCancellers},enableFlags,optype)
 					break
 				}
 			}
@@ -188,7 +188,7 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 			fmt.Printf("\nRare case reached!\n")
 			var desOp = sc.GetUserByID(userID).CurrOp.ID()
 			var bsIdsAll []uint
-			bsIdsAll, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, OpEnableFlags: p.OpEnableFlags, IntCancellers: p.IntCancellers})
+			bsIdsAll, err = intrStations(sc, hexMap, userID, &Params{FrMode: "FR3", Level: p.Level, IntCancellers: p.IntCancellers},enableFlags,optype)
 			if err == nil {
 				bsIds = *new([]uint)
 				for i := 0; i < len(bsIdsAll); i++ {
