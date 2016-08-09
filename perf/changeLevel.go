@@ -30,6 +30,7 @@ func ChangeLevel(sc *model.Scenario, targetLvl uint, opEnable []bool) (map[strin
 	} else if targetLvl == 1 {
 		for i := 0; i < len(newOper); i++ {
           if sc.Users()[i].BS1()!=nil{
+          	
 			newOper[i] = int(sc.Users()[i].BS1().OwnerOp().ID())
 		    }else{
 		    	newOper[i]=10

@@ -31,17 +31,17 @@ func sinr(rxPows []float64, intrCancelCount uint) ([]float64, error) {
 	// Pre Processing SINR calculation
 	var sum float64 = 0.0
 	for i := 1; i < len(rxPows); i++ {
-		sum += math.Pow(10, (rxPows[i]/10)) / 1000
+		sum += math.Pow(10, (rxPows[i]/10))
 	}
-	vals[0] = rxPows[0] - 10*math.Log10((sum+noise)*1000) // Pre SINR
+	vals[0] = rxPows[0] - 10*math.Log10((sum+noise)) // Pre SINR
 
 	// Post Processing SINR and ROI calculation
 	sum = 0.0
 	for i := int(intrCancelCount) + 1; i < len(rxPows); i++ {
-		sum += math.Pow(10, (rxPows[i]/10)) / 1000
+		sum += math.Pow(10, (rxPows[i]/10))
 	}
-	vals[1] = rxPows[0] - 10*math.Log10((sum+noise)*1000) // Post SINR
-	vals[2] = 10 * math.Log10(sum*1000)                   // ROI
+	vals[1] = rxPows[0] - 10*math.Log10((sum+noise)) // Post SINR
+	vals[2] = 10 * math.Log10(sum)                   // ROI
 
 	return vals, nil
 }
