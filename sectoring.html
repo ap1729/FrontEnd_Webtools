@@ -242,8 +242,16 @@ field{
      <div class="panel-heading">Outputs</div>
      <div class="panel-body">
       <form id= "rate">
-        Pre SINR Sum Rate<input id="PreSumRate" type="number" step="0.01" style="width:5%;">
-        Post SINR Sum Rate<input id="PostSumRate" type="number" step="0.01" style="width: 5%;">
+       Center Pre SINR Sum Rate<input id="centerPreRate" type="number" step="0.01" style="width:5%;">
+      Center Post SINR Sum Rate<input id="centerPostRate" type="number" step="0.01" style="width: 5%;"> -CENTER CELL <br> 
+      Center Pre SINR Sum Rate1<input id="centerPreRate0" type="number" step="0.01" style="width:5%;">
+      Center Post SINR Sum Rate1<input id="centerPostRate0" type="number" step="0.01" style="width: 5%;"> -OPERATOR 1<br>
+      Center Pre SINR Sum Rate2<input id="centerPreRate1" type="number" step="0.01" style="width:5%;">
+      Center Post SINR Sum Rate2<input id="centerPostRate1" type="number" step="0.01" style="width: 5%;"> -OPERATOR 2<br>
+      Center Pre SINR Sum Rate3<input id="centerPreRate2" type="number" step="0.01" style="width:5%;">
+      Center Post SINR Sum Rate3<input id="centerPostRate2" type="number" step="0.01" style="width: 5%;">-OPERATOR 3<br>
+      Center Pre SINR Sum Rate4<input id="centerPreRate3" type="number" step="0.01" style="width:5%;">
+      Center Post SINR Sum Rate4<input id="centerPostRate3" type="number" step="0.01" style="width: 5%;">-OPERATOR 4<br>
       </form>
      </div> 
      <div class="panel-body">
@@ -515,6 +523,16 @@ console.log(obj);
 if(checkerr(obj.status,obj.msg)<0)
 {
    console.log("backend error");
+}
+else if(obj.data.bsid == null)
+{
+obj.data.post=Math.round(obj.data.post * 100) / 100;
+obj.data.pre=Math.round(obj.data.pre * 100) / 100;
+obj.data.roi=Math.round(obj.data.roi * 100) / 100;
+document.getElementById("LastSIR").valube=obj.data.roi;
+document.getElementById("PostSINR").value=obj.data.post;
+document.getElementById("PreSINR").value=obj.data.pre;
+console.log("NULL");
 }
 else{
 //obj.SIR is SIR
@@ -893,9 +911,11 @@ else
   topBSno=parseInt(topBSno);
 
 
+var chnglevel=1;
+if(opertype()=="single")
+ chnglevel=0;
 
-
-BackObj={perf:"lvlchng",params:1,frmode:document.getElementById("FR").value,optype:opertype() };//params is to which level
+BackObj={perf:"lvlchng",params:chnglevel,frmode:document.getElementById("FR").value,optype:opertype() };//params is to which level
  console.log(JSON.stringify(BackObj));
 
 
@@ -903,6 +923,8 @@ $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from serve
 //document.getElementById("loader").style.display = "none";
 
 level=1;//updating level
+if(opertype()=="single")
+ level=0;
 //console.log(document.getElementById("loader").style.display);
 topx=document.getElementById("topx").value;
 
@@ -1547,8 +1569,21 @@ else{
           d3.select(str2).style("fill",color(obj.data.post[i]));
         }
   }
-  document.getElementById("PostSumRate").value=Math.round(100*obj.data.postSumRate)/100;
-  document.getElementById("PreSumRate").value=Math.round(100*obj.data.preSumRate)/100;
+  if(opertype()=="multi"){
+  document.getElementById("centerPostRate").value=Math.round(100*obj.data.centerPostRate)/100;
+  document.getElementById("centerPreRate").value=Math.round(100*obj.data.centerPreRate)/100;
+}
+else{
+  document.getElementById("centerPostRate0").value=Math.round(100*obj.data.centerPostRate0)/100;
+  document.getElementById("centerPreRate0").value=Math.round(100*obj.data.centerPreRate0)/100;
+  document.getElementById("centerPostRate1").value=Math.round(100*obj.data.centerPostRate1)/100;
+  document.getElementById("centerPreRate1").value=Math.round(100*obj.data.centerPreRate1)/100;
+  document.getElementById("centerPostRate2").value=Math.round(100*obj.data.centerPostRate2)/100;
+  document.getElementById("centerPreRate2").value=Math.round(100*obj.data.centerPreRate2)/100;
+  document.getElementById("centerPostRate3").value=Math.round(100*obj.data.centerPostRate3)/100;
+  document.getElementById("centerPreRate3").value=Math.round(100*obj.data.centerPreRate3)/100;
+}
+
   document.getElementById("loader").style.display = "none";
 
 }

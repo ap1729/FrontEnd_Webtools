@@ -14,6 +14,15 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 	var postSumRate float64 = 0.0
 	var CenterPostRate float64=0.0
 	var CenterPreRate float64=0.0
+	var CenterPostRate0 float64=0.0
+	var CenterPreRate0 float64=0.0
+	var CenterPostRate1 float64=0.0
+	var CenterPreRate1 float64=0.0
+	var CenterPostRate2 float64=0.0
+	var CenterPreRate2 float64=0.0
+	var CenterPostRate3 float64=0.0
+	var CenterPreRate3 float64=0.0
+
 	for i := 0; i < len(sc.Users()); i++ {
 		if sc.Users()[i].CurrOp.ID() == 10{
             //if currop not assigned
@@ -39,17 +48,49 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 //to find rate only for center cell
 	centerUsers := hexMap.FindContainedUsers(9)
 	for i:=0;i<len(centerUsers);i++ {
+		
 		//loops over all users in center cell
 		if centerUsers[i].CurrOp.ID() != 10{
+			if(optype=="single"){
+			  vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p,optype)
+			  if(centerUsers[i].CurrOp.ID()==0){
+                if err == nil {
+                  CenterPreRate0 += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
+			      CenterPostRate0 += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
+		              }
+			   }else if(centerUsers[i].CurrOp.ID()==1){
+                    if err == nil {
+                  CenterPreRate1 += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
+			      CenterPostRate1 += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
+		              }
+			   	}else if(centerUsers[i].CurrOp.ID()==2) {
+                        if err == nil {
+                  CenterPreRate2 += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
+			      CenterPostRate2 += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
+		              }
+			   		}else if(centerUsers[i].CurrOp.ID()==3){
+                        if err == nil {
+                  CenterPreRate3 += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
+			      CenterPostRate3 += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
+		              }
+			   		}
+            
+			 }else{
+			 	//multi
           vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p,optype)
          if err == nil {
+
 			CenterPreRate += math.Log2(1 + math.Pow(10, vals["pre"].(float64)/10))
 			CenterPostRate += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
 		     }
-
+           }
 
 		}	
 	}
-
+ if(optype=="multi"){
 	return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals, "preSumRate": preSumRate, "postSumRate": postSumRate,"centerPostRate":CenterPostRate,"centerPreRate":CenterPreRate}
+ }else{
+ return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals, "preSumRate": preSumRate, "postSumRate": postSumRate,"centerPostRate0":CenterPostRate0,"centerPreRate0":CenterPreRate0,"centerPostRate1":CenterPostRate1,"centerPreRate1":CenterPreRate1,"centerPostRate2":CenterPostRate2,"centerPreRate2":CenterPreRate2,"centerPostRate3":CenterPostRate3,"centerPreRate3":CenterPreRate3}	
+ }
+ 
 }
