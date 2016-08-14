@@ -4,10 +4,15 @@ import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
 	"math"
-	//"fmt"
+	"fmt"
+	"time"
 )
 
 func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype string) map[string]interface{} {
+ 	
+    var lap1, lap2 ,lap3,lap4 time.Time// time 
+
+
 	preSinrVals := make([]float64, len(sc.Users()))
 	postSinrVals := make([]float64, len(sc.Users()))
 	var preSumRate float64 = 0.0
@@ -22,7 +27,7 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 	var CenterPreRate2 float64=0.0
 	var CenterPostRate3 float64=0.0
 	var CenterPreRate3 float64=0.0
-
+    var total uint =0
 	for i := 0; i < len(sc.Users()); i++ {
 		if sc.Users()[i].CurrOp.ID() == 10{
             //if currop not assigned
@@ -44,13 +49,14 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 		}
        }
 	}//for loop over
-
+lap3=time.Now()
 //to find rate only for center cell
 	centerUsers := hexMap.FindContainedUsers(9)
 	for i:=0;i<len(centerUsers);i++ {
 		
 		//loops over all users in center cell
 		if centerUsers[i].CurrOp.ID() != 10{
+			lap1=time.Now()
 			if(optype=="single"){
 			  vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p,optype)
 			  if(centerUsers[i].CurrOp.ID()==0){
@@ -76,6 +82,7 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 			   		}
             
 			 }else{
+			 	total+=1;
 			 	//multi
           vals, err := SinrProfile(sc, hexMap, centerUsers[i].ID(), 0, p,optype)
          if err == nil {
@@ -84,9 +91,13 @@ func SinrHeatMap(sc *model.Scenario, hexMap *service.HexMap, p *Params,optype st
 			CenterPostRate += math.Log2(1 + math.Pow(10, vals["post"].(float64)/10))
 		     }
            }
-
+            lap2=time.Now()
 		}	
+		fmt.Println("Finished so far ",total," time taken",lap2.Sub(lap1))
 	}
+	lap4=time.Now()
+	fmt.Println("TOTAL ",total)
+	fmt.Println("TOTAL time",lap4.Sub(lap3))
  if(optype=="multi"){
 	return map[string]interface{}{"pre": preSinrVals, "post": postSinrVals, "preSumRate": preSumRate, "postSumRate": postSumRate,"centerPostRate":CenterPostRate,"centerPreRate":CenterPreRate}
  }else{

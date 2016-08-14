@@ -38,7 +38,7 @@ if p.Level == 0 {
      			for i :=0;i<len(ind);i++{
 			
 			if sc.GetStationByID(ind[i]).ID()== actualBS{
-				fmt.Println("AAAAA",actualBS)
+				//fmt.Println("AAAAA",actualBS)
                tempInd := ind[i]
 				tempLoss := losses[i]
 				for k := i; k > 0; k-- {

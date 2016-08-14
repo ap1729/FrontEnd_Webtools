@@ -100,6 +100,7 @@ func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params,optype string)
 	users := hexMap.FindContainedUsers(9)
 
 	for i := 0; i < len(users); i++ {
+	 if sc.Users()[users[i].ID()].CurrOp.ID() != 10{
 		intStatIds, err := intrStations(sc, hexMap, users[i].ID(), &p,enableFlags,optype)
 		if err != nil {
 			// TODO
@@ -117,6 +118,7 @@ func cdfL0L1(sc *model.Scenario, hexMap *service.HexMap, p Params,optype string)
 		}
 		prsArrDb = append(prsArrDb, prsPosRoiArr[0])
 		posArrDb = append(posArrDb, prsPosRoiArr[1])
+      }//current oper check 
 	}
 
 	//>>>>>>>>>>>>>>>>>> for pre processing SINR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<//

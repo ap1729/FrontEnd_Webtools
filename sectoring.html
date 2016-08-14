@@ -533,6 +533,7 @@ document.getElementById("LastSIR").valube=obj.data.roi;
 document.getElementById("PostSINR").value=obj.data.post;
 document.getElementById("PreSINR").value=obj.data.pre;
 console.log("NULL");
+document.getElementById("loader").style.display = "none";
 }
 else{
 //obj.SIR is SIR
@@ -1235,7 +1236,7 @@ if(topx=="")
 else
   topx=parseInt(topx);
 
-BackObj={perf:"cdf",intcnc:topx,frmode:document.getElementById("FR").value };
+BackObj={perf:"cdf",intcnc:topx,frmode:document.getElementById("FR").value,optype:opertype()};
 console.log(BackObj);
 
 document.getElementById("loader").style.display = "block";
@@ -1269,8 +1270,12 @@ else{
 
 ctx.moveTo(0,0);
 ctx.font="30px Arial";//font and size of text
-ctx.fillText("CDF CURVES:",600,100);//heading
-ctx.fillText(document.getElementById("FR").value,820,100);
+ctx.fillText("CDF CURVES:",600,50);//heading
+ctx.fillText("OPERTYPE:",200,150);//heading
+ctx.fillText("Inter Cancellers",500,150);//heading
+ctx.fillText(document.getElementById("FR").value,820,50);
+ctx.fillText(opertype(),380,150);
+ctx.fillText(document.getElementById("topx").value,720,150);
 plotcurve(obj.data.sinr,obj.data.pre0,"#3399ff");//blue
 plotcurve(obj.data.sinr,obj.data.pre1,"#ff0066");//pink
 plotcurve(obj.data.sinr,obj.data.post0,"#ff9933");//orange
