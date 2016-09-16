@@ -45,7 +45,7 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 				if err != nil {
 					return false
 				}
-
+                 //if not assigned any operator ,op 10 is error operator
 				if(op==-1){
 				 op=10
 				}

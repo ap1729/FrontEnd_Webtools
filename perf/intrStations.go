@@ -28,7 +28,9 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 		bsIds = *new([]uint)
 		for i := uint(0); i < uint(len(sc.BaseStations())); i++ {
 			if enableFlags[sc.GetStationByID(i).OwnerOp().ID()] == true {
+				 if sc.GetStationByID(i).Destroyed==0{
 				bsIds = append(bsIds, i)
+			  }
 			}
 		}
 
@@ -73,7 +75,9 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 			for m := 0; m < len(bs); m++ {
 				// Check if the BS's operator is enabled
 				if enableFlags[bs[m].OwnerOp().ID()] == true {
+					if sc.GetStationByID(uint(m)).Destroyed==0{
 					bsIds = append(bsIds, bs[m].ID())
+				  }
 				}
 			}
 		}
@@ -194,7 +198,9 @@ func intrStations(sc *model.Scenario, hexMap *service.HexMap, userID uint, p *Pa
 				for i := 0; i < len(bsIdsAll); i++ {
 					// fmt.Printf("Desired: %v, Iteration: %v", desOp, sc.GetStationByID(bsIdsAll[i]).OwnerOp())
 					if sc.GetStationByID(bsIdsAll[i]).OwnerOp().ID() == desOp {
+						if sc.GetStationByID(uint(i)).Destroyed==0{
 						bsIds = append(bsIds, bsIdsAll[i])
+					   }
 					}
 				}
 			}

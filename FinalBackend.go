@@ -217,12 +217,15 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 
 		    */
-         
+        case "disaster":
+               ontype := rxData["mode"].(float64)
+               r.data,r.err = perf.DestroyBS(scenario , ontype)
 		case "lvlchng":
 			targetLvl := uint(rxData["params"].(float64))
 			r.data, r.err = perf.ChangeLevel(scenario, targetLvl, opEnable)
 		case "emer":
-			r.data, r.err = perf.EmDownlink(scenario, hexMap, opEnable)
+			optype := rxData["optype"].(string)
+			r.data, r.err = perf.EmDownlink1(scenario, hexMap, params,optype)
 		case "sir":
 			//fmt.Printf("topN is: %v, and somehow uint(topN) is %v", topN, uint(topN))
 			optype := rxData["optype"].(string)

@@ -58,7 +58,7 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,
 	}
 	if nodeType == "BS" {
         
-		bs := NewBaseStation(sb.lastBsId, x, y, ht, op)
+		bs := NewBaseStation(sb.lastBsId, x, y, ht,op)
 		sb.lastBsId++
 		return sb.scenario.addBaseStation(bs)
 	}

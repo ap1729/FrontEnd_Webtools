@@ -209,10 +209,11 @@ field{
                                 <option value="AFFR">AFFR</option>
                        </select>
                        <br>
-
+                    
                       Drag Enabled<input type="checkbox" id="dragcheck" >
                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                     OPERATOR MODE <br>
+                     
+                     <br>OPERATOR MODE <br>
                      <form id ="opertype">
                      Single <input type ="checkbox" id="single"> <br>
                      Multi <input type ="checkbox" id="multi" checked="true"> <br>
@@ -224,6 +225,7 @@ field{
                            <button type="button" title=" Each ue connects to its operator's strongest eNodeB " data-toggle="tooltip" class="btn btn-default" onclick="level0()">Level0</button>
                            <button type="button" class="btn btn-default" title="Each ue connects to strongest eNodeB" data-toggle="tooltip" onclick="level1()">Level1</button>
                            <button type="button" class="btn btn-default" title="Shows CDF plots of system" data-toggle="tooltip" onclick="CDF()">CDF</button>
+                           <button type="button" class="btn btn-default" title="Disaster  Situation is created" data-toggle="tooltip" onclick="disaster()">Disaster</button>
                            <button type="button" class="btn btn-default" title="Emergency heatmap" data-toggle="tooltip" onclick="emergency()">Emergency</button>
                            <button type="button" class="btn btn-default" title="Post processing SINR heatmap" data-toggle="tooltip" onclick="sinrheatmap()">SINR Heatmap</button>
                          <br>  <br>Click UE to view SIR profile
@@ -317,7 +319,7 @@ field{
   var currselected=-1; //latest selected circle
   var wcount=0;//window number for cdf plot
   var wcount1=0;
-
+  var disas=0;//disaster is on or off
 
 var x = d3.scale.linear()
     .domain([-2200, (2300 )]) // changes range of values for x axis
@@ -1273,6 +1275,12 @@ ctx.font="30px Arial";//font and size of text
 ctx.fillText("CDF CURVES:",600,50);//heading
 ctx.fillText("OPERTYPE:",200,150);//heading
 ctx.fillText("Inter Cancellers",500,150);//heading
+ctx.fillText("Disaster",820,150);//heading
+if(disas==1)
+ ctx.fillText("ON",940,150);
+else
+ ctx.fillText("OFF",940,150);
+
 ctx.fillText(document.getElementById("FR").value,820,50);
 ctx.fillText(opertype(),380,150);
 ctx.fillText(document.getElementById("topx").value,720,150);
@@ -1520,7 +1528,7 @@ $.post("http://localhost:8080/update",JSON.stringify(BackObj),onsuccess,"json");
 }
 function emergency(){
 
-BackObj={perf:"emer"};
+BackObj={perf:"emer",level:level,intcnc:parseInt(document.getElementById("topx").value),frmode:document.getElementById("FR").value,optype:opertype()};
  console.log(JSON.stringify(BackObj));
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),heatmap,"json");//getting from server
@@ -1536,7 +1544,7 @@ console.log(obj,"is recieved");
 else{
       //UE id starts from UE0
       var color = d3.scale.linear()
-            .domain([-100, -60, -35, -10, 15, 100]) //domain of value  corresponding to colour
+            .domain([-100, -40, -30, -20, 0, 100]) //domain of value  corresponding to colour
             .range(['#000000', '#FF0000', '#FFA500', '#FFA5A5', '#A5FFFF', '#FFFFFF']);
             // .range(['#000000', '#000000', '#FF0000', '#FFA500', '#FFFF00', '#FFFF00']);//colour to go change value ('#FF3000','#0030FF')
       str1="#UE";
@@ -1584,7 +1592,11 @@ else{
          {
           str2=str1+(i).toString();//UE id starts from UE0 for sectoring
           //obj.data.post[i] is a value for which corresponding colour is given,change below linear
+        
+        //to make inactive
+        //  d3.select(str2).classed('inactive',false);
           d3.select(str2).style("fill",color(obj.data.post[i]));
+
         }
   }
   if(opertype()=="multi"){
@@ -1611,6 +1623,45 @@ function opertype(){
     return "multi"
    else
     return "single" 
+}
+
+function disaster(){
+  disas=1-disas;
+  BackObj={perf:"disaster",mode:disas};
+console.log(JSON.stringify(BackObj));
+
+document.getElementById("loader").style.display = "block";
+
+$.post("/update",JSON.stringify(BackObj),bsinactive,"json");
+}
+
+function bsinactive(obj){
+   console.log(obj);
+// OBJ=obj.data.opconn;
+if(checkerr(obj.status,obj.msg)<0)
+{
+ console.log("error");
+}
+else{
+
+
+
+str1="#BS";
+ for(i=0;i<obj.data.active.length;i++)
+   {
+    str2=str1+(i).toString();
+    if(obj.data.active[i]==1)
+    {
+       d3.select(str2).classed('inactive',true);
+    }
+    else{
+      d3.select(str2).classed('inactive',false);
+     }
+   
+   }
+
+  }
+  document.getElementById("loader").style.display = "none";
 }
     </script>
 
