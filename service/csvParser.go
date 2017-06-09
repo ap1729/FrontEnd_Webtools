@@ -18,14 +18,16 @@ import (
 func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 	file, err := os.Open(locFilePath)
 	if err != nil {
+		fmt.Println(err)
 		return false
 	}
 
 	defer file.Close()
-	
+
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
+		fmt.Println(err)
 		return false
 	}
 	// Temporary fix
@@ -39,17 +41,17 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 		}
 		nodeType := row[0][0:2]
 		//fmt.Println(nodeType)
-		
 
 		        op, err := strconv.ParseInt(string(row[3]), 10, 64)
 				if err != nil {
+					fmt.Println(err)
 					return false
 				}
                  //if not assigned any operator ,op 10 is error operator
 				if(op==-1){
 				 op=10
 				}
-				opId := uint(op) 
+				opId := uint(op)
         lvlbs0,err := strconv.ParseInt(string(row[4]),10,64)
         if err != nil {
         	fmt.Println(err)
@@ -61,16 +63,17 @@ func ReadNodes(sb *model.ScenarioBuilder, locFilePath string) bool {
 			return false
 		}
 
-
 		if !sb.OperatorExists(opId) {
 			sb.AddOperator(opId)
 		}
 		x, err := strconv.ParseFloat(row[1], 64)
 		if err != nil {
+			fmt.Println(err)
 			return false
 		}
 		y, err := strconv.ParseFloat(row[2], 64)
 		if err != nil {
+			fmt.Println(err)
 			return false
 		}
 		err2 := sb.AddNode(nodeType, x, y, 0, opId,lvlbs0,lvlbs1)

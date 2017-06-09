@@ -19,7 +19,7 @@ import (
 // Read CSV - "import"
 // Generate manually - "manual"
 const dataGenOpt = "import"
-const locFilePath = "data/NewNodelocations.csv"
+const locFilePath = "data/test_node_loc_mod.csv"
 const lossFilePath = "data/NewLoss.csv"
 
 // Package scope variables that encapsulate all required data
@@ -54,8 +54,11 @@ func initialize() bool {
 		}
 		// Time stamp 2
 		lap2 = time.Now()
+		fmt.Println("Add nodes done in", lap2.Sub(lap1))
+
 		// Import loss values into Scenario object
-		suc = service.ReadLossTable(sb, lossFilePath)
+		suc = sb.Seal("calc", nil)
+		// suc = service.ReadLossTable(sb, lossFilePath)
 		if suc == false {
 			// fmt.Printf("Error: %v", err)
 			return false
@@ -213,7 +216,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			 r.data, r.err = perf.AssignSingleOperator(scenario,hexMap,opEnable)//temp
 		    } else{
 		     r.data, r.err = perf.AssignSingleOperator(scenario,hexMap, opEnable)
-		    } 
+		    }
 
 
 		    */
@@ -243,7 +246,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Console feedback
 		fmt.Printf("\nUser requested to perform calculations of type \"%v\".\n", rxData["perf"])
-		fmt.Printf("\nAn error occured in perf:\n%v\n", err)
+		if err != nil{
+			fmt.Printf("\nAn error occured in perf:\n%v\n", err)
+		}
 		response = r
 
 	}

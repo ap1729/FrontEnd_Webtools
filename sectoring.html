@@ -165,7 +165,7 @@ field{
 
               <dl>
                 <dd class="legend">LEGEND</dd>
-                
+
                 <dd>Operator 1</dd>
                 <dt class="lime"></dt>
                 <dd>Operator 2</dd>
@@ -174,12 +174,12 @@ field{
                 <dt class="red"></dt>
                 <dd>Operator 4</dd>
                 <dt class="blue"></dt>
-                
+
                 <dd> UE(user) </dd>
                 <dt class="circle"></dt>
-                
+
                 <dd> eNodeB </dd>
-                <dt class="rect1"></dt> 
+                <dt class="rect1"></dt>
             </dl>
           <div class="loader" id="loader"></div>
           </div>
@@ -209,10 +209,10 @@ field{
                                 <option value="AFFR">AFFR</option>
                        </select>
                        <br>
-                    
+
                       Drag Enabled<input type="checkbox" id="dragcheck" >
                        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                     
+
                      <br>OPERATOR MODE <br>
                      <form id ="opertype">
                      Single <input type ="checkbox" id="single"> <br>
@@ -245,7 +245,7 @@ field{
      <div class="panel-body">
       <form id= "rate">
        Center Pre SINR Sum Rate<input id="centerPreRate" type="number" step="0.01" style="width:5%;">
-      Center Post SINR Sum Rate<input id="centerPostRate" type="number" step="0.01" style="width: 5%;"> -CENTER CELL <br> 
+      Center Post SINR Sum Rate<input id="centerPostRate" type="number" step="0.01" style="width: 5%;"> -CENTER CELL <br>
       Center Pre SINR Sum Rate1<input id="centerPreRate0" type="number" step="0.01" style="width:5%;">
       Center Post SINR Sum Rate1<input id="centerPostRate0" type="number" step="0.01" style="width: 5%;"> -OPERATOR 1<br>
       Center Pre SINR Sum Rate2<input id="centerPreRate1" type="number" step="0.01" style="width:5%;">
@@ -255,7 +255,7 @@ field{
       Center Pre SINR Sum Rate4<input id="centerPreRate3" type="number" step="0.01" style="width:5%;">
       Center Post SINR Sum Rate4<input id="centerPostRate3" type="number" step="0.01" style="width: 5%;">-OPERATOR 4<br>
       </form>
-     </div> 
+     </div>
      <div class="panel-body">
           <form id="putdata">
                 ROI <input id="LastSIR" type="number" step="0.01"  style="width: 5%;" >
@@ -441,21 +441,21 @@ function doPlot(obj) {
                         if(d.id%3==0)
                             return x(d.x);
                    else if(d.id%3==1)
-                            return x(d.x)+3.1;
+                            return x(d.x)+5.1;
                         else
-                           return x(d.x)-3;
+                           return x(d.x)-5;
                               })
             .attr("y",function(d,i){
                      if(d.id%3==0)
-                            return y(d.y)-5;
+                            return y(d.y)-9;
                    else if(d.id%3==1)
                             return y(d.y)+1;
                         else
                            return y(d.y)+1;
                            })  //this 3.5 is to make the point as center of rectangle
             .attr("class", "bs")
-            .attr("width",6)
-            .attr("height",6)
+            .attr("width",10)
+            .attr("height",10)
             .style("fill",function(d,i) {
                                         return bscolor[d.opid].color;
                                         } )
@@ -848,7 +848,7 @@ function zoomed() {
 
 function validoperator(){
   //function to say if it is single or multi operator
-  
+
   if ((document.getElementById("single").checked && document.getElementById("multi").checked) ||((   !document.getElementById("single").checked && !document.getElementById("multi").checked))){
    window.alert("Choose EXACTLY ONE opertype");
    }
@@ -864,7 +864,7 @@ BackObj={perf:"enop",optype:a};//params is to which level
 document.getElementById("loader").style.display = "block";
 $.post("/update",JSON.stringify(BackObj),onsuccess1,"json");//getting from server
  }
- 
+
 }
 
 
@@ -893,7 +893,7 @@ str1="#UE";
       d3.select(str2).classed('inactive',false);
     d3.select(str2).style("fill",opercolor[obj.data.opconn[i]].color);
      }
-   
+
    }
 
   }
@@ -1592,7 +1592,7 @@ else{
          {
           str2=str1+(i).toString();//UE id starts from UE0 for sectoring
           //obj.data.post[i] is a value for which corresponding colour is given,change below linear
-        
+
         //to make inactive
         //  d3.select(str2).classed('inactive',false);
           d3.select(str2).style("fill",color(obj.data.post[i]));
@@ -1622,7 +1622,7 @@ function opertype(){
   if (document.getElementById("multi").checked ==true)
     return "multi"
    else
-    return "single" 
+    return "single"
 }
 
 function disaster(){
@@ -1657,7 +1657,7 @@ str1="#BS";
     else{
       d3.select(str2).classed('inactive',false);
      }
-   
+
    }
 
   }

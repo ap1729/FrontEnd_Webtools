@@ -1,6 +1,6 @@
 package model
 import(
- //"fmt"
+ // "fmt"
 )
 // The ScenarioBuilder type is a robust and safe factory to create new scenarios.
 // It works by adding necessary node details and uses a "sealing" mechanism to prevent multiple references modifying data.
@@ -57,14 +57,14 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,
 		return false
 	}
 	if nodeType == "BS" {
-        
+
 		bs := NewBaseStation(sb.lastBsId, x, y, ht,op)
 		sb.lastBsId++
 		return sb.scenario.addBaseStation(bs)
 	}
 	if nodeType == "UE" {
 		//similarly for bs1
-      
+
   //if lvlbs0 =-1 ,then bs0 is nil
   //if lvlbs1 =-1 ,then bs1 is nil
 		bs0 := sb.scenario.GetStationByID(uint(lvlbs0))
@@ -116,8 +116,9 @@ func (sb *ScenarioBuilder) Seal(lossOpt string, lossTable [][]float64) bool {
 		for i := 0; i < M; i++ {
 			sb.scenario.lossTable[i] = make([]float64, N)
 			for j := 0; j < N; j++ {
-				sb.scenario.lossTable[i][j] = -1 * HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
-					sb.scenario.Users()[i].X(), sb.scenario.Users()[i].Y())
+				sb.scenario.lossTable[i][j] = -1
+				// sb.scenario.lossTable[i][j] = -1 * HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
+					// sb.scenario.Users()[i].X(), sb.scenario.Users()[i].Y())
 			}
 		}
 		goto successCase
