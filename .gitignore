@@ -12,3 +12,7 @@
 ehthumbs.db
 Thumbs.db
 *~
+
+# Ctags files #
+###############
+tags

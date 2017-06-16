@@ -9,7 +9,7 @@ type BaseStation struct {
 	ownerOp  *Operator
 	//which users are it connected to
 	ConnectedUsers []*User //which users are the bs connected to
-	Destroyed uint
+	Destroyed      uint
 }
 
 // Getter methods for all BaseStation properties that are not exported (read-only):
@@ -41,5 +41,5 @@ func (bs *BaseStation) OwnerOp() *Operator {
 
 // Constructor to instantiate a BaseStation. The constructor must be used to create new objects as all properties are read-only.
 func NewBaseStation(id uint, x, y, ht float64, op *Operator) *BaseStation {
-	return &BaseStation{id: id, x: x, y: y, ht: ht, ownerOp: op,Destroyed:0}
+	return &BaseStation{id: id, x: x, y: y, ht: ht, ownerOp: op, Destroyed: 0}
 }

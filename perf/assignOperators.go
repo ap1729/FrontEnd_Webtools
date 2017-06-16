@@ -4,54 +4,41 @@ import (
 	"FrontEnd_WebTools/model"
 	"FrontEnd_WebTools/service"
 	"errors"
-	"math/rand"
 	"fmt"
+	"math/rand"
 )
 
-
-func NewAssignOperators(sc *model.Scenario, optype string) (map[string]interface{}, error){
-// Handling argument nil exception
-	if sc == nil  {
+func NewAssignOperators(sc *model.Scenario, optype string) (map[string]interface{}, error) {
+	// Handling argument nil exception
+	if sc == nil {
 		return nil, errors.New(ARG_NIL)
 	}
-//newOps is Operator Id's to return to frontend
+	//newOps is Operator Id's to return to frontend
 	newOps := make([]uint, len(sc.Users()))
-  
-  //making all basestations connections as null
+
+	//making all basestations connections as null
 	/*
- for i:=0;i<len(sc.BaseStations());i++{
- 	sc.BaseStations()[i].ConnectedUsers=[]
- } 
-*/
-for i := 0; i < len(sc.Users()); i++ {
-  if sc.Users()[i].BS0()!=nil{
-  sc.Users()[i].ConnectedBs=sc.Users()[i].BS0()//connecting bs to ue
-  sc.Users()[i].CurrOp= sc.Users()[i].BS0().OwnerOp()//finding currop
-  sc.Users()[i].BS0().ConnectedUsers=append(sc.Users()[i].BS0().ConnectedUsers,sc.Users()[i])//attaching users to basestation
-  newOps[i]=sc.Users()[i].BS0().OwnerOp().ID()//setting newOps
+	 for i:=0;i<len(sc.BaseStations());i++{
+	 	sc.BaseStations()[i].ConnectedUsers=[]
+	 }
+	*/
+	for i := 0; i < len(sc.Users()); i++ {
+		if sc.Users()[i].BS0() != nil {
+			sc.Users()[i].ConnectedBs = sc.Users()[i].BS0()                                                //connecting bs to ue
+			sc.Users()[i].CurrOp = sc.Users()[i].BS0().OwnerOp()                                           //finding currop
+			sc.Users()[i].BS0().ConnectedUsers = append(sc.Users()[i].BS0().ConnectedUsers, sc.Users()[i]) //attaching users to basestation
+			newOps[i] = sc.Users()[i].BS0().OwnerOp().ID()                                                 //setting newOps
 
-   }else{
-   	//not assigned to any operator
-   	newOps[i]=10 
-   }
-}  
+		} else {
+			//not assigned to any operator
+			newOps[i] = 10
+		}
+	}
 
-
-
-
- returnData := map[string]interface{}{}
+	returnData := map[string]interface{}{}
 	returnData["opconn"] = newOps
-	return returnData, nil	
+	return returnData, nil
 }
-
-
-
-
-
-
-
-
-
 
 // Change the registered operator of each user, based on the enabled operators as specified
 // by the flags.
@@ -97,7 +84,6 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}
 	return returnData, nil
 }
 
-
 //below function for new assigning of single operator case
 //Take each cell's users(approx 200)
 //divide into 4 parts of 50 each
@@ -105,152 +91,141 @@ func AssignOperators(sc *model.Scenario, enFlags []bool) (map[string]interface{}
 //to each group of 50 assign one operator and connect top10 to each sector
 ///leave 20 in each group as vacant
 
+func AssignSingleOperator(sc *model.Scenario, hexMap *service.HexMap, optype string) (map[string]interface{}, error) {
+	//Single Operator Assigning is different
 
-
-func AssignSingleOperator(sc *model.Scenario,hexMap *service.HexMap, optype string) (map[string]interface{}, error) {
- //Single Operator Assigning is different
-
- // Handling argument nil exception
-	if sc == nil  {
+	// Handling argument nil exception
+	if sc == nil {
 		return nil, errors.New(ARG_NIL)
 	}
 
-  
- fmt.Println("OPER TYPE",optype)
+	fmt.Println("OPER TYPE", optype)
 
- newOps := make([]uint, len(sc.Users()))
+	newOps := make([]uint, len(sc.Users()))
 
-for i := 0; i < len(sc.Users()); i++ {
- newOps[i]=10;
- sc.Users()[i].CurrOp = model.NewOperator(uint(10)) //default operator is 10
-}	
+	for i := 0; i < len(sc.Users()); i++ {
+		newOps[i] = 10
+		sc.Users()[i].CurrOp = model.NewOperator(uint(10)) //default operator is 10
+	}
 
+	var flag uint
+	var total uint
+	total = 0
+	var ASSIGNED = []float64{}
+	var usersPerBS uint
+	for i := 0; i < 19; i++ {
+		//for each hexagon
+		fmt.Println("HEXAGON ", i)
+		ue := hexMap.FindContainedUsers(uint(i))
+		bs := hexMap.FindContainedStations(uint(i))
 
-var flag uint
-var total uint
-total=0
-var ASSIGNED =[]float64{}
-var usersPerBS uint
-for i:=0;i<19;i++{
-	//for each hexagon
-   fmt.Println("HEXAGON ",i)
-   ue:=hexMap.FindContainedUsers(uint(i))
-   bs:=hexMap.FindContainedStations(uint(i))
+		//ue's and bs in that cell are got
+		//bs should be 12 in number
 
-   //ue's and bs in that cell are got
-   //bs should be 12 in number
-   
-   usersPerBS =uint(len(ue)/4)
- //number of users associated to each basestation .approx 50
+		usersPerBS = uint(len(ue) / 4)
+		//number of users associated to each basestation .approx 50
 
-   for j:=0;j<4;j++{
-   	//going by operator ,each sector has at max 10
-     	//var assigned = []uint{}
-   	     for t:=0;t<3;t++{
-   		//for each sector
-   		     var losses = []float64{} //to have losses for that basestation
-   		
-   	//	     fmt.Println("        BASESTaTION:",bs[3*j+t].ID(),"OPER",bs[3*j+t].OwnerOp().ID())
-    //          fmt.Println("UE")
-   	       for k:=j*int(usersPerBS);k<(j+1)*int(usersPerBS);k++{
-                 losses=append(losses,sc.Loss(uint(ue[k].ID()),uint(bs[3*j+t].ID())))
-            //     fmt.Println(ue[k].ID()) //id's of users concerned with this bs
-   	                 }
+		for j := 0; j < 4; j++ {
+			//going by operator ,each sector has at max 10
+			//var assigned = []uint{}
+			for t := 0; t < 3; t++ {
+				//for each sector
+				var losses = []float64{} //to have losses for that basestation
 
+				//	     fmt.Println("        BASESTaTION:",bs[3*j+t].ID(),"OPER",bs[3*j+t].OwnerOp().ID())
+				//          fmt.Println("UE")
+				for k := j * int(usersPerBS); k < (j+1)*int(usersPerBS); k++ {
+					losses = append(losses, sc.Loss(uint(ue[k].ID()), uint(bs[3*j+t].ID())))
+					//     fmt.Println(ue[k].ID()) //id's of users concerned with this bs
+				}
 
-   	   //losses is now got for all 50 users assigned to that operator 
+				//losses is now got for all 50 users assigned to that operator
 
-        losses,ind := sort(losses)
-        ind1 := make([]uint, len(ind))
-        
-        for l:=0;l<len(ind);l++{
-        	//ind[l]=ue[l+int(j*int(usersPerBS))].ID()
-        	ind1[l]=ue[j*int(usersPerBS)+int(ind[l])].ID()
-        }  
-         //ind1 has ue id's 
-fmt.Println(ind1)
+				losses, ind := sort(losses)
+				ind1 := make([]uint, len(ind))
 
-     var count uint  
-     count=0
-     for b:=0;b<len(ind1);b++{
-       flag=0
-      //checking if already assigned
-		      for k:=0;k<len(ASSIGNED);k++{
-		          if ASSIGNED[k]==float64(ind1[b]){
-		        //  	   fmt.Println("Denied",ASSIGNED[k],"connected to",sc.Users()[int(ASSIGNED[k])].ConnectedBs.ID())
-		          	   flag=1
-		             	break
-		              } 
-		          } 
-		       if flag==0{
-             //assigning now
-		       	   // fmt.Println("ASSIGNED")
-		       	    count+=1
-		       	    total+=1
-		       	    ASSIGNED=append(ASSIGNED,float64(ind1[b]))	
-			     	sc.Users()[ind1[b]].CurrOp = bs[3*j+t].OwnerOp()
-			     	sc.Users()[ind1[b]].ConnectedBs = bs[3*j+t]
-			     	bs[3*j+t].ConnectedUsers=append(bs[3*j+t].ConnectedUsers,sc.Users()[ind1[b]])
-				   // assigned=append(assigned,ind1[b]) 
-				    newOps[ind1[b]] = sc.Users()[ind1[b]].CurrOp.ID()
-		       }
-		       if count==10{
-		       	break
-		       }
-       }  //b loop
-   	 }//t loop ,i.e sectors of bs
-   }//j loop bs
+				for l := 0; l < len(ind); l++ {
+					//ind[l]=ue[l+int(j*int(usersPerBS))].ID()
+					ind1[l] = ue[j*int(usersPerBS)+int(ind[l])].ID()
+				}
+				//ind1 has ue id's
+				fmt.Println(ind1)
 
-   
-}//each hexagon
+				var count uint
+				count = 0
+				for b := 0; b < len(ind1); b++ {
+					flag = 0
+					//checking if already assigned
+					for k := 0; k < len(ASSIGNED); k++ {
+						if ASSIGNED[k] == float64(ind1[b]) {
+							//  	   fmt.Println("Denied",ASSIGNED[k],"connected to",sc.Users()[int(ASSIGNED[k])].ConnectedBs.ID())
+							flag = 1
+							break
+						}
+					}
+					if flag == 0 {
+						//assigning now
+						// fmt.Println("ASSIGNED")
+						count += 1
+						total += 1
+						ASSIGNED = append(ASSIGNED, float64(ind1[b]))
+						sc.Users()[ind1[b]].CurrOp = bs[3*j+t].OwnerOp()
+						sc.Users()[ind1[b]].ConnectedBs = bs[3*j+t]
+						bs[3*j+t].ConnectedUsers = append(bs[3*j+t].ConnectedUsers, sc.Users()[ind1[b]])
+						// assigned=append(assigned,ind1[b])
+						newOps[ind1[b]] = sc.Users()[ind1[b]].CurrOp.ID()
+					}
+					if count == 10 {
+						break
+					}
+				} //b loop
+			} //t loop ,i.e sectors of bs
+		} //j loop bs
 
+	} //each hexagon
 
+	fmt.Println("TOTAL", total)
 
-fmt.Println("TOTAL",total)
+	for i := 0; i < 228; i++ {
+		fmt.Println("BS", i, " ", len(sc.BaseStations()[i].ConnectedUsers))
+	}
 
-for i:=0;i<228;i++{
-	fmt.Println("BS",i," ",len(sc.BaseStations()[i].ConnectedUsers))
-}
+	/*
+	   for i := 0; i < len(sc.BaseStations()); i++ {
+	   	var losses = []float64{} //to have losses for that basestation
+	       for j:=0;j<len(sc.Users());j++{
+	         losses=append(losses,sc.Loss(uint(j),uint(i)))
+	       }
+	       losses,ind := sort(losses)
+	      fmt.Println(ind[0:10])
+	      //Assigning top 10 connected to each basestation
+	      var count uint
+	      count=0
+	      for j:=0;j<len(sc.Users());j++{
+	         flag=0
+	         //checking if already assigned
+	         for k:=0;k<len(assigned);k++{
+	             if assigned[k]==ind[j]{
+	             	   flag=1
+	                	break
+	                 }
+	             }
+	             if flag==0{
+	                       count+=1
+	   			     	sc.Users()[ind[j]].CurrOp = sc.GetStationByID(uint(i)).OwnerOp()
+	   				    assigned=append(assigned,ind[j])
+	   				    newOps[ind[j]] = sc.Users()[ind[j]].CurrOp.ID()
+	   				    //to check if 10 have been assigned
+	               }
+	           if count==10{
+	           	break
+	           }
+	       }
+	   //the ue's not assigned to any bs have to be assigned a null operator
+	   }
+	*/
 
-
-/*
-for i := 0; i < len(sc.BaseStations()); i++ {
-	var losses = []float64{} //to have losses for that basestation
-    for j:=0;j<len(sc.Users());j++{
-      losses=append(losses,sc.Loss(uint(j),uint(i)))
-    }	
-    losses,ind := sort(losses)
-   fmt.Println(ind[0:10])
-   //Assigning top 10 connected to each basestation
-   var count uint
-   count=0
-   for j:=0;j<len(sc.Users());j++{
-      flag=0
-      //checking if already assigned
-      for k:=0;k<len(assigned);k++{
-          if assigned[k]==ind[j]{
-          	   flag=1
-             	break
-              } 
-          } 
-          if flag==0{
-                    count+=1
-			     	sc.Users()[ind[j]].CurrOp = sc.GetStationByID(uint(i)).OwnerOp()
-				    assigned=append(assigned,ind[j])
-				    newOps[ind[j]] = sc.Users()[ind[j]].CurrOp.ID()
-				    //to check if 10 have been assigned				   
-            }
-        if count==10{
-        	break
-        }
-    }
-//the ue's not assigned to any bs have to be assigned a null operator
-}
-*/
-
-    returnData := map[string]interface{}{}
-    returnData["opconn"] = newOps
+	returnData := map[string]interface{}{}
+	returnData["opconn"] = newOps
 	return returnData, nil
 }
-
-

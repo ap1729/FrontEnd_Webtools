@@ -1,7 +1,9 @@
 package model
-import(
- // "fmt"
-)
+
+// import (
+//  "fmt"
+// )
+
 // The ScenarioBuilder type is a robust and safe factory to create new scenarios.
 // It works by adding necessary node details and uses a "sealing" mechanism to prevent multiple references modifying data.
 //
@@ -47,7 +49,7 @@ func (sb *ScenarioBuilder) AddOperator(opID uint) bool {
 // Adds a node with the specified parameters. This function can only be used if the ScenarioBuilder is not sealed.
 //
 // NodeType specifies the type of node - "BS" and "UE" are supported.
-func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,lvlbs0 int64,lvlbs1 int64) bool {
+func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint, lvlbs0 int64, lvlbs1 int64) bool {
 	if *sb.isSealed == true {
 		return false
 	}
@@ -58,18 +60,18 @@ func (sb *ScenarioBuilder) AddNode(nodeType string, x, y, ht float64, opID uint,
 	}
 	if nodeType == "BS" {
 
-		bs := NewBaseStation(sb.lastBsId, x, y, ht,op)
+		bs := NewBaseStation(sb.lastBsId, x, y, ht, op)
 		sb.lastBsId++
 		return sb.scenario.addBaseStation(bs)
 	}
 	if nodeType == "UE" {
 		//similarly for bs1
 
-  //if lvlbs0 =-1 ,then bs0 is nil
-  //if lvlbs1 =-1 ,then bs1 is nil
+		//if lvlbs0 =-1 ,then bs0 is nil
+		//if lvlbs1 =-1 ,then bs1 is nil
 		bs0 := sb.scenario.GetStationByID(uint(lvlbs0))
 		bs1 := sb.scenario.GetStationByID(uint(lvlbs1))
-		ue := NewUser(sb.lastUeId, x, y, ht, op,bs0,bs1)
+		ue := NewUser(sb.lastUeId, x, y, ht, op, bs0, bs1)
 		sb.lastUeId++
 		return sb.scenario.addUser(ue)
 	}
@@ -116,9 +118,8 @@ func (sb *ScenarioBuilder) Seal(lossOpt string, lossTable [][]float64) bool {
 		for i := 0; i < M; i++ {
 			sb.scenario.lossTable[i] = make([]float64, N)
 			for j := 0; j < N; j++ {
-				sb.scenario.lossTable[i][j] = -1
-				// sb.scenario.lossTable[i][j] = -1 * HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
-					// sb.scenario.Users()[i].X(), sb.scenario.Users()[i].Y())
+				sb.scenario.lossTable[i][j] = -1 * HataLoss(sb.scenario.BaseStations()[j].X(), sb.scenario.BaseStations()[j].Y(),
+					sb.scenario.Users()[i].X(), sb.scenario.Users()[i].Y())
 			}
 		}
 		goto successCase

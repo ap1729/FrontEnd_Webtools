@@ -1,18 +1,20 @@
 package model
-import(
+
+import (
 //"fmt"
 )
+
 // User is a taggable structure that stores location, operator and other properties.
 type User struct {
 	id        uint
 	x, y, ht  float64
 	defaultOp *Operator
-    bs0 *BaseStation //basestation in level0
-    bs1 *BaseStation //basestation in level1
+	bs0       *BaseStation //basestation in level0
+	bs1       *BaseStation //basestation in level1
 	// A public property for setting the current operator. This property has no internal implications,
 	// it is present as for convenience and encapsulation.
-	ConnectedBs *BaseStation //basestation it is connected to 
-	CurrOp *Operator
+	ConnectedBs *BaseStation //basestation it is connected to
+	CurrOp      *Operator
 }
 
 // Getter methods for all User properties that are not exported (read-only).
@@ -53,10 +55,10 @@ func (ue *User) BS1() *BaseStation {
 }
 
 // Constructor to instantiate a User. The constructor must be used to create new objects as all properties are read-only.
-func NewUser(id uint, x, y, ht float64, op *Operator,bs0 *BaseStation,bs1 *BaseStation) *User {
-	if(bs0==nil){
-	  return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op}
-	}else{
-	return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op,bs0: bs0,bs1: bs1}
-   }
+func NewUser(id uint, x, y, ht float64, op *Operator, bs0 *BaseStation, bs1 *BaseStation) *User {
+	if bs0 == nil {
+		return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op}
+	} else {
+		return &User{id: id, x: x, y: y, ht: ht, defaultOp: op, CurrOp: op, bs0: bs0, bs1: bs1}
+	}
 }
